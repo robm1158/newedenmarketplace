@@ -8,22 +8,29 @@ import itemPrices
 from ItemIdEnum import item
 from RegionIdEnum import region
 
+class pushData:
+    def __init__(self) -> None:
+        self.dynamodb = boto3.resource('dynamodb')
+        self.newTable = CreateNewTable()
 
-def getItemsPriceHistory(type_id: int,region_id: int) -> Dict:
-    response = requests.get(f"https://esi.evetech.net/latest/markets/{region_id}/history/?datasource=tranquility&type_id={type_id}")
-    return json.dumps(response.json())
+    def pushPriceHistoryToDynamo(self,tableName: str)->None:
+        response = self.newTable.createPriceHistoryTable(tableName)
+        print(response)
+        if response == 200:
+            print(f'Create new table {tableName}')
+            table = self.dynamodb.Table(tableName)
+            jsonstuff = itemPrices.getItemsPriceHistory(item[tableName].value,region.THE_FORGE.value)
+            jsondata = json.loads(jsonstuff, parse_float=Decimal)
+            for myDict in jsondata:
+                # print(myDict)
+                table.put_item(Item = myDict)
+        else:
+            print("Just update the table")
+            table = self.dynamodb.Table(tableName)
+            jsonstuff = itemPrices.getItemsPriceHistory(item[tableName].value,region.THE_FORGE.value)
+            jsondata = json.loads(jsonstuff, parse_float=Decimal)
+            for myDict in jsondata:
+                # print(myDict)
+                table.put_item(Item = myDict)
+        print(f'Finished pushing the {tableName} table')
 
-dynamodb = boto3.resource('dynamodb','us-east-1')
-print(item.TRITANIUM.value)
-newTable = CreateNewTable()
-newTable.createPriceHistoryTable("TRITANIUM","TRITANIUM")
-# table = dynamodb.Table("TRITANIUM")
-# jsonstuff = getItemsPriceHistory(item.TRITANIUM.value,region.THE_FORGE.value)
-# jsondata = json.loads(jsonstuff, parse_float=Decimal)
-# def pushPriceHistoryToDynamo():
-
-# for myDict in jsondata:
-# #     print(myDict)
-#     # myDict.update({'TRITANIUM':34})
-#     # print(myDict)
-#     table.put_item(Item = myDict)
