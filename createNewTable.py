@@ -1,4 +1,5 @@
 import boto3
+from botocore.exceptions import ClientError
 import json
 import requests
 import typing
@@ -30,6 +31,8 @@ class CreateNewTable:
                 }
             )
             print(response)
-        except Exception as err:
-            print(f'{err}')
-            # print(f'{tableName} Table already created')
+        except ClientError  as err:
+            if err.response['ResponseMetadata']['HTTPStatusCode'] == 400:
+                print(f"{err.response['message']} Table already created")
+            else:
+                print(f"{err.response['message']} Table already created")
