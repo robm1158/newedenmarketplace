@@ -19,6 +19,8 @@ class pushData:
         if response == 200:
             print(f'Create new table {tableName}')
             table = self.dynamodb.Table(tableName)
+            table.wait_until_exists()
+            print("Done waiting")
             jsonstuff = itemPrices.getItemsPriceHistory(item[tableName].value,region.THE_FORGE.value)
             jsondata = json.loads(jsonstuff, parse_float=Decimal)
             for myDict in jsondata:
