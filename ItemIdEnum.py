@@ -1,21 +1,21 @@
 from enum import Enum
 
 class item(Enum):
-    PLAGIOCLASE = 18
-    SPODUMAIN = 19
-    KERNITE = 20
-    HEDBERGITE = 21
-    ARKONOR = 22
-    TRITANIUM = 34
-    PYERITE = 35
-    MEXALLON = 36
-    ISOGEN = 37
-    NOCXIUM	= 38
-    ZYDRINE	= 39
-    MEGACYTE = 40
-    GARBAGE	= 41
-    SPICED_WINE	= 42
-    ANTIBIOTICS = 43
+    # PLAGIOCLASE = 18
+    # SPODUMAIN = 19
+    # KERNITE = 20
+    # HEDBERGITE = 21
+    # ARKONOR = 22
+    # TRITANIUM = 34
+    # PYERITE = 35
+    # MEXALLON = 36
+    # ISOGEN = 37
+    # NOCXIUM	= 38
+    # ZYDRINE	= 39
+    # MEGACYTE = 40
+    # GARBAGE	= 41
+    # SPICED_WINE	= 42
+    # ANTIBIOTICS = 43
     ENRICHED_URANIUM = 44
     FROZEN_PLANT_SEEDS = 45
     CARBONIZED_LEAD_S = 178
