@@ -9,7 +9,7 @@ class CreateNewTable:
     def __init__(self) -> None:
         self.dynamodb = boto3.resource('dynamodb')
     
-    def createPriceHistoryTable(self, tableName: str, idName: str) -> None:
+    def createPriceHistoryTable(self, tableName: str) -> int:
         try:
             response = self.dynamodb.create_table(
                 TableName=tableName,
@@ -30,9 +30,11 @@ class CreateNewTable:
                     'WriteCapacityUnits': 10
                 }
             )
-            print(response)
+            print("[createNewTable]: New table created")
+            return 200
         except ClientError  as err:
             if err.response['ResponseMetadata']['HTTPStatusCode'] == 400:
-                print(f"{err.response['message']} Table already created")
+                print(f"[createNewTable]: {err.response['message']} Table already created")
             else:
-                print(f"{err.response['message']} Table already created")
+                print(f"[createNewTable]: {err.response['message']}")
+            return err.response['ResponseMetadata']['HTTPStatusCode']
