@@ -4,6 +4,7 @@ import json
 import requests
 import typing
 from decimal import Decimal
+import logging
 
 class CreateNewTable:
     def __init__(self) -> None:
@@ -26,21 +27,20 @@ class CreateNewTable:
                     }
                 ],
                 ProvisionedThroughput={
-                    'ReadCapacityUnits': 1,
-                    'WriteCapacityUnits': 50
+                    'ReadCapacityUnits': 10,
+                    'WriteCapacityUnits': 10
                 }
             )
-            print("[createNewTable]: New table created")
+            logging.info("[createPriceHistoryTable]: New table created")
             return 200
         except ClientError  as err:
-            if err.response['ResponseMetadata']['HTTPStatusCode'] == 400:
-                print(f"[createNewTable]: {err.response['message']} Table already created")
-            else:
-                print(f"[createNewTable]: {err.response['message']}")
-            pass
+            logging.warning(f"[createPriceHistoryTable]: {err.response['message']} : Status: {err.response['ResponseMetadata']['HTTPStatusCode']}")
+            # pass
             return err.response['ResponseMetadata']['HTTPStatusCode']
+
             
     def createItemOrderTable(self, tableName: str) -> int:
+        response = None
         try:
             response = self.dynamodb.create_table(
                 TableName=tableName,
@@ -69,12 +69,9 @@ class CreateNewTable:
                     'WriteCapacityUnits': 10
                 }
             )
-            print(f'[createNewTable]: New table {tableName} created')
+            logging.info(f'[createItemOrderTable]: New table {tableName}_ORDERS created')
             return 200
         except ClientError  as err:
-            if err.response['ResponseMetadata']['HTTPStatusCode'] == 400:
-                print(f"[createNewTable]: {err.response['message']} Table already created")
-            else:
-                print(f"[createNewTable]: Error msg {err.response['message']}")
+            logging.warning(f"[createItemOrderTable]: {err.response['message']} : Status: {err.response['ResponseMetadata']['HTTPStatusCode']}")
             pass
             return err.response['ResponseMetadata']['HTTPStatusCode']
