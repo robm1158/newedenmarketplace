@@ -4,6 +4,8 @@ import requests
 import json
 from ItemIdEnum import item
 from RegionIdEnum import region
+from decimal import Decimal
+
 
 
 def getItemsPriceHistory(type_id: int,region_id: int) -> Dict:
@@ -23,8 +25,4 @@ def getRegionOrderIds(region_id: int) -> list:
         response = requests.get(f"https://esi.evetech.net/latest/markets/{region_id}/types/?datasource=tranquility&page={pageNum}")
         idList.append(response.json())
         pageNum+=1
-        # print(pageNum)
-        # print(len(idList))
     return idList
-# print(getRegionOrderIds(region.THE_FORGE.value))
-# print(region.THE_FORGE.value)
