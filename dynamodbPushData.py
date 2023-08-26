@@ -7,6 +7,7 @@ from createNewTable import CreateNewTable
 import itemPrices
 from ItemIdEnum import item
 from RegionIdEnum import region
+import logging
 
 class pushData:
     def __init__(self) -> None:
@@ -15,57 +16,53 @@ class pushData:
 
     def pushPriceHistoryToDynamo(self,tableName: str)->None:
         response = self.newTable.createPriceHistoryTable(tableName)
-        print(response)
         if response == 200:
-            print(f'Create new table {tableName}')
+            logging.info(f'Create new table {tableName}')
             table = self.dynamodb.Table(tableName)
             table.wait_until_exists()
-            print("Done waiting")
+            logging.info("Done waiting")
             itemjson = itemPrices.getItemsPriceHistory(item[tableName].value,region.THE_FORGE.value)
             jsondata = json.loads(itemjson, parse_float=Decimal)
             with table.batch_writer() as batch:
                 for myDict in jsondata:
-                    print(myDict)
                     response = batch.put_item(Item = myDict)
+
         else:
-            print("Just update the table")
+            logging.info("[pushPriceHistoryToDynamo] Just update the table")
             table = self.dynamodb.Table(tableName)
             itemjson = itemPrices.getItemsPriceHistory(item[tableName].value,region.THE_FORGE.value)
             jsondata = json.loads(itemjson, parse_float=Decimal)
             with table.batch_writer() as batch:
                 for myDict in jsondata:
-                    print(myDict)
                     response = batch.put_item(Item = myDict)
-        print(f'Finished pushing the {tableName} table')
+
+        logging.info(f'[pushPriceHistoryToDynamo] Finished pushing the {tableName} table')
+        logging.info(f'[pushPriceHistoryToDynamo] Response code {response}')
 
     def pushItemOrdersToDynamo(self,tableName: str)->None:
         stringName = tableName+"_ORDERS"
         response = self.newTable.createItemOrderTable(stringName)
+        print(stringName)
         print(response)
         if response == 200:
-            print(f'Create new table {stringName}')
+            logging.info(f'[pushItemOrdersToDynamo] Create new table {stringName}')
             table = self.dynamodb.Table(stringName)
             table.wait_until_exists()
-            print("Done waiting")
+            logging.info("Done waiting")
             itemjson = itemPrices.getAllItemOrderHistory(item[tableName].value,region.THE_FORGE.value)
             jsondata = json.loads(itemjson, parse_float=Decimal)
-            try:
-                with table.batch_writer() as batch:
-                    for myDict in jsondata:
-                        response = batch.put_item(Item = myDict)
-   
-            except Exception as e:
-                print(f"An exception occurred: {e}, {e.args}")
+            with table.batch_writer() as batch:
+                for myDict in jsondata:
+                    response = batch.put_item(Item = myDict)
         else:
-            print("Just update the table")
-            table = self.dynamodb.Table(tableName)
+            logging.info("Just update the table")
+            table = self.dynamodb.Table(stringName)
             itemjson = itemPrices.getAllItemOrderHistory(item[tableName].value,region.THE_FORGE.value)
             jsondata = json.loads(itemjson, parse_float=Decimal)
-            try:
-                with table.batch_writer() as batch:
-                    for myDict in jsondata:
-                        response = batch.put_item(Item = myDict)
+            with table.batch_writer() as batch:
+                for myDict in jsondata:
+                    response = batch.put_item(Item = myDict)
 
-            except Exception as e:
-                print(f"An exception occurred: {e}, {e.args}")
-        print(f'Finished pushing the {tableName}_ORDERS table')
+
+        logging.info(f'[pushItemOrdersToDynamo] Finished pushing the {tableName}_ORDERS table')
+        logging.info(f'[pushItemOrdersToDynamo] Response code {response}')
