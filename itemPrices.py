@@ -25,12 +25,4 @@ def getRegionOrderIds(region_id: int) -> list:
         response = requests.get(f"https://esi.evetech.net/latest/markets/{region_id}/types/?datasource=tranquility&page={pageNum}")
         idList.append(response.json())
         pageNum+=1
-        # print(pageNum)
-    # print(len(idList))
     return idList
-# print(getRegionOrderIds(region.THE_FORGE.value))
-# itemjson = getAllItemOrderHistory(item["PHASED_PLASMA_L"].value,region.THE_FORGE.value)
-# print(type(json.loads(itemjson, parse_float=Decimal)))
-# itemjson = getItemsPriceHistory(item["PHASED_PLASMA_L"].value,region.THE_FORGE.value)
-# jsondata = json.loads(itemjson, parse_float=Decimal)
-# print(type(jsondata))
