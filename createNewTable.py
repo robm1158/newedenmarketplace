@@ -37,6 +37,7 @@ class CreateNewTable:
                 print(f"[createNewTable]: {err.response['message']} Table already created")
             else:
                 print(f"[createNewTable]: {err.response['message']}")
+            pass
             return err.response['ResponseMetadata']['HTTPStatusCode']
             
     def createItemOrderTable(self, tableName: str) -> int:
@@ -75,4 +76,5 @@ class CreateNewTable:
                 print(f"[createNewTable]: {err.response['message']} Table already created")
             else:
                 print(f"[createNewTable]: Error msg {err.response['message']}")
+            pass
             return err.response['ResponseMetadata']['HTTPStatusCode']
