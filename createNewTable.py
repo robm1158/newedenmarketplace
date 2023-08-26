@@ -42,7 +42,7 @@ class CreateNewTable:
     def createItemOrderTable(self, tableName: str) -> int:
         try:
             response = self.dynamodb.create_table(
-                TableName=tableName+"_ORDERS",
+                TableName=tableName,
                 KeySchema=[
                     {
                         'AttributeName': 'issued', # It is called issued in the esi pull
@@ -64,8 +64,8 @@ class CreateNewTable:
                     }
                 ],
                 ProvisionedThroughput={
-                    'ReadCapacityUnits': 50,
-                    'WriteCapacityUnits': 50
+                    'ReadCapacityUnits': 10,
+                    'WriteCapacityUnits': 10
                 }
             )
             print(f'[createNewTable]: New table {tableName} created')
