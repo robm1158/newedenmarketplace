@@ -4,6 +4,8 @@ import requests
 import json
 from ItemIdEnum import item
 from RegionIdEnum import region
+from decimal import Decimal
+
 
 
 def getItemsPriceHistory(type_id: int,region_id: int) -> Dict:
@@ -24,7 +26,11 @@ def getRegionOrderIds(region_id: int) -> list:
         idList.append(response.json())
         pageNum+=1
         # print(pageNum)
-        # print(len(idList))
+    # print(len(idList))
     return idList
 # print(getRegionOrderIds(region.THE_FORGE.value))
-# print(region.THE_FORGE.value)
+# itemjson = getAllItemOrderHistory(item["PHASED_PLASMA_L"].value,region.THE_FORGE.value)
+# print(type(json.loads(itemjson, parse_float=Decimal)))
+# itemjson = getItemsPriceHistory(item["PHASED_PLASMA_L"].value,region.THE_FORGE.value)
+# jsondata = json.loads(itemjson, parse_float=Decimal)
+# print(type(jsondata))

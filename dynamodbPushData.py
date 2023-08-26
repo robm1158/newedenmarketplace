@@ -21,18 +21,44 @@ class pushData:
             table = self.dynamodb.Table(tableName)
             table.wait_until_exists()
             print("Done waiting")
-            jsonstuff = itemPrices.getItemsPriceHistory(item[tableName].value,region.THE_FORGE.value)
-            jsondata = json.loads(jsonstuff, parse_float=Decimal)
-            for myDict in jsondata:
-                # print(myDict)
-                table.put_item(Item = myDict)
+            itemjson = itemPrices.getItemsPriceHistory(item[tableName].value,region.THE_FORGE.value)
+            jsondata = json.loads(itemjson, parse_float=Decimal)
+            with table.batch_writer() as batch:
+                for myDict in jsondata:
+                    print(myDict)
+                    response = batch.put_item(Item = myDict)
         else:
             print("Just update the table")
             table = self.dynamodb.Table(tableName)
-            jsonstuff = itemPrices.getItemsPriceHistory(item[tableName].value,region.THE_FORGE.value)
-            jsondata = json.loads(jsonstuff, parse_float=Decimal)
-            for myDict in jsondata:
-                # print(myDict)
-                table.put_item(Item = myDict)
+            itemjson = itemPrices.getItemsPriceHistory(item[tableName].value,region.THE_FORGE.value)
+            jsondata = json.loads(itemjson, parse_float=Decimal)
+            with table.batch_writer() as batch:
+                for myDict in jsondata:
+                    print(myDict)
+                    response = batch.put_item(Item = myDict)
         print(f'Finished pushing the {tableName} table')
 
+    def pushItemOrdersToDynamo(self,tableName: str)->None:
+        response = self.newTable.createItemOrderTable(tableName)
+        print(response)
+        if response == 200:
+            print(f'Create new table {tableName}')
+            table = self.dynamodb.Table(tableName)
+            table.wait_until_exists()
+            print("Done waiting")
+            itemjson = itemPrices.getAllItemOrderHistory(item[tableName].value,region.THE_FORGE.value)
+            jsondata = json.loads(itemjson, parse_float=Decimal)
+            with table.batch_writer() as batch:
+                for myDict in jsondata:
+                    print(myDict)
+                    response = batch.put_item(Item = myDict)
+        else:
+            print("Just update the table")
+            table = self.dynamodb.Table(tableName)
+            itemjson = itemPrices.getAllItemOrderHistory(item[tableName].value,region.THE_FORGE.value)
+            jsondata = json.loads(itemjson, parse_float=Decimal)
+            with table.batch_writer() as batch:
+                for myDict in jsondata:
+                    print(myDict)
+                    response = batch.put_item(Item = myDict)
+        print(f'Finished pushing the {tableName} table')

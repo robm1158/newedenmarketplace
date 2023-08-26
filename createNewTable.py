@@ -42,10 +42,10 @@ class CreateNewTable:
     def createItemOrderTable(self, tableName: str) -> int:
         try:
             response = self.dynamodb.create_table(
-                TableName=tableName,
+                TableName=tableName+"_ORDERS",
                 KeySchema=[
                     {
-                        'AttributeName': 'date', # It is called issued in the esi pull
+                        'AttributeName': 'issued', # It is called issued in the esi pull
                         'KeyType': 'HASH'  # Hash Key
                     },
                     {
@@ -55,16 +55,16 @@ class CreateNewTable:
                 ],
                 AttributeDefinitions=[
                     {
-                        'AttributeName': 'date',
+                        'AttributeName': 'issued',
                         'AttributeType': 'S'  # string data type
                     },
                     {
                         'AttributeName': 'order_id',
-                        'AttributeType': 'N'  # string data type
+                        'AttributeType': 'N'  # number data type
                     }
                 ],
                 ProvisionedThroughput={
-                    'ReadCapacityUnits': 1,
+                    'ReadCapacityUnits': 50,
                     'WriteCapacityUnits': 50
                 }
             )
