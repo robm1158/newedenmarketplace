@@ -5,7 +5,8 @@ from decimal import Decimal
 
 
 async def getItemsPriceHistory(type_id: int, region_id: int) -> Dict:
-    async with aiohttp.ClientSession() as session:
+    connector = aiohttp.TCPConnector(limit_per_host=20)
+    async with aiohttp.ClientSession(connector=connector) as session:
         async with session.get(f"https://esi.evetech.net/latest/markets/{region_id}/history/?datasource=tranquility&type_id={type_id}") as response:
             data = await response.json()
             return json.dumps(data)
