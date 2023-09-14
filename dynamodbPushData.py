@@ -1,72 +1,52 @@
 import json
 import asyncio
 import aioboto3
-from concurrent.futures import ThreadPoolExecutor
 from createNewTable import CreateNewTable
 import itemPrices
 from ItemIdEnum import item
 from RegionIdEnum import region
 import logging
 from decimal import Decimal
-import aiohttp
-import botocore.config
 
-
-
-class pushData:
+class PushData:
     def __init__(self) -> None:
         self.session = aioboto3.Session()
-        
         self.newTable = CreateNewTable()
 
-    async def pushPriceHistoryToDynamo(self, tableName: str) -> None:
+    async def updateTable(self, table, table_name, item_id):
+        logging.info(f"Updating table {table_name}")
+        itemjson = await itemPrices.getItemsPriceHistory(item_id, region.THE_FORGE.value)
+        jsondata = json.loads(itemjson, parse_float=Decimal)
+
+        async with table.batch_writer() as batch:
+            for myDict in jsondata:
+                await batch.put_item(Item=myDict)
+
+    async def pushPriceHistoryToDynamo(self, table_name: str) -> None:
         async with self.session.resource('dynamodb') as dynamodb:
-            loop = asyncio.get_event_loop()
-            response = await loop.run_in_executor(None, self.newTable.createPriceHistoryTable, tableName)
+            response = await asyncio.to_thread(self.newTable.createPriceHistoryTable, table_name)
 
             if response == 200:
-                logging.info(f'Create new table {tableName}')
-                table = await dynamodb.Table(tableName)
+                logging.info(f'Creating new table {table_name}')
+                table = await dynamodb.Table(table_name)
                 await table.wait_until_exists()
-                logging.info("Done waiting")
-                itemjson = await itemPrices.getItemsPriceHistory(item[tableName].value, region.THE_FORGE.value)
-                jsondata = json.loads(itemjson, parse_float=Decimal)
-                async with table.batch_writer() as batch:
-                    for myDict in jsondata:
-                        await batch.put_item(Item=myDict)
             else:
-                logging.info("[pushPriceHistoryToDynamo] Just update the table")
-                table = await dynamodb.Table(tableName)
-                itemjson = await itemPrices.getItemsPriceHistory(item[tableName].value, region.THE_FORGE.value)
-                jsondata = json.loads(itemjson, parse_float=Decimal)
-                async with table.batch_writer() as batch:
-                    for myDict in jsondata:
-                        await batch.put_item(Item=myDict)
-            
-            logging.info(f'[pushPriceHistoryToDynamo] Finished pushing the {tableName} table')
+                table = await dynamodb.Table(table_name)
 
-    async def pushItemOrdersToDynamo(self, tableName: str) -> None:
-        loop = asyncio.get_event_loop()
-        stringName = tableName + "_ORDERS"
-        response = await loop.run_in_executor(None, self.newTable.createItemOrderTable, stringName)
+            await self.updateTable(table, table_name, item[table_name].value)
+            logging.info(f'Finished pushing the {table_name} table')
 
-        if response == 200:
-            logging.info(f'[pushItemOrdersToDynamo] Create new table {stringName}')
-            table = await self.dynamodb.Table(stringName)
-            await table.wait_until_exists()
-            logging.info("Done waiting")
-            itemjson = await itemPrices.getAllItemOrderHistory(item[tableName].value, region.THE_FORGE.value)
-            jsondata = json.loads(itemjson)
-            async with table.batch_writer() as batch:
-                for myDict in jsondata:
-                    await batch.put_item(Item=myDict)
-        else:
-            logging.info("Just update the table")
-            table = await self.dynamodb.Table(stringName)
-            itemjson = await itemPrices.getAllItemOrderHistory(item[tableName].value, region.THE_FORGE.value)
-            jsondata = json.loads(itemjson)
-            async with table.batch_writer() as batch:
-                for myDict in jsondata:
-                    await batch.put_item(Item=myDict)
-        
-        logging.info(f'[pushItemOrdersToDynamo] Finished pushing the {tableName}_ORDERS table')
+    async def pushItemOrdersToDynamo(self, table_name: str) -> None:
+        string_name = f"{table_name}_ORDERS"
+        response = await asyncio.to_thread(self.newTable.createItemOrderTable, string_name)
+
+        async with self.session.resource('dynamodb') as dynamodb:
+            if response == 200:
+                logging.info(f'Creating new table {string_name}')
+                table = await dynamodb.Table(string_name)
+                await table.wait_until_exists()
+            else:
+                table = await dynamodb.Table(string_name)
+
+            await self.updateTable(table, string_name, item[table_name].value)
+            logging.info(f'Finished pushing the {string_name} table')

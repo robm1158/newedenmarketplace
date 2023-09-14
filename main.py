@@ -19,7 +19,7 @@ async def main2():
     print(results)
 
 async def main():
-    manager =  dynamodbPushData.pushData()
+    manager =  dynamodbPushData.PushData()
     
     table_names = list(ItemIdEnum.item)
 
