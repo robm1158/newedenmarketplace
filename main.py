@@ -24,13 +24,14 @@ async def main():
     table_names = list(ItemIdEnum.item)
 
     # Run pushPriceHistoryToDynamo concurrently for all table names
-    await asyncio.gather(*(manager.pushPriceHistoryToDynamo(str(table_name.name)) for table_name in table_names))
+    await asyncio.gather(*(manager.pushItemOrdersToDynamo(str(table_name.name)) for table_name in table_names))
 
 
 # Run the event loop
 if __name__ == "__main__":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     asyncio.run(main())
+    # asyncio.run(main2())
     
 
 
