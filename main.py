@@ -31,9 +31,3 @@ async def main():
 if __name__ == "__main__":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     asyncio.run(main())
-    # asyncio.run(main2())
-    
-
-
-# for i in ItemIdEnum.item:
-#     print(i.value)
