@@ -1,15 +1,19 @@
-import boto3
+import aioboto3
 from botocore.exceptions import ClientError
 import json
 import requests
 import typing
 from decimal import Decimal
 import logging
+import boto3
 
 class CreateNewTable:
+    #  instantiates objects to use in class
     def __init__(self) -> None:
         self.dynamodb = boto3.resource('dynamodb')
-    
+        self.session = aioboto3.Session()
+        
+    # This creates the table neede for the price history
     def createPriceHistoryTable(self, tableName: str) -> int:
         try:
             response = self.dynamodb.create_table(
@@ -27,7 +31,7 @@ class CreateNewTable:
                     }
                 ],
                 ProvisionedThroughput={
-                    'ReadCapacityUnits': 10,
+                    'ReadCapacityUnits': 1,
                     'WriteCapacityUnits': 10
                 }
             )
@@ -38,7 +42,7 @@ class CreateNewTable:
             # pass
             return err.response['ResponseMetadata']['HTTPStatusCode']
 
-            
+    # This creates the table for item orders 
     def createItemOrderTable(self, tableName: str) -> int:
         response = None
         try:
@@ -65,7 +69,7 @@ class CreateNewTable:
                     }
                 ],
                 ProvisionedThroughput={
-                    'ReadCapacityUnits': 10,
+                    'ReadCapacityUnits': 1,
                     'WriteCapacityUnits': 10
                 }
             )
@@ -75,3 +79,34 @@ class CreateNewTable:
             logging.warning(f"[createItemOrderTable]: {err.response['message']} : Status: {err.response['ResponseMetadata']['HTTPStatusCode']}")
             pass
             return err.response['ResponseMetadata']['HTTPStatusCode']
+        
+    # This just sets up the autoscaling for a table. Must be called after the table exists
+    def enableAutoScaling(self, table_name: str) -> None:
+            # Using boto3 to create autoscaling client
+            autoscaling = boto3.client('application-autoscaling')
+            
+            # Registering the DynamoDB table for autoscaling
+            autoscaling.register_scalable_target(
+                ServiceNamespace='dynamodb',
+                ResourceId=f'table/{table_name}',
+                ScalableDimension='dynamodb:table:WriteCapacityUnits',
+                MinCapacity=1,
+                MaxCapacity=10
+            )
+
+            # Defining the scaling policy
+            autoscaling.put_scaling_policy(
+                PolicyName=f'WriteAutoScalingPolicy-{table_name}',
+                ServiceNamespace='dynamodb',
+                ResourceId=f'table/{table_name}',
+                ScalableDimension='dynamodb:table:WriteCapacityUnits',
+                PolicyType='TargetTrackingScaling',
+                TargetTrackingScalingPolicyConfiguration={
+                    'TargetValue': 70.0,
+                    'PredefinedMetricSpecification': {
+                        'PredefinedMetricType': 'DynamoDBWriteCapacityUtilization'
+                    },
+                    'ScaleOutCooldown': 30,
+                    'ScaleInCooldown': 30
+                }
+            )
