@@ -8,10 +8,12 @@ import logging
 import boto3
 
 class CreateNewTable:
+    #  instantiates objects to use in class
     def __init__(self) -> None:
         self.dynamodb = boto3.resource('dynamodb')
         self.session = aioboto3.Session()
-    
+        
+    # This creates the table neede for the price history
     def createPriceHistoryTable(self, tableName: str) -> int:
         try:
             response = self.dynamodb.create_table(
@@ -40,7 +42,7 @@ class CreateNewTable:
             # pass
             return err.response['ResponseMetadata']['HTTPStatusCode']
 
-            
+    # This creates the table for item orders 
     def createItemOrderTable(self, tableName: str) -> int:
         response = None
         try:
@@ -78,6 +80,7 @@ class CreateNewTable:
             pass
             return err.response['ResponseMetadata']['HTTPStatusCode']
         
+    # This just sets up the autoscaling for a table. Must be called after the table exists
     def enableAutoScaling(self, table_name: str) -> None:
             # Using boto3 to create autoscaling client
             autoscaling = boto3.client('application-autoscaling')
