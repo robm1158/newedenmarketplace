@@ -27,7 +27,7 @@ async def main():
     await asyncio.gather(*(manager.pushItemOrdersToDynamo(str(table_name.name)) for table_name in table_names))
 
 
-# Run the event loop
-if __name__ == "__main__":
-    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-    asyncio.run(main())
+# # Run the event loop
+# if __name__ == "__main__":
+#     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+#     asyncio.run(main())
