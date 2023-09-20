@@ -1,7 +1,7 @@
 services:
   app:
     build: .
-    container_name: EveEnv
+    container_name: EveEnvDiskF
     entrypoint:
     - sleep
     - infinity
