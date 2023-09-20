@@ -2,6 +2,7 @@
 FROM python:3.10
 WORKDIR /code
 COPY .\requirements /code
+COPY .\.gitignore /code
 
 # Install dependencies
 RUN pip install -r requirements.txt
