@@ -1,2 +1,3 @@
 aioboto3
 aiohttp
+requests
