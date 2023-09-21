@@ -5,29 +5,31 @@ import ItemIdEnum
 import asyncio
 import aiohttp
 import itemPrices
+import pandas as pd
+import pathlib
+from RegionIdEnum import region
 
-# 
+# for directory in pathlib.Path("/root/code/data/").iterdir():
+#   if str(directory) != "/root/code/data/index.html.tmp": 
+#     data = pd.read_csv(directory)
+#     print(data)
+#
 
-async def main2():
-    # List of type_ids
-    type_ids = ItemIdEnum.item
-    region_id = RegionIdEnum.region.THE_FORGE.value
+path = pathlib.Path('/root/code/data/market-orders-2021-06-19_16-50-12.v3.csv.bz2')
+data = pd.read_csv(path)
+#print(data)
 
-    # Gather all asynchronous calls into one, effectively running them concurrently
-    results = await asyncio.gather(*(itemPrices.getItemsPriceHistory(type_id.value, region_id) for type_id in type_ids))
-
-    print(results)
-
-async def main():
-    manager =  dynamodbPushData.PushData()
+region_index = data.columns.get_loc('region_id')
+#print(region_index)
+#print(region_index)
+newData = pd.DataFrame(columns=data.columns)
+print(newData)
+for row in data.values:
+  if row[region_index] == region.THE_FORGE.value:
+    newData.loc[len(newData)] = row.tolist()
+  
+newCSVName = path.parent.joinpath('the-forge-historical-' + str(path.name))
+newData.to_csv(newCSVName, index=False)      
+print(newData)
     
-    table_names = list(ItemIdEnum.item)
-
-    # Run pushPriceHistoryToDynamo concurrently for all table names
-    await asyncio.gather(*(manager.pushItemOrdersToDynamo(str(table_name.name)) for table_name in table_names))
-
-
-# # Run the event loop
-# if __name__ == "__main__":
-#     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-#     asyncio.run(main())
+#the-forge-historical-market-orders-2021-06-19_16-50-12.v3.csv.bz2
