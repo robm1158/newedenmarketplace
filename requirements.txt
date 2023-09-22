@@ -2,3 +2,6 @@ aioboto3
 aiohttp
 requests
 pandas
+pathlib
+scipy
+asyncio
