@@ -5,3 +5,5 @@ pandas
 pathlib
 scipy
 asyncio
+tensorflow
+scikit-learn
