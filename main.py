@@ -5,8 +5,15 @@ import ItemIdEnum
 import asyncio
 import aiohttp
 import itemPrices
+import pandas as pd
+import pathlib
 
 # 
+def main3():
+    path = pathlib.Path('/root/code/eveHistoricalData/data.everef.net/market-orders/history/2021/2021-10-11/market-orders-2021-10-11_01-15-02.v3.csv.bz2')
+    data = pd.read_csv(path)
+    print(data)
+
 
 async def main2():
     # List of type_ids
@@ -27,7 +34,8 @@ async def main():
     await asyncio.gather(*(manager.pushItemOrdersToDynamo(str(table_name.name)) for table_name in table_names))
 
 
-# # Run the event loop
-# if __name__ == "__main__":
-#     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-#     asyncio.run(main())
+# Run the event loop
+if __name__ == "__main__":
+    # asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    # asyncio.run(main())
+    main3()
