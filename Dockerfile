@@ -1,8 +1,7 @@
 # syntax=docker/dockerfile:1
 FROM python:3.10
 WORKDIR /code
-COPY .\requirements /code
-COPY .\.gitignore /code
+COPY requirements.txt /code
 
 # Install dependencies
 RUN pip install -r requirements.txt
