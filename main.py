@@ -13,23 +13,19 @@ from RegionIdEnum import region
 #   if str(directory) != "/root/code/data/index.html.tmp": 
 #     data = pd.read_csv(directory)
 #     print(data)
-#
+
+# How the file name should appear once reconstructed:
+# #the-forge-historical-market-orders-2021-06-19_16-50-12.v3.csv.bz2
 
 path = pathlib.Path('/root/code/data/market-orders-2021-06-19_16-50-12.v3.csv.bz2')
 data = pd.read_csv(path)
-#print(data)
 
-region_index = data.columns.get_loc('region_id')
-#print(region_index)
-#print(region_index)
-newData = pd.DataFrame(columns=data.columns)
-print(newData)
-for row in data.values:
-  if row[region_index] == region.THE_FORGE.value:
-    newData.loc[len(newData)] = row.tolist()
-  
-newCSVName = path.parent.joinpath('the-forge-historical-' + str(path.name))
-newData.to_csv(newCSVName, index=False)      
-print(newData)
-    
-#the-forge-historical-market-orders-2021-06-19_16-50-12.v3.csv.bz2
+newCSVName = path.parent.joinpath("the-forge-historical2-" + path.name)
+print(data.loc[data['region_id'] == region.THE_FORGE.value])
+data.loc[data['region_id'] == region.THE_FORGE.value].to_csv(newCSVName, index=False)
+
+
+
+
+
+
