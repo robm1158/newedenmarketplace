@@ -9,3 +9,6 @@ tensorflow
 scikit-learn
 pydot
 graphviz
+seaborn
+matplotlib
+statsmodels
