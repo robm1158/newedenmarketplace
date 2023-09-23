@@ -7,3 +7,5 @@ scipy
 asyncio
 tensorflow
 scikit-learn
+pydot
+graphviz
