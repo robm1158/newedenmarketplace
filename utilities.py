@@ -30,5 +30,5 @@ def combineItemcsv(path: pathlib.Path, item: item) -> None:
         if str(file.suffix) == ".bz2":
             df = pd.read_csv(file)
             df_merged = pd.concat([df_merged,df])
-        newCSVName = path.parent.joinpath("merged-"+item.name+'-' + file.name)
+        newCSVName = path.parent.joinpath("merged-"+ file.name)
     df_merged.to_csv(newCSVName, index=False)
