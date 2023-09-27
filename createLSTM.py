@@ -108,9 +108,9 @@ def createLSTM(itemName: str, data: pd.DataFrame, n_input: int, n_features: int,
     test_predictions_df1 = pd.DataFrame({'X_test':list(X_test_list), 
                                     'LSTM Prediction':list(test_predictions1)})
 
-    test_predictions_df1.plot(title=f'{itemName} LSTM Prediction vs Actual',ylabel='Price')
-    plt.show()
-    
+    # test_predictions_df1.plot(title=f'{itemName} LSTM Prediction vs Actual',ylabel='Price')
+    # plt.show()
+    print(f'================== {itemName} ==================')
     if savePlot == True:
         plt.figure()
         test_predictions_df1.plot(title=f'{itemName} LSTM Prediction vs Actual',ylabel='Price')
