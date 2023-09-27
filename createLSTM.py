@@ -57,13 +57,14 @@ def createLSTM(itemName: str, data: pd.DataFrame, n_input: int, n_features: int,
     data['price'].plot(ylabel='Price')
     plt.savefig(f'{path/itemName}_predata_standarize_plot.png')
     xFeat = data
-   
+    print(xFeat.shape)
     sc =MinMaxScaler()
     X_ft = sc.fit_transform(xFeat.values)
     X_ft = pd.DataFrame(X_ft, index=xFeat.index, columns=xFeat.columns)
     plt.figure()
     data['price'].hist()
     plt.savefig(f'{path/itemName}_postdata_standarize_hist.png')
+    
     plt.figure()
     data['price'].plot()
     plt.savefig(f'{path/itemName}_postdata_standarize_plot.png')

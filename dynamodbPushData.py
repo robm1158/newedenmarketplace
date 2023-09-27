@@ -13,7 +13,7 @@ class PushData:
     def __init__(self) -> None:
         self.session = aioboto3.Session()
         self.newTable = CreateNewTable()
-
+        
     # This method will pull data from EvE ESI and push the data into the db table.
     #  If the table doesnt exist it will create one then update it otherwise it just updates it.
     async def pushPriceHistoryToDynamo(self, table_name: str) -> None:
