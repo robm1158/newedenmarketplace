@@ -33,30 +33,40 @@ def Sequential_Input_LSTM(df, input_sequence):
         
     return np.array(X), np.array(y)
 
-def createLSTM(item: str, path: pathlib.Path, n_input: int, n_features: int, epochs: int, batch_size: int, save: bool) -> None:
-
+def createLSTM(itemName: str, data: pd.DataFrame, n_input: int, n_features: int, epochs: int, batch_size: int, save: bool, savePlot: bool) -> None:
+    cwd = pathlib.Path().cwd()
+    path = cwd.joinpath("LSTM_models/"+itemName)
+    try:
+        path.mkdir(parents=True, exist_ok=False)
+    except FileExistsError as e:
+        print(e)
+        pass
+    
     early_stop = tf.keras.callbacks.EarlyStopping(monitor = 'loss', patience = 5)
-    data = pd.read_csv("D:\\Code\\eve-aws\\merged-PLAGIOCLASE-PLAGIOCLASE-the-forge-historical-market-orders-2021-06-19_23-30-02.v3.csv.bz2")
     data = utilities.convertFromZuluTime(data)
-    data = utilities.removeOutliers(data,3)
-
+    data = utilities.removeOutliers(data)
 
     data = data.drop(columns=['range','universe_id','http_last_modified'])
-    data['issued'] = pd.to_datetime(data['issued'],origin='unix',unit='D').astype(np.int64) // 10**9
+    data['issued'] = pd.to_datetime(data['issued'],origin='unix',unit='D')
     date_time = pd.to_datetime(data['issued'])
     data.set_index('issued',inplace=True)
-    # data = data.set_index('issued')
-    targetY = data['price']
+    plt.figure()
+    data['price'].hist()
+    plt.savefig(f'{path/itemName}_predata_standarize_hist.png')
+    plt.figure()
+    data['price'].plot(ylabel='Price')
+    plt.savefig(f'{path/itemName}_predata_standarize_plot.png')
     xFeat = data
-    # sns.displot(xFeat['price'])
-    # plt.rcParams['figure.figsize'] = [8, 6]
-    # qqplot(xFeat['price'], norm, fit=True, line="45")
-
-    # plt.show()
-    sc =StandardScaler()
+   
+    sc =MinMaxScaler()
     X_ft = sc.fit_transform(xFeat.values)
     X_ft = pd.DataFrame(X_ft, index=xFeat.index, columns=xFeat.columns)
-
+    plt.figure()
+    data['price'].hist()
+    plt.savefig(f'{path/itemName}_postdata_standarize_hist.png')
+    plt.figure()
+    data['price'].plot()
+    plt.savefig(f'{path/itemName}_postdata_standarize_plot.png')
     n_input = n_input  
 
     df_min_model_data = X_ft['price']
@@ -74,57 +84,59 @@ def createLSTM(item: str, path: pathlib.Path, n_input: int, n_features: int, epo
 
     lstm = tf.keras.models.Sequential()
     lstm.add(tf.keras.layers.InputLayer((n_input,n_features)))
-    lstm.add(tf.keras.layers.LSTM(50,return_sequences=True,activation='tanh'))
-    lstm.add(tf.keras.layers.Dropout(0.2))
+    lstm.add(tf.keras.layers.LSTM(100,return_sequences=True,activation='relu'))
+    lstm.add(tf.keras.layers.Dropout(0.5))
+    lstm.add(tf.keras.layers.LSTM(100,return_sequences=True,activation='relu'))
     lstm.add(tf.keras.layers.LSTM(50))
     lstm.add(tf.keras.layers.Dense(50, activation='relu', kernel_initializer='he_normal'))
-    lstm.add(tf.keras.layers.Dense(50, activation='relu', kernel_initializer='he_normal'))
     lstm.add(tf.keras.layers.Dense(1))
-    lstm.compile(loss='mean_squared_error',optimizer='adam', metrics=tf.keras.metrics.RootMeanSquaredError())
+    lstm.compile(loss='mean_squared_error',optimizer='adam', metrics=[tf.keras.metrics.RootMeanSquaredError(),tf.keras.metrics.Accuracy()])
     lstm.summary()
 
-    history = lstm.fit(XTrain,yTrain,epochs=epochs,batch_size=batch_size,shuffle=False,validation_data=(xTest,yTest))
-    loss, rmse = lstm.evaluate(xTest,yTest,verbose=0) # type: ignore
+    history = lstm.fit(XTrain,yTrain,epochs=epochs,batch_size=batch_size,shuffle=False,validation_data=(xTest,yTest), callbacks = [early_stop] )
+    lstm.evaluate(xTest,yTest,verbose=0) # type: ignore
     if save == True:
-        tf.keras.models.save_model(lstm, f"D:\\Code\\eve-aws\\LSTM_models\\{item}_lstm_model.keras")
+        tf.keras.models.save_model(lstm, f"D:\\Code\\eve-aws\\LSTM_models\\{itemName}_lstm_model.keras")
     
-    print(loss-1,rmse-1)
     test_predictions1 = lstm.predict(xTest).flatten()
 
     X_test_list = []
     for i in range(len(xTest)):
         X_test_list.append(xTest[i][0])
-
-    # test_predictions1 = test_predictions1[:,n_input-1].flatten()
     
     test_predictions_df1 = pd.DataFrame({'X_test':list(X_test_list), 
                                     'LSTM Prediction':list(test_predictions1)})
 
-    test_predictions_df1.plot(title="LSTM Prediction vs Actual",ylabel='Price')
+    test_predictions_df1.plot(title=f'{itemName} LSTM Prediction vs Actual',ylabel='Price')
     plt.show()
-
-    print(history.history.keys())
     
-    plt.plot(history.history['loss'],label='loss')
-    plt.plot(history.history['val_loss'],label='val_loss')
-    plt.title('loss')
-    plt.ylabel('loss')
-    plt.xlabel('epoch')
-    plt.legend()
-    plt.show()
+    if savePlot == True:
+        plt.figure()
+        test_predictions_df1.plot(title=f'{itemName} LSTM Prediction vs Actual',ylabel='Price')
+        plt.savefig(f'{path/itemName}_prediction_plot.png')
 
-    plt.plot(history.history['root_mean_squared_error'],label='root_mean_squared_error')
-    plt.plot(history.history['val_root_mean_squared_error'],label='val_root_mean_squared_error')
-    plt.title('root_mean_squared_error')
-    plt.ylabel('root_mean_squared_values')
-    plt.xlabel('epoch')
-    plt.legend()
-    plt.show()
-
-    # plt.scatter(np.array(xTestDates),np.array(X_test_list),label='X_test')
-    # plt.scatter(np.array(xTestDates),np.array(test_predictions1),label='LSTM Prediction')
-    # plt.title('Estimation of Price')
-    # plt.ylabel('Price')
-    # plt.xlabel('Dates')
-    # plt.legend()
-    # plt.show()
+        print(history.history.keys())
+        plt.figure()
+        plt.plot(history.history['loss'],label='loss')
+        plt.plot(history.history['val_loss'],label='val_loss')
+        plt.title('loss')
+        plt.ylabel('loss')
+        plt.xlabel('epoch')
+        plt.legend()
+        plt.savefig(f'{path/itemName}_loss_plot.png')
+        plt.figure()
+        plt.plot(history.history['accuracy'],label='accuracy')
+        plt.plot(history.history['val_accuracy'],label='val_accuracy')
+        plt.title('accuracy')
+        plt.ylabel('accuracy_values')
+        plt.xlabel('epoch')
+        plt.legend()
+        plt.savefig(f'{path/itemName}_accuracy_plot.png')
+        plt.figure()
+        plt.plot(history.history['root_mean_squared_error'],label='root_mean_squared_error')
+        plt.plot(history.history['val_root_mean_squared_error'],label='val_root_mean_squared_error')
+        plt.title('root_mean_squared_error')
+        plt.ylabel('root_mean_squared_values')
+        plt.xlabel('epoch')
+        plt.legend()
+        plt.savefig(f'{path/itemName}_root_mean_squared_error_plot.png')
