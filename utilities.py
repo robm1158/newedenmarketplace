@@ -5,9 +5,9 @@ import pathlib
 from RegionIdEnum import region
 from ItemIdEnum import item
 
-def removeOutliers(df: pd.DataFrame, threshold: int) -> pd.DataFrame:
+def removeOutliers(df: pd.DataFrame) -> pd.DataFrame:
     zScores = np.abs(stats.zscore(df['price'],nan_policy='omit'))
-    threshold = threshold
+    threshold = np.mean(zScores)*1.5
     return df[(zScores < threshold)]
 
 def convertFromZuluTime(df: pd.DataFrame) -> pd.DataFrame:
