@@ -7,14 +7,11 @@ from ItemIdEnum import item
 
 def removeOutliers(df: pd.DataFrame) -> pd.DataFrame:
     zScores = np.abs(stats.zscore(df['price'],nan_policy='omit'))
-    # print(np.mean(zScores)*3)
-    copy = df.copy()
-    # print(len(copy))
+    dfLen = len(df)
     
     threshold = np.inf #100000
-    # print(len(df[df['price'] < threshold]))
-    # print((len(copy)/len(df[df['price'] < threshold]))-1)
-    while (len(copy)/len(df[df['price'] < threshold])) - 1 < 0.10:
+
+    while (dfLen/len(df[df['price'] < threshold])) - 1 < 0.1:
         df['price'] = ((df['price'] - df['price'].mean()) / df['price'].std()).abs()
         threshold = df['price'].mean()*3
         df = df[df['price'] < threshold]
