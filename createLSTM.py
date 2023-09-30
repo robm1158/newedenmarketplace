@@ -14,11 +14,18 @@ from sklearn.model_selection import TimeSeriesSplit
 import seaborn as sns
 from statsmodels.graphics.gofplots import qqplot
 from scipy.stats import norm, uniform
+from keras import backend as K
+from tensorflow_addons.metrics import RSquare
 
 
 pd.set_option('display.max_rows', 10)
 pd.set_option('display.max_columns', 17)
 pd.set_option('display.width', 250)
+
+def coeff_determination(y_true, y_pred):
+    SS_res =  K.sum(K.square( y_true-y_pred )) 
+    SS_tot = K.sum(K.square( y_true - K.mean(y_true) ) ) 
+    return ( 1 - SS_res/(SS_tot + K.epsilon()) )
 
 def Sequential_Input_LSTM(df, input_sequence):
     df_np = df.to_numpy()
@@ -37,7 +44,7 @@ def createLSTM(itemName: str, data: pd.DataFrame, n_input: int, n_features: int,
     cwd = pathlib.Path().cwd()
     path = cwd.joinpath("LSTM_models/"+itemName)
     try:
-        path.mkdir(parents=True, exist_ok=False)
+        path.mkdir(mode=0o777,parents=True, exist_ok=False)
     except FileExistsError as e:
         print(e)
         pass
@@ -78,37 +85,38 @@ def createLSTM(itemName: str, data: pd.DataFrame, n_input: int, n_features: int,
     dateIndex = date_time
     XTrain, xTest = X[:splitIDX], X[splitIDX:]
     yTrain, yTest = y[:splitIDX], y[splitIDX:]
-    XTrainDates, xTestDates = dateIndex[:splitIDX], dateIndex[splitIDX+10:]
+    XTrainDates, xTestDates = dateIndex[:splitIDX], dateIndex[splitIDX+n_input:]
 
 
     n_features = n_features
 
     lstm = tf.keras.models.Sequential()
     lstm.add(tf.keras.layers.InputLayer((n_input,n_features)))
-    lstm.add(tf.keras.layers.LSTM(100,return_sequences=True,activation='relu'))
+    lstm.add(tf.keras.layers.LSTM(100,return_sequences=True,activation='tanh'))
     lstm.add(tf.keras.layers.Dropout(0.5))
-    lstm.add(tf.keras.layers.LSTM(100,return_sequences=True,activation='relu'))
+    lstm.add(tf.keras.layers.LSTM(100,return_sequences=True,activation='tanh'))
     lstm.add(tf.keras.layers.LSTM(50))
-    lstm.add(tf.keras.layers.Dense(50, activation='relu', kernel_initializer='he_normal'))
+    lstm.add(tf.keras.layers.Dense(50, activation='tanh'))
     lstm.add(tf.keras.layers.Dense(1))
-    lstm.compile(loss='mean_squared_error',optimizer='adam', metrics=[tf.keras.metrics.RootMeanSquaredError(),tf.keras.metrics.Accuracy()])
+    lstm.compile(loss='logcosh',optimizer='adam', metrics=[tf.keras.metrics.RootMeanSquaredError(), RSquare()])
     lstm.summary()
 
-    history = lstm.fit(XTrain,yTrain,epochs=epochs,batch_size=batch_size,shuffle=False,validation_data=(xTest,yTest), callbacks = [early_stop] )
+    history = lstm.fit(XTrain,yTrain,epochs=epochs,batch_size=batch_size,shuffle=False,validation_data=(xTest,yTest), callbacks = [early_stop],verbose=1) # type: ignore 
     lstm.evaluate(xTest,yTest,verbose=0) # type: ignore
     if save == True:
         tf.keras.models.save_model(lstm, f"D:\\Code\\eve-aws\\LSTM_models\\{itemName}_lstm_model.keras")
     
     test_predictions1 = lstm.predict(xTest).flatten()
-
+    
     X_test_list = []
     for i in range(len(xTest)):
         X_test_list.append(xTest[i][0])
     
     test_predictions_df1 = pd.DataFrame({'X_test':list(X_test_list), 
-                                    'LSTM Prediction':list(test_predictions1)})
+                                    'LSTM Prediction':list(test_predictions1)})    
+    
 
-    # test_predictions_df1.plot(title=f'{itemName} LSTM Prediction vs Actual',ylabel='Price')
+    test_predictions_df1.plot(title=f'{itemName} LSTM Prediction vs Actual',ylabel='Price')
     # plt.show()
     print(f'================== {itemName} ==================')
     if savePlot == True:
@@ -125,14 +133,16 @@ def createLSTM(itemName: str, data: pd.DataFrame, n_input: int, n_features: int,
         plt.xlabel('epoch')
         plt.legend()
         plt.savefig(f'{path/itemName}_loss_plot.png')
+        
         plt.figure()
-        plt.plot(history.history['accuracy'],label='accuracy')
-        plt.plot(history.history['val_accuracy'],label='val_accuracy')
-        plt.title('accuracy')
-        plt.ylabel('accuracy_values')
+        plt.plot(history.history['r_square'],label='r_square')
+        plt.plot(history.history['val_r_square'],label='val_r_square')
+        plt.title('r_square')
+        plt.ylabel('r_square')
         plt.xlabel('epoch')
         plt.legend()
-        plt.savefig(f'{path/itemName}_accuracy_plot.png')
+        plt.savefig(f'{path/itemName}_r_square_plot.png')
+
         plt.figure()
         plt.plot(history.history['root_mean_squared_error'],label='root_mean_squared_error')
         plt.plot(history.history['val_root_mean_squared_error'],label='val_root_mean_squared_error')
@@ -141,3 +151,4 @@ def createLSTM(itemName: str, data: pd.DataFrame, n_input: int, n_features: int,
         plt.xlabel('epoch')
         plt.legend()
         plt.savefig(f'{path/itemName}_root_mean_squared_error_plot.png')
+    # plt.close('all')
