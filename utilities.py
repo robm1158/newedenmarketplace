@@ -7,8 +7,16 @@ from ItemIdEnum import item
 
 def removeOutliers(df: pd.DataFrame) -> pd.DataFrame:
     zScores = np.abs(stats.zscore(df['price'],nan_policy='omit'))
-    threshold = np.mean(zScores)
-    return df[(zScores < threshold)]
+    dfLen = len(df)
+    
+    threshold = np.inf #100000
+
+    while (dfLen/len(df[df['price'] < threshold])) - 1 < 0.1:
+        df['price'] = ((df['price'] - df['price'].mean()) / df['price'].std()).abs()
+        threshold = df['price'].mean()*3
+        df = df[df['price'] < threshold]
+    len(df)
+    return df
 
 def convertFromZuluTime(df: pd.DataFrame) -> pd.DataFrame:
     df['issued'] = pd.DatetimeIndex(df['issued'])
@@ -30,5 +38,5 @@ def combineItemcsv(path: pathlib.Path, item: item) -> None:
         if str(file.suffix) == ".bz2":
             df = pd.read_csv(file)
             df_merged = pd.concat([df_merged,df])
-        newCSVName = path.parent.joinpath("merged-"+item.name+'-' + file.name)
+        newCSVName = path.parent.joinpath("merged-"+ file.name)
     df_merged.to_csv(newCSVName, index=False)

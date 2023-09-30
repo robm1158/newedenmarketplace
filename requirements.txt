@@ -5,3 +5,10 @@ pandas
 pathlib
 scipy
 asyncio
+tensorflow
+scikit-learn
+pydot
+graphviz
+seaborn
+matplotlib
+statsmodels
