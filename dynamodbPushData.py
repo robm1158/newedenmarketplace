@@ -13,7 +13,7 @@ class PushData:
     def __init__(self) -> None:
         self.session = aioboto3.Session()
         self.newTable = CreateNewTable()
-
+        
     # This method will pull data from EvE ESI and push the data into the db table.
     #  If the table doesnt exist it will create one then update it otherwise it just updates it.
     async def pushPriceHistoryToDynamo(self, table_name: str) -> None:
@@ -52,7 +52,7 @@ class PushData:
     # This just updates the table
     async def updatePriceHistoryTable(self, table, table_name, item_id):
         itemjson = await itemPrices.getItemsPriceHistory(item_id, region.THE_FORGE.value)
-        jsondata = json.loads(itemjson, parse_float=Decimal)
+        jsondata = json.loads(itemjson, parse_float=Decimal)# type: ignore
 
         async with table.batch_writer() as batch:
             for myDict in jsondata:
@@ -61,7 +61,7 @@ class PushData:
     # This just updates the table
     async def updateItemOrderTable(self, table, table_name, item_id):
         itemjson = await itemPrices.getAllItemOrderHistory(item_id, region.THE_FORGE.value)
-        jsondata = json.loads(itemjson, parse_float=Decimal)
+        jsondata = json.loads(itemjson, parse_float=Decimal) # type: ignore
 
         async with table.batch_writer() as batch:
             for myDict in jsondata:
