@@ -13,3 +13,5 @@ seaborn
 matplotlib
 statsmodels
 pymongo
+dask
+tensorflow_addons
