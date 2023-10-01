@@ -26,13 +26,14 @@ pd.set_option('display.width', 250)
 
 async def main():
     puller = s3PullData.PullData()
-    for items in item:
-        print(f'================== {items.name} ==================')
+    print(puller.getObjectList())
+    # for items in item:
+    #     print(f'================== {items.name} ==================')
         
-        result = await puller.getItemData(items.value, regionId=10000002)
-        print(len(result))
+        # result = await puller.getItemData(items.value, regionId=10000002)
+        # print(len(result))
 
-        createLSTM.createLSTM(items.name, result, 30, 1, 300,64,True,True)
+        # createLSTM.createLSTM(items.name, result, 30, 1, 300,64,True,True)
     # utilities.removeOutliers(result)
     # result = await puller.getItemData(22, regionId=10000002)
 

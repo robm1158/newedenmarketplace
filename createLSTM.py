@@ -60,9 +60,11 @@ def createLSTM(itemName: str, data: pd.DataFrame, n_input: int, n_features: int,
     plt.figure()
     data['price'].hist()
     plt.savefig(f'{path/itemName}_predata_standarize_hist.png')
+    plt.clf()
     plt.figure()
     data['price'].plot(ylabel='Price')
     plt.savefig(f'{path/itemName}_predata_standarize_plot.png')
+    plt.clf()
     xFeat = data
     print(xFeat.shape)
     sc =MinMaxScaler()
@@ -71,10 +73,11 @@ def createLSTM(itemName: str, data: pd.DataFrame, n_input: int, n_features: int,
     plt.figure()
     data['price'].hist()
     plt.savefig(f'{path/itemName}_postdata_standarize_hist.png')
-    
+    plt.clf()
     plt.figure()
     data['price'].plot()
     plt.savefig(f'{path/itemName}_postdata_standarize_plot.png')
+    plt.clf()
     n_input = n_input  
 
     df_min_model_data = X_ft['price']
@@ -133,7 +136,7 @@ def createLSTM(itemName: str, data: pd.DataFrame, n_input: int, n_features: int,
         plt.xlabel('epoch')
         plt.legend()
         plt.savefig(f'{path/itemName}_loss_plot.png')
-        
+        plt.clf()
         plt.figure()
         plt.plot(history.history['r_square'],label='r_square')
         plt.plot(history.history['val_r_square'],label='val_r_square')
@@ -142,7 +145,7 @@ def createLSTM(itemName: str, data: pd.DataFrame, n_input: int, n_features: int,
         plt.xlabel('epoch')
         plt.legend()
         plt.savefig(f'{path/itemName}_r_square_plot.png')
-
+        plt.clf()
         plt.figure()
         plt.plot(history.history['root_mean_squared_error'],label='root_mean_squared_error')
         plt.plot(history.history['val_root_mean_squared_error'],label='val_root_mean_squared_error')
@@ -151,4 +154,4 @@ def createLSTM(itemName: str, data: pd.DataFrame, n_input: int, n_features: int,
         plt.xlabel('epoch')
         plt.legend()
         plt.savefig(f'{path/itemName}_root_mean_squared_error_plot.png')
-    # plt.close('all')
+        plt.clf()

@@ -6,6 +6,7 @@ import csv
 import io
 import asyncio
 import numpy as np
+import pathlib
 from ItemIdEnum import item
 from io import StringIO
 import dask.dataframe as dd
@@ -24,3 +25,13 @@ class PullData():
         
         return result_df
         
+    def getObjectList(self) -> list:
+        s3 = boto3.resource('s3')
+        objectLists = []
+        bucket = s3.Bucket(self.bucketName)
+        for object in bucket.objects.all():
+            path = pathlib.Path(object.key)
+            if not path.name.endswith('.tmp'):
+                objectLists.append(path)
+            
+        return objectLists
