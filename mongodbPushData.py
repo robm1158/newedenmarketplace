@@ -48,12 +48,12 @@ async def main():
     db = mongoPushData('eve-historical-data')
     db.checkConnection()
     for items in item:
-        print(f'================== {items.name} ==================')
-        
-        result = await puller.getItemData(items.value, regionId=10000002)
-        result.reset_index(inplace=True)
-        result.index = result.index.map(str)
-        db.pushData(result,items.name)
+        for path in puller.getS3ObjectList():
+            print(path,items.name)
+            result = await puller.getItemData(items.value, regionId=10000002, path=path)
+            result.reset_index(inplace=True)
+            result.index = result.index.map(str)
+            db.pushData(result,items.name)
 
 
         
