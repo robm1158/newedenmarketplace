@@ -81,15 +81,28 @@ def createLSTM(itemName: str, data: pd.DataFrame, n_input: int, n_features: int,
     n_input = n_input  
 
     df_min_model_data = X_ft['price']
+    print(len(df_min_model_data))
 
     X, y = Sequential_Input_LSTM(df_min_model_data, n_input)
+    print(len(X),len(y))
     trainSplit = 0.8
     splitIDX = int(np.floor(len(X)*trainSplit))
     dateIndex = date_time
     XTrain, xTest = X[:splitIDX], X[splitIDX:]
     yTrain, yTest = y[:splitIDX], y[splitIDX:]
     XTrainDates, xTestDates = dateIndex[:splitIDX], dateIndex[splitIDX+n_input:]
-
+    
+    batchLimiter = len(XTrain[:,0])
+    print(XTrain.shape, yTrain.shape)
+    print(batchLimiter)
+    if batchLimiter < 500:
+        batch_size = 8
+    elif batchLimiter < 2000:
+        batch_size = 16
+    elif batchLimiter < 5000:
+        batch_size = 32
+    else:
+        batch_size = 64
 
     n_features = n_features
 
