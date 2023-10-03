@@ -60,21 +60,23 @@ def createLSTM(itemName: str, data: pd.DataFrame, n_input: int, n_features: int,
     plt.figure()
     data['price'].hist()
     plt.savefig(f'{path/itemName}_predata_standarize_hist.png')
+    plt.clf()
     plt.figure()
     data['price'].plot(ylabel='Price')
     plt.savefig(f'{path/itemName}_predata_standarize_plot.png')
+    plt.clf()
     xFeat = data
-    print(xFeat.shape)
     sc =MinMaxScaler()
     X_ft = sc.fit_transform(xFeat.values)
     X_ft = pd.DataFrame(X_ft, index=xFeat.index, columns=xFeat.columns)
     plt.figure()
     data['price'].hist()
     plt.savefig(f'{path/itemName}_postdata_standarize_hist.png')
-    
+    plt.clf()
     plt.figure()
     data['price'].plot()
     plt.savefig(f'{path/itemName}_postdata_standarize_plot.png')
+    plt.clf()
     n_input = n_input  
 
     df_min_model_data = X_ft['price']
@@ -86,7 +88,17 @@ def createLSTM(itemName: str, data: pd.DataFrame, n_input: int, n_features: int,
     XTrain, xTest = X[:splitIDX], X[splitIDX:]
     yTrain, yTest = y[:splitIDX], y[splitIDX:]
     XTrainDates, xTestDates = dateIndex[:splitIDX], dateIndex[splitIDX+n_input:]
+    
+    batchLimiter = len(XTrain[:,0])
 
+    if batchLimiter < 500:
+        batch_size = 8
+    elif batchLimiter < 2000:
+        batch_size = 16
+    elif batchLimiter < 5000:
+        batch_size = 32
+    else:
+        batch_size = 64
 
     n_features = n_features
 
@@ -133,7 +145,7 @@ def createLSTM(itemName: str, data: pd.DataFrame, n_input: int, n_features: int,
         plt.xlabel('epoch')
         plt.legend()
         plt.savefig(f'{path/itemName}_loss_plot.png')
-        
+        plt.clf()
         plt.figure()
         plt.plot(history.history['r_square'],label='r_square')
         plt.plot(history.history['val_r_square'],label='val_r_square')
@@ -142,7 +154,7 @@ def createLSTM(itemName: str, data: pd.DataFrame, n_input: int, n_features: int,
         plt.xlabel('epoch')
         plt.legend()
         plt.savefig(f'{path/itemName}_r_square_plot.png')
-
+        plt.clf()
         plt.figure()
         plt.plot(history.history['root_mean_squared_error'],label='root_mean_squared_error')
         plt.plot(history.history['val_root_mean_squared_error'],label='val_root_mean_squared_error')
@@ -151,4 +163,5 @@ def createLSTM(itemName: str, data: pd.DataFrame, n_input: int, n_features: int,
         plt.xlabel('epoch')
         plt.legend()
         plt.savefig(f'{path/itemName}_root_mean_squared_error_plot.png')
-    # plt.close('all')
+        plt.clf()
+    plt.close('all')
