@@ -9,7 +9,7 @@ import asyncio
 import pandas as pd
 from json import loads, dumps
 
-class mongoPushData():
+class mongoData():
     def __init__(self, dbName:str) -> None:
         self.uri = f"mongodb+srv://{passwords.mongoUser.value}:{passwords.mongoPassword.value}@serverlessinstance0.drbmrdi.mongodb.net/?retryWrites=true&w=majority"
 
@@ -32,6 +32,11 @@ class mongoPushData():
             collection = db[collectionName]
             print("Created Collection")
     
+    def getCollectionList(self) -> list:
+        db = self.client[self.dbName]
+        collection_names = db.list_collection_names()
+        return collection_names
+    
     
     def pushData(self, data: pd.DataFrame, collectionName: str) -> None:
         self.createCollection(collectionName)
@@ -40,20 +45,32 @@ class mongoPushData():
         result = data.to_dict(orient="dict")
         collection.insert_one(result)
         print("Finished Pushing Data")
-    
+        
+    def pullData(self, collectionName: str):
+        db = self.client[self.dbName]
+        collection = db[collectionName]
+        
+        documents = collection.find({},{"issued": 1, "price": 1, "_id": 0})
+        df = pd.DataFrame(list(documents))
+        all_data = []
+        for idx, row in df.iterrows():
+            issued = list(row['issued'].values())
+            price = list(row['price'].values())
+            for i, p in zip(issued, price):
+                all_data.append({'issued': i, 'price': p})
 
+        flattened_df = pd.DataFrame(all_data)
+
+        return flattened_df
 
 async def main():
-    puller = s3PullData.PullData()
-    db = mongoPushData('eve-historical-data')
+    db = mongoData('eve-historical-data')
     db.checkConnection()
-    for items in item:
-        for path in puller.getS3ObjectList():
-            print(path,items.name)
-            result = await puller.getItemData(items.value, regionId=10000002, path=path)
-            result.reset_index(inplace=True)
-            result.index = result.index.map(str)
-            db.pushData(result,items.name)
+    collectionList = db.getCollectionList()
+    for item in collectionList:
+        print(item)
+        data = db.pullData(item)
+        print(data)
 
 
         
