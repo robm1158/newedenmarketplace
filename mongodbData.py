@@ -50,7 +50,7 @@ class mongoData():
         db = self.client[self.dbName]
         collection = db[collectionName]
         
-        documents = collection.find({},{"issued": 1, "price": 1, "_id": 0})
+        documents = collection.find({}, {"issued": 1, "price": 1, "is_buy_order": 1, "_id": 0})
         df = pd.DataFrame(list(documents))
         all_data = []
         for idx, row in df.iterrows():
@@ -63,15 +63,15 @@ class mongoData():
 
         return flattened_df
 
-async def main():
-    db = mongoData('eve-historical-data')
-    db.checkConnection()
-    collectionList = db.getCollectionList()
-    for item in collectionList:
-        print(item)
-        data = db.pullData(item)
-        print(data)
+# async def main():
+#     db = mongoData('eve-historical-data')
+#     db.checkConnection()
+#     collectionList = db.getCollectionList()
+#     for item in collectionList:
+#         print(item)
+#         data = db.pullData(item)
+#         print(data)
 
 
         
-asyncio.run(main())
+# asyncio.run(main())
