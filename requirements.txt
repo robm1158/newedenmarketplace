@@ -12,3 +12,9 @@ graphviz
 seaborn
 matplotlib
 statsmodels
+pymongo
+dask
+tensorflow_addons
+pymongo
+s3fs
+dash
