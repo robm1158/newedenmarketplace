@@ -6,16 +6,17 @@ from RegionIdEnum import region
 from ItemIdEnum import item
 
 def removeOutliers(df: pd.DataFrame) -> pd.DataFrame:
-    zScores = np.abs(stats.zscore(df['price'],nan_policy='omit'))
+    dfzscores = ((df['price'] - df['price'].mean()) / df['price'].std()).abs()
+    df['z_score'] = dfzscores
     dfLen = len(df)
     
     threshold = np.inf #100000
 
-    while (dfLen/len(df[df['price'] < threshold])) - 1 < 0.1:
-        df['price'] = ((df['price'] - df['price'].mean()) / df['price'].std()).abs()
-        threshold = df['price'].mean()*3
-        df = df[df['price'] < threshold]
-    len(df)
+    while ((dfLen/len(df)) - 1 < 0.1):
+        threshold = df['z_score'].mean()*3
+        df = df[df['z_score'] < threshold]
+        dfzscores = ((df['price'] - df['price'].mean()) / df['price'].std()).abs()
+        df['z_score'] = pd.Series(dfzscores)
     return df
 
 def convertFromZuluTime(df: pd.DataFrame) -> pd.DataFrame:

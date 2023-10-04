@@ -27,19 +27,16 @@ pd.set_option('display.width', 250)
 
 async def main():
     puller = s3PullData.PullData()
-    path = '2022/2022-06-10/*.v3.csv.bz2'
-    for items in item:
+    path = '2022/2022-06-10/market-orders-2022-06-10_2*.v3.csv.bz2'
+    # for items in item:
         print(f'================== {items.name} ==================')
-        
-        result = await puller.getItemData(items.value, regionId=10000002,path=path)
+        print(items)
+    result = await puller.getItemData(item.TRITANIUM.value, regionId=10000002,path=path)
+    print(result.shape)
 
-        createLSTM.createLSTM(items.name, result, 30, 1, 300,64,True,True)
         del result
         gc.collect()
-    # utilities.removeOutliers(result)
-    # result = await puller.getItemData(22, regionId=10000002)
 
-    # createLSTM.createLSTM(item.PROTON_L.name, result, 30, 1, 300,64,False,False)
 
 
 # Run the main coroutine using asyncio's event loop
