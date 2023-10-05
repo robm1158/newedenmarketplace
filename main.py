@@ -28,11 +28,10 @@ pd.set_option('display.width', 250)
 async def main():
     puller = s3PullData.PullData()
     path = '2022/2022-06-10/market-orders-2022-06-10_2*.v3.csv.bz2'
-    # for items in item:
+    for items in item:
         print(f'================== {items.name} ==================')
-        print(items)
-    result = await puller.getItemData(item.TRITANIUM.value, regionId=10000002,path=path)
-    print(result.shape)
+        result = await puller.getItemData(items.value, regionId=10000002,path=path)
+        print(result.shape)
 
         del result
         gc.collect()
