@@ -7,23 +7,28 @@ import aiohttp
 import itemPrices
 import pandas as pd
 import pathlib
+import pyarrow as pa
+import pyarrow.parquet as pq
+from pathlib import Path
 from RegionIdEnum import region
 
-# for directory in pathlib.Path("/root/code/data/").iterdir():
-#   if str(directory) != "/root/code/data/index.html.tmp": 
-#     data = pd.read_csv(directory)
-#     print(data)
+# Converts CSV file to Pickle file type with the new name
+def fileToPickle():   
+  for directory in pathlib.Path("/root/code/data/").iterdir():
+    if str(directory).endswith(".v3.csv.bz2"):
+      data = pd.read_csv(directory)
+      new_name = "new-the-forge-historical2-" + directory.name[0:33] + ".pkl"
+      data.to_pickle(new_name)
+#fileToPickle()
 
-# How the file name should appear once reconstructed:
-# #the-forge-historical-market-orders-2021-06-19_16-50-12.v3.csv.bz2
-
-path = pathlib.Path('/root/code/data/market-orders-2021-06-19_16-50-12.v3.csv.bz2')
-data = pd.read_csv(path)
-
-newCSVName = path.parent.joinpath("the-forge-historical2-" + path.name)
-print(data.loc[data['region_id'] == region.THE_FORGE.value])
-data.loc[data['region_id'] == region.THE_FORGE.value].to_csv(newCSVName, index=False)
-
+# Reads the pickle file and prints off the data filtered by region_id 
+def pickleRead():
+  for directory in pathlib.Path("/root/code/data2/").iterdir():
+    if str(directory).endswith(".pkl"):
+      path = pathlib.Path(directory)
+      data = pd.read_pickle(path)
+      #print(data.loc[data['region_id'] == region.THE_FORGE.value])
+pickleRead()      
 
 
 
