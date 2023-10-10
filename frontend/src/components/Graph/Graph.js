@@ -9,13 +9,15 @@ function Graph({ data }) {
       type: 'scatter',
       mode: 'lines+points',
       marker: { color: 'red' },
+      title: data.map(d => d.name)
     },
+    
   ];
 
   return (
     <Plot
       data={plotData}
-      layout={{ width: 720, height: 440, title: 'Plotly Graph' }}
+      layout={{ width: 720, height: 440}}
     />
   );
 }

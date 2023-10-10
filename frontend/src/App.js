@@ -49,19 +49,23 @@ function App() {
     <div className="App">
         <h1>My React App</h1>
         <Dropdown options={options} onChange={handleDropdownChange} />
+        <div style={{ display: "flex", justifyContent: 'center'}}>
+          {graphData && <Graph data={graphData} />}
+        </div>
         
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
+          
             <div>
                 <h2>Buy Orders</h2>
-                <PagedTable data={buyOrders} headers={['id', 'name', 'price']} />
+                <PagedTable data={buyOrders} headers={['issued', 'station_id', 'price']} />
             </div>
             <div>
-                <h2>Non-Buy Orders</h2>
-                <PagedTable data={nonBuyOrders} headers={['id', 'name', 'price']} />
+                <h2>Sell Orders</h2>
+                <PagedTable data={nonBuyOrders} headers={['issued', 'station_id', 'price']} />
             </div>
         </div>
 
-        {graphData && <Graph data={graphData} />}
+        
     </div>
 );
 
