@@ -10,7 +10,7 @@ import pandas as pd
 from json import loads, dumps
 from motor.motor_asyncio import AsyncIOMotorClient
 
-class mongoData():
+class mongodbData():
     def __init__(self, dbName:str) -> None:
         self.uri = f"mongodb+srv://{passwords.mongoUser.value}:{passwords.mongoPassword.value}@serverlessinstance0.drbmrdi.mongodb.net/?retryWrites=true&w=majority"
         
