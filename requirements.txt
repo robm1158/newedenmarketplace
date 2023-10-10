@@ -21,4 +21,3 @@ dash
 motor
 Flask
 Flask-Cors
-bson
