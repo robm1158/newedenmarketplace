@@ -5,23 +5,23 @@ import requests
 from app import app as flask_app
 import sys
 sys.path.append('/root/code/eve-aws/utils')
+from utils.ItemIdEnum import item
+
 
 # Create Dash app and associate with Flask app
 dash_app = Dash(__name__, server=flask_app, url_base_pathname='/dashboard/')
 
 # Layout of the app
-dash_app.layout = html.Div([
-    dcc.Dropdown(
-        id='item-dropdown',
-        options=[
-            {'label': 'TRITANIUM', 'value': 'TRITANIUM'},
-            {'label': 'PYERITE', 'value': 'PYERITE'},
-            # add more options as required
-        ],
-        value='TRITANIUM'
-    ),
-    dcc.Graph(id='item-graph'),
-])
+dash_app.layout = html.Div(
+    [
+        dcc.Dropdown(
+            id='item-dropdown',
+            options = [{'label': items.name, 'value': items.name} for items in item],
+            value='TRITANIUM'
+        ),
+        dcc.Graph(id='item-graph'),
+    ]
+)
 
 
 @dash_app.callback(
