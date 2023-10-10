@@ -18,3 +18,4 @@ tensorflow_addons
 pymongo
 s3fs
 dash
+motor
