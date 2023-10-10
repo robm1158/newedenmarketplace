@@ -18,12 +18,12 @@ class PullData():
     async def getItemData(self, itemId: int, regionId: int, path: str) -> pd.DataFrame:
         # Using Dask to read CSV files directly from S3
         # Construct S3 file paths for the first 30 files
-        file_list = dd.read_csv(f's3://{self.bucketName}/{path}', storage_options={ 'use_ssl': True},blocksize=None,assume_missing=True).compute() # type: ignore
+        file_list = dd.read_csv(f's3://{self.bucketName}/{path}', storage_options={ 'use_ssl': True},blocksize=None,assume_missing=True) # type: ignore
 
         # # Now we can perform comparison on the Dask dataframe
         result_df = file_list[(file_list['type_id'] == itemId) & (file_list['region_id'] == regionId)]
         
-        return result_df
+        return result_df.compute()
         
     def getS3ObjectList(self) -> list:
         s3 = boto3.resource('s3')
