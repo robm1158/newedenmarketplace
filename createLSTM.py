@@ -1,5 +1,5 @@
 import pandas as pd
-import utilities
+import utils
 import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
@@ -50,8 +50,8 @@ def createLSTM(itemName: str, data: pd.DataFrame, n_input: int, n_features: int,
         pass
     
     early_stop = tf.keras.callbacks.EarlyStopping(monitor = 'loss', patience = 5)
-    data = utilities.convertFromZuluTime(data)
-    data = utilities.removeOutliers(data)
+    data = utils.convertFromZuluTime(data)
+    data = utils.removeOutliers(data)
 
     data = data.drop(columns=['range','universe_id','http_last_modified'])
     data['issued'] = pd.to_datetime(data['issued'],origin='unix',unit='D')

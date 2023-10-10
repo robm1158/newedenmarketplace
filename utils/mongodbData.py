@@ -16,6 +16,7 @@ class mongodbData():
         
         # Create a new client and connect to the server
         self.client = AsyncIOMotorClient(self.uri)
+        self.comClient = MongoClient(self.uri)
         self.dbName = dbName
 
     async def checkConnection(self):
@@ -63,24 +64,45 @@ class mongodbData():
         flattened_df = pd.DataFrame(all_data)
 
         return flattened_df
+    
+    def syncPullData(self, collectionName: str):
+        db = self.comClient[self.dbName]
+        collection = db[collectionName]
+
+        documents = collection.find({}, {"issued": 1, "price": 1, "is_buy_order": 1, "_id": 0})
+        df = pd.DataFrame(list(documents))
+
+        all_data = []
+        for idx, row in df.iterrows():
+            issued = row['issued']
+            price = row['price']
+            # Assuming you also want to use 'is_buy_order' based on the initial find query
+            is_buy_order = row['is_buy_order']  
+
+            for i, p, b in zip(issued, price, is_buy_order):
+                all_data.append({'issued': i, 'price': p, 'is_buy_order': b})
+
+        flattened_df = pd.DataFrame(all_data)
+
+        return flattened_df
 
     async def deleteDB(self, dbName: str) -> None:
         await self.client.drop_database(dbName)
         print(f"Deleted {dbName}")
 
 
-async def main():
-    puller = s3PullData.PullData()
-    db = mongoData('eve-market-order-history-the-forge')
-    await db.checkConnection()
+# async def main():
+#     puller = s3PullData.PullData()
+#     db = mongodbData('eve-market-order-history-the-forge')
+#     await db.checkConnection()
 
-    for object in puller.getS3ObjectList():
-        for items in item:
-            print(f'================== {items.name} ==================')
-            object = object.replace('\\', '/')
-            print(object)
-            result = await puller.getItemData(items.value, regionId=10000002, path=object)
-            await db.pushData(result, items.name)
+#     for object in puller.getS3ObjectList():
+#         for items in item:
+#             print(f'================== {items.name} ==================')
+#             object = object.replace('\\', '/')
+#             print(object)
+#             result = await puller.getItemData(items.value, regionId=10000002, path=object)
+#             await db.pushData(result, items.name)
 
         
-asyncio.run(main())
+# asyncio.run(main())

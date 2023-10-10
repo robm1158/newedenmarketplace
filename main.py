@@ -1,5 +1,5 @@
 import pandas as pd
-import utilities
+import utils
 import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
