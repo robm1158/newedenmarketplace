@@ -2,7 +2,7 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 import pymongo
 import sys
-sys.path.append('/root/code/utils')
+sys.path.append('/root/code/eve-aws')
 print(sys.path)
 from utils import mongodbData as mdb
 # from utils import s3PullData
