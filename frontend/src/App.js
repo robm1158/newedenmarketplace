@@ -4,15 +4,17 @@ import DataTable from './components/DataTable/DataTable';
 import axios from 'axios';
 import './App.css';
 
+// Import the enum
+import { ItemEnum } from './constants/ItemEnum';
+
 function App() {
-  // const [message, setMessage] = useState("");
   const [data, setData] = useState(null);  
 
-  const options = [
-    { label: "TRITANIUM", value: "TRITANIUM" },
-    { label: "PYERITE", value: "PYERITE" },
-    // ... add more options as needed
-  ];
+  // Convert the Enum to dropdown options format using the keys
+  const options = Object.keys(ItemEnum).map(key => ({
+    label: key,
+    value: key,
+  }));
 
   const handleDropdownChange = async (selectedValue) => {
     console.log("Selected value:", selectedValue);
@@ -32,7 +34,6 @@ function App() {
       {data && data.length > 0 && <DataTable data={data} />}
       <a href="/dashboard/" target="_blank">Go to Dashboard</a>
     </div>
-
   );
 }
 
