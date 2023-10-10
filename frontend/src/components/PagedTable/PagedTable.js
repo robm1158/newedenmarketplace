@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-function PagedTable({ data, rowsPerPage = 10, headers = [] }) {
+function PagedTable({ data, headers, rowsPerPage = 10 }) {
     const [currentPage, setCurrentPage] = useState(0);
     
     const totalPages = Math.ceil(data.length / rowsPerPage);
@@ -12,17 +12,13 @@ function PagedTable({ data, rowsPerPage = 10, headers = [] }) {
             <table>
                 <thead>
                     <tr>
-                        {headers.map((header, index) => (
-                            <th key={index}>{header}</th>
-                        ))}
+                        {headers.map(header => <th key={header}>{header}</th>)}
                     </tr>
                 </thead>
                 <tbody>
                     {currentData.map((row, rowIndex) => (
                         <tr key={rowIndex}>
-                            {headers.map((header, colIndex) => (
-                                <td key={colIndex}>{row[header]}</td>
-                            ))}
+                            {headers.map(header => <td key={header}>{row[header]}</td>)}
                         </tr>
                     ))}
                 </tbody>
