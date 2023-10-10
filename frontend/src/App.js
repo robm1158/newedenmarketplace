@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Dropdown from './components/Dropdown/Dropdown';
-import DataTable from './components/DataTable';
+import DataTable from './components/DataTable/DataTable';
 import axios from 'axios';
 import './App.css';
 
