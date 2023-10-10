@@ -11,3 +11,6 @@ services:
       source: /var/run/docker.sock
       target: /var/run/docker.sock
     - .:/root/code
+    ports:
+      - "5000:5000" # Flask default port
+      - "3000:3000" # create-react-app default port
