@@ -3,9 +3,10 @@ from flask_cors import CORS
 import pymongo
 import sys
 print(sys.path)
-sys.path.append('/root/code/utilities')
+sys.path.append('/root/code/utils')
 print(sys.path)
-from utilities.s3PullData import *
+from utils import mongodbData
+# from utils import s3PullData
 import pandas as pd
 
 app = Flask(__name__)
@@ -13,7 +14,7 @@ app = Flask(__name__)
 # Use CORS with your app
 CORS(app)
 
-db = mongoData('eve-market-order-history-the-forge')
+db = mongodbData('eve-market-order-history-the-forge')
 
 @app.route('/')
 def index():
