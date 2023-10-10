@@ -3,6 +3,7 @@ from flask_cors import CORS
 import pymongo
 import sys
 sys.path.append('/root/code/utils')
+print(sys.path)
 from utils import mongodbData as mdb
 # from utils import s3PullData
 import pandas as pd

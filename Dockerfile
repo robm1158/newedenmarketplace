@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 FROM python:3.10
 WORKDIR /code
-
+ENV PYTHONPATH="${PYTHONPATH}:/root/code/"
 # Install system dependencies and add Node.js from Nodesource
 RUN apt-get update && apt-get install -y \
     awscli \
