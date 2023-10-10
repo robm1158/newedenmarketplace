@@ -1,5 +1,5 @@
 import pandas as pd
-import utilities
+import utils
 import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
@@ -32,8 +32,8 @@ async def main():
     # for items in item:
     print(f'================== {item.TRITANIUM.name} ==================')
     df = await puller.getItemData(item.TRITANIUM.value, regionId=10000002,path=path)
-    df = utilities.removeOutliers(df)
-    df = utilities.convertFromZuluTime(df)
+    df = utils.removeOutliers(df)
+    df = utils.convertFromZuluTime(df)
     df = df.drop(columns=['range','universe_id','http_last_modified'])
     df['issued'] = df['issued'].dt.date
     fig = px.scatter(df, x='issued', y="price",color='is_buy_order')
