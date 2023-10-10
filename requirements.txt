@@ -19,3 +19,6 @@ pymongo
 s3fs
 dash
 motor
+Flask
+Flask-Cors
+bson
