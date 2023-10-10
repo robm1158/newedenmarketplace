@@ -30,7 +30,9 @@ function App() {
       <h1>My React App</h1>
       <Dropdown options={options} onChange={handleDropdownChange} />
       {data && data.length > 0 && <DataTable data={data} />}
+      <a href="/dashboard/" target="_blank">Go to Dashboard</a>
     </div>
+
   );
 }
 
