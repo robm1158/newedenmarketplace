@@ -3,6 +3,8 @@ import pandas as pd
 import plotly.express as px
 import requests
 from app import app as flask_app
+import sys
+sys.path.append('/root/code/eve-aws/utils')
 
 # Create Dash app and associate with Flask app
 dash_app = Dash(__name__, server=flask_app, url_base_pathname='/dashboard/')
