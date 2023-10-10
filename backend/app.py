@@ -21,9 +21,9 @@ def index():
 @app.route('/get_item/<item_name>')
 def get_item(item_name: str):
     df = db.syncPullData(item_name)
+    df = df.sort_values(by=['issued'], ascending=False)
     
     if df is not None:
-        # print(df.to_json(orient="records"))
         return df.to_json(orient="records"), 200
     return jsonify({"error": "Data not found for the given ID"}), 404
 
