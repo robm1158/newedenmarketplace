@@ -69,26 +69,18 @@ class mongoData():
         print(f"Deleted {dbName}")
 
 
-async def process_object(obj, item_value, item_name, db, puller):
-    obj = obj.replace('\\', '/')
-    print(f'================== {item_name} ==================')
-    print(obj)
-    result = await puller.getItemData(item_value, regionId=10000002, path=obj)
-    await db.pushData(result, item_name)
-
-
 async def main():
     puller = s3PullData.PullData()
     db = mongoData('eve-market-order-history-the-forge')
     await db.checkConnection()
-    
-    tasks = []
-    for obj in puller.getS3ObjectList():
-        for items in item:
-            task = process_object(obj, items.value, items.name, db, puller)
-            tasks.append(task)
-            
-    # Run all tasks concurrently
-    await asyncio.gather(*tasks)
 
+    for object in puller.getS3ObjectList():
+        for items in item:
+            print(f'================== {items.name} ==================')
+            object = object.replace('\\', '/')
+            print(object)
+            result = await puller.getItemData(items.value, regionId=10000002, path=object)
+            await db.pushData(result, items.name)
+
+        
 asyncio.run(main())
