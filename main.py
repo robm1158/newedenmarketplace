@@ -1,36 +1,27 @@
 import pandas as pd
-import utils
 import matplotlib.pyplot as plt
 import numpy as np
-import tensorflow as tf
-import sklearn as sk
-from sklearn.preprocessing import MinMaxScaler, StandardScaler
-from sklearn.metrics import mean_squared_error
-from sklearn.metrics import mean_absolute_percentage_error
-from sklearn.model_selection import train_test_split
-from sklearn.model_selection import TimeSeriesSplit
-import seaborn as sns
-from statsmodels.graphics.gofplots import qqplot
-from scipy.stats import norm, uniform
-import createLSTM
-from ItemIdEnum import item
 import pathlib
-import s3PullData
 import asyncio
-import gc
-from motor.motor_asyncio import AsyncIOMotorClient
-from mongodbData import mongoData
-
-
+from itemPrices import getGroups
+from itemPrices import unravelGroupsAsync
+from itemPrices import construct_hierarchy
+import json
 
 pd.set_option('display.max_rows', 10)
 pd.set_option('display.max_columns', 17)
 pd.set_option('display.width', 250)
+def save_to_file(data, filename='output.json'):
+    with open(filename, 'w') as file:
+        json.dump(data, file, indent=4)
 
 async def main():
-    puller = s3PullData.PullData()
-    db = mongoData('eve-market-order-history-the-forge')
-    await db.deleteDB('eve-market-order-history-the-forge')
+    data = await getGroups()
+    result = await unravelGroupsAsync(data)
+    
+    data1 = construct_hierarchy(result)
+    save_to_file(data1)
+    print(data1)
 
 # Run the main coroutine using asyncio's event loop
 asyncio.run(main())

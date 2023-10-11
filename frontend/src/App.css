@@ -1,5 +1,8 @@
 .App {
-  text-align: center;
+  display: flex;
+  justify-content: flex-start;
+  align-items: stretch; /* ensures that sidebar and content take full height */
+  height: 100vh; /* use full viewport height */
 }
 
 .App-logo {
@@ -7,12 +10,39 @@
   pointer-events: none;
 }
 
+/* This media query keeps the logo spinning for those who don't have motion reduction preference */
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
   }
 }
 
+/* Sidebar Styles */
+.sidebar {
+  width: 250px; /* Adjust this width as needed */
+  background-color: #282c34; /* Adjust this to your desired sidebar color */
+  overflow: auto; /* Makes the sidebar scrollable if the content is too tall */
+  color: white;
+  padding: 16px;
+}
+
+.content {
+  flex-grow: 1; /* allows the content to take up the remaining space */
+  padding: 16px;
+  overflow-y: auto; /* scrollable if content is too tall */
+}
+
+/* If you prefer the content and sidebar to stack on smaller screens (like mobile devices), use a media query */
+@media (max-width: 768px) {
+  .App {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+  }
+}
+
+/* Remaining styles remain unchanged */
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
