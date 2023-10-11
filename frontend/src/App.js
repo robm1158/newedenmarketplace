@@ -5,6 +5,8 @@ import DataTable from './components/DataTable/DataTable';
 import Graph from './components/Graph/Graph';
 import { ItemEnum } from './constants/ItemEnum';
 import PagedTable from './components/PagedTable/PagedTable';
+import { ColorModeContext, useMode } from './theme';
+import { CssBaseline, ThemeProvider } from '@mui/material';
 import axios from 'axios';
 import './App.css';
 
@@ -12,6 +14,7 @@ import './App.css';
 function App() {
   const [tableData, setTableData] = useState(null);
   const [graphData, setGraphData] = useState(null);
+  const [theme, colorMode] = useMode();
 
   // Convert the Enum to dropdown options format using the keys
   const options = Object.keys(ItemEnum).map(key => ({
@@ -46,27 +49,32 @@ function App() {
   };
 
   return (
-    <div className="App">
-        <h1>My React App</h1>
-        <Dropdown options={options} onChange={handleDropdownChange} />
-        <div style={{ display: "flex", justifyContent: 'center'}}>
-          {graphData && <Graph data={graphData} />}
-        </div>
-        
-        <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-          
-            <div>
-                <h2>Buy Orders</h2>
-                <PagedTable data={buyOrders} headers={['issued', 'station_id', 'price']} />
+    <ColorModeContext.Provider value={colorMode}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <div className="App">
+          <main className='content'>
+            <h1>My React App</h1>
+            <Dropdown options={options} onChange={handleDropdownChange} />
+            <div style={{ display: "flex", justifyContent: 'center'}}>
+              {graphData && <Graph data={graphData} />}
             </div>
-            <div>
-                <h2>Sell Orders</h2>
-                <PagedTable data={nonBuyOrders} headers={['issued', 'station_id', 'price']} />
+            
+            <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
+              
+                <div>
+                    <h2>Buy Orders</h2>
+                    <PagedTable data={buyOrders} headers={['issued', 'station_id', 'price']} />
+                </div>
+                <div>
+                    <h2>Sell Orders</h2>
+                    <PagedTable data={nonBuyOrders} headers={['issued', 'station_id', 'price']} />
+                </div>
             </div>
+          </main>
         </div>
-
-        
-    </div>
+      </ThemeProvider>
+    </ColorModeContext.Provider>
 );
 
 }
