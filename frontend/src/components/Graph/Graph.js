@@ -4,8 +4,8 @@ import Plot from 'react-plotly.js';
 function Graph({ data }) {
   const plotData = [
     {
-      x: data.map(d => d.issued), // Assuming 'date' is a key in your data
-      y: data.map(d => d.price), // Assuming 'value' is a key in your data
+      x: data.map(d => d.issued), 
+      y: data.map(d => d.price), 
       type: 'scatter',
       mode: 'lines+points',
       marker: { color: 'red' },
