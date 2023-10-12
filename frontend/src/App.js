@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-// import Dropdown from './components/Dropdown/Dropdown';
-// import { Routes, Route } from 'react-router-dom';
 import Graph from './components/Graph/Graph';
 import { ItemEnum } from './constants/ItemEnum';
 import PagedTable from './components/PagedTable/PagedTable';
@@ -8,7 +6,6 @@ import { ColorModeContext, useMode } from './theme';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import Topbar from './scenes/global/Topbar';
 import CustomSidebar from "./scenes/global/Sidebar";
-// import { Dashboard } from "./scenes/dashboard";
 import axios from 'axios';
 import './App.css';
 
@@ -22,16 +19,22 @@ function App() {
     value: key,
   }));
 
+  const REVERSED_ITEM_ENUM = Object.keys(ItemEnum).reduce((obj, key) => {
+    obj[ItemEnum[key]] = key;
+    return obj;
+}, {});
+
   const buyOrders = tableData ? tableData.filter(order => order.is_buy_order === true) : [];
   const nonBuyOrders = tableData ? tableData.filter(order => order.is_buy_order === false) : [];
     
   const handleSidebarClick = async (selectedValue) => {
+    const selectedItemName = REVERSED_ITEM_ENUM[selectedValue];
     // You might use the type_id here to fetch relevant data
     try {
-        const tableResponse = await axios.get(`http://127.0.0.1:5000/get_item/${selectedValue}`);
+        const tableResponse = await axios.get(`http://127.0.0.1:5000/get_item/${selectedItemName}`);
         setTableData(tableResponse.data);
 
-        const graphResponse = await axios.post(`http://127.0.0.1:5000/get_graph_data`, { selectedValue: selectedValue });
+        const graphResponse = await axios.post(`http://127.0.0.1:5000/get_graph_data/${ selectedItemName }`);
         setGraphData(graphResponse.data);
       
     } catch (error) {
