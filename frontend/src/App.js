@@ -49,7 +49,7 @@ function App() {
               <CustomSidebar />
             </div>
             <main className='content'>
-              <h1>My React App</h1>
+              <h1>My React App </h1>
               <Dropdown options={options} onChange={handleDropdownChange} />
               <div style={{ display: "flex", justifyContent: 'center' }}>
                 {graphData && <Graph data={graphData} />}

@@ -61,13 +61,15 @@ async def unravelGroupsAsync(data: list) -> list:
         # Adjusting the structure of results
         structured_results = []
         for group, result in zip(data, results):  # Zip the original data with results for simultaneous iteration
+            image_name = group.get('iconFile', f"/Icons/items/{result.get('icon_id', 'default')}.png").split('/')[-1]  # This will give you just the image name
+            print(image_name)
             structured_entry = {
                 "market_group_id": result['market_group_id'],
                 "marketGroupName": result['name'],
                 "description": result['description'],
                 "parent_group_id": result.get('parent_group_id', None),
                 "iconID": group.get('iconID', None),  # Using iconID from the original data
-                "iconFile": group.get('iconFile', f"/Icons/items/{result.get('icon_id', 'default')}.png"),  # Use iconFile from the original data or build it from result's icon_id
+                "iconFile": image_name,  # Use iconFile from the original data or build it from result's icon_id
                 "types": result.get('types', [])
             }
             structured_results.append(structured_entry)

@@ -22,7 +22,7 @@ async def main():
     # # print(result)
     
     data1 = construct_hierarchy(result)
-    save_to_file(data1)
+    # save_to_file(data1)
     # print(data1)
 
 # Run the main coroutine using asyncio's event loop

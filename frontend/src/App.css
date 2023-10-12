@@ -9,17 +9,23 @@ body, html {
   margin: 0;
 }
 
+h1 {
+  text-align: center;
+}
+
 .mainWrapper {
   display: flex;
   flex-grow: 1;
 }
 
 .sidebar {
-  width: 250px;
+  width: 330px;  /* Adjust this width as needed, increased from 250px */
   background-color: #282c34;
-  overflow-y: auto;
-  color: white;
-  padding: 16px;
+  flex-grow: 1;  /* This will make the sidebar take up all available space */
+  /* color: white; */
+  padding: 4px;
+  box-sizing: border-box;
+  overflow-y: auto; /* Allow scrolling only if content exceeds the height */
 }
 
 .content {
