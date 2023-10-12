@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Dropdown from './components/Dropdown/Dropdown';
-import { Routes, Route } from 'react-router-dom';
+// import Dropdown from './components/Dropdown/Dropdown';
+// import { Routes, Route } from 'react-router-dom';
 import Graph from './components/Graph/Graph';
 import { ItemEnum } from './constants/ItemEnum';
 import PagedTable from './components/PagedTable/PagedTable';
@@ -24,19 +24,21 @@ function App() {
 
   const buyOrders = tableData ? tableData.filter(order => order.is_buy_order === true) : [];
   const nonBuyOrders = tableData ? tableData.filter(order => order.is_buy_order === false) : [];
-
-  const handleDropdownChange = async (selectedValue) => {
+    
+  const handleSidebarClick = async (selectedValue) => {
+    // You might use the type_id here to fetch relevant data
     try {
-      const tableResponse = await axios.get(`http://127.0.0.1:5000/get_item/${selectedValue}`);
-      setTableData(tableResponse.data);
+        const tableResponse = await axios.get(`http://127.0.0.1:5000/get_item/${selectedValue}`);
+        setTableData(tableResponse.data);
 
-      const graphResponse = await axios.post(`http://127.0.0.1:5000/get_graph_data`, { selectedValue: selectedValue });
-      setGraphData(graphResponse.data);
+        const graphResponse = await axios.post(`http://127.0.0.1:5000/get_graph_data`, { selectedValue: selectedValue });
+        setGraphData(graphResponse.data);
       
     } catch (error) {
-      console.error("Error fetching data:", error);
+        console.error("Error fetching data:", error);
     }
-  };
+};
+
 
   return (
     <ColorModeContext.Provider value={colorMode}>
@@ -46,11 +48,11 @@ function App() {
           <Topbar />
           <div className="mainWrapper">
             <div className="sidebar">
-              <CustomSidebar />
+            <CustomSidebar handleSidebarClick={handleSidebarClick} setTableData={setTableData} setGraphData={setGraphData} />
+
             </div>
             <main className='content'>
               <h1>My React App </h1>
-              <Dropdown options={options} onChange={handleDropdownChange} />
               <div style={{ display: "flex", justifyContent: 'center' }}>
                 {graphData && <Graph data={graphData} />}
               </div>
