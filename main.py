@@ -1,5 +1,4 @@
 import sys
-print(sys.path)
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -10,7 +9,8 @@ from itemPrices import unravelGroupsAsync
 from itemPrices import construct_hierarchy
 import json
 from tqdm import tqdm
-from utils.ItemIdEnum import item
+import requests
+# from utils.ItemIdEnum import item
 
 pd.set_option('display.max_rows', 10)
 pd.set_option('display.max_columns', 17)
@@ -27,6 +27,7 @@ def extract_types(data):
         types.extend(item['types'])  # Add types from current item
         types.extend(extract_types(item['children']))  # Recursively get types from children
     return types
+
 async def main():
     # data = await getGroups()
     # # print(data)
@@ -51,8 +52,22 @@ async def main():
     # type_list = []
     # enum_list = []
     # final_enum_list = []
-    # with open('/root/code/eve-aws/types.txt', 'r') as file:
-    #     type_list = file.readlines()
+    with open('/root/code/eve-aws/types.txt', 'r') as file:
+        type_list = file.readlines()
+        type_list = [line.strip().rstrip(',') for line in type_list]
+        for type in type_list:
+            url = f"https://esi.evetech.net/latest/markets/10000002/orders/?datasource=tranquility&order_type=all&page=1&type_id={type}"
+            response = requests.get(url)
+            try:
+                data = response.json()
+                if data is None:
+                    print("yes")
+                    print(type)
+            except json.decoder.JSONDecodeError:
+                print(type)
+                print(response)
+                print("Failed to parse JSON from response.")
+            # print(data)
 
     #     # Optionally, if you want to remove newline characters from each string in the list:
     #     type_list = [line.strip() for line in type_list]
@@ -62,8 +77,7 @@ async def main():
         
     # for type in tqdm(type_list, total=100):
     #     for enum in enum_list:
-    #         if type in enum:
-    #             final_enum_list.append(enum)
+
 
     
         
