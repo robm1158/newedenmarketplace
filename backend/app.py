@@ -2,11 +2,8 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 import pymongo
 import sys
-
 sys.path.append('/root/code/eve-aws')
-print(sys.path)
 from utils import mongodbData as mdb
-# from utils import s3PullData
 import pandas as pd
 from utils import ItemIdEnum as item
 
@@ -24,8 +21,9 @@ def index():
 @app.route('/get_item/<item_name>')
 def get_item(item_name: str):
     df = db.syncPullData(item_name)
+    print(df)
     df = df.sort_values(by=['issued'], ascending=False)
-    
+    print(df)
     if df is not None:
         return df.to_json(orient="records"), 200
     return jsonify({"error": "Data not found for the given ID"}), 404
