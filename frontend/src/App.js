@@ -43,35 +43,34 @@ function App() {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <div className="App">
-          <div className="sidebar">
-            <CustomSidebar />
+          <Topbar />
+          <div className="mainWrapper">
+            <div className="sidebar">
+              <CustomSidebar />
+            </div>
+            <main className='content'>
+              <h1>My React App</h1>
+              <Dropdown options={options} onChange={handleDropdownChange} />
+              <div style={{ display: "flex", justifyContent: 'center' }}>
+                {graphData && <Graph data={graphData} />}
+              </div>
+              
+              <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
+                  <div>
+                      <h2>Buy Orders</h2>
+                      <PagedTable data={buyOrders} headers={['issued', 'station_id', 'price']} />
+                  </div>
+                  <div>
+                      <h2>Sell Orders</h2>
+                      <PagedTable data={nonBuyOrders} headers={['issued', 'station_id', 'price']} />
+                  </div>
+              </div>
+            </main>
           </div>
-          <main className='content'>
-            <Topbar />
-            {/* <Routes>
-              <Route path="/" element={<Dashboard />} />
-            </Routes> */}
-            <h1>My React App</h1>
-            <Dropdown options={options} onChange={handleDropdownChange} />
-            <div style={{ display: "flex", justifyContent: 'center' }}>
-              {graphData && <Graph data={graphData} />}
-            </div>
-            
-            <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-                <div>
-                    <h2>Buy Orders</h2>
-                    <PagedTable data={buyOrders} headers={['issued', 'station_id', 'price']} />
-                </div>
-                <div>
-                    <h2>Sell Orders</h2>
-                    <PagedTable data={nonBuyOrders} headers={['issued', 'station_id', 'price']} />
-                </div>
-            </div>
-          </main>
         </div>
       </ThemeProvider>
     </ColorModeContext.Provider>
-  );
+);
 }
 
 export default App;
