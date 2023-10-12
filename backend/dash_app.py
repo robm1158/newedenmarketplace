@@ -1,10 +1,11 @@
+import sys
+sys.path.append('/root/code/eve-aws/utils')
+print(sys.path)
 from dash import Dash, dcc, html, Input, Output
 import pandas as pd
 import plotly.express as px
 import requests
 from app import app as flask_app
-import sys
-sys.path.append('/root/code/eve-aws/utils')
 from utils.ItemIdEnum import item
 
 
