@@ -17,11 +17,13 @@ def save_to_file(data, filename='output.json'):
 
 async def main():
     data = await getGroups()
+    # print(data)
     result = await unravelGroupsAsync(data)
+    # # print(result)
     
     data1 = construct_hierarchy(result)
     save_to_file(data1)
-    print(data1)
+    # print(data1)
 
 # Run the main coroutine using asyncio's event loop
 asyncio.run(main())

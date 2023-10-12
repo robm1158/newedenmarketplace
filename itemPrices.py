@@ -40,20 +40,41 @@ async def getRegionOrderIds(region_id: int) -> list:
 
 async def getGroups() -> list:
     async with aiohttp.ClientSession() as session:
-        async with session.get(f"https://esi.evetech.net/latest/markets/groups/") as response:
+        async with session.get(f"https://evetycoon.com/api/v1/market/groups") as response:
             data = await response.json()
             return data
         
 
-async def fetch(session, group):
-    url = f"https://esi.evetech.net/latest/markets/groups/{group}/?datasource=tranquility&language=en"
+async def fetch(session, url):
     async with session.get(url) as response:
         return await response.json()
 
-async def unravelGroupsAsync(data: list):
+async def unravelGroupsAsync(data: list) -> list:
     async with aiohttp.ClientSession() as session:
-        tasks = [fetch(session, group) for group in data]
-        return await asyncio.gather(*tasks)
+        tasks = []
+        for group in data:
+            url = f"https://esi.evetech.net/latest/markets/groups/{group['marketGroupID']}/?datasource=tranquility&language=en"
+            tasks.append(fetch(session, url))
+        
+        results = await asyncio.gather(*tasks)
+
+        # Adjusting the structure of results
+        structured_results = []
+        for group, result in zip(data, results):  # Zip the original data with results for simultaneous iteration
+            structured_entry = {
+                "market_group_id": result['market_group_id'],
+                "marketGroupName": result['name'],
+                "description": result['description'],
+                "parent_group_id": result.get('parent_group_id', None),
+                "iconID": group.get('iconID', None),  # Using iconID from the original data
+                "iconFile": group.get('iconFile', f"/Icons/items/{result.get('icon_id', 'default')}.png"),  # Use iconFile from the original data or build it from result's icon_id
+                "types": result.get('types', [])
+            }
+            structured_results.append(structured_entry)
+
+        return structured_results
+
+
 
 def unravelGroups(data: list):
     loop = asyncio.get_event_loop()
@@ -64,26 +85,30 @@ def unravelGroups(data: list):
 def construct_hierarchy(data):
     def find_children(parent_id):
         children = []
-        for item in tqdm(data, total=100):
+        for item in data:
             if item.get('parent_group_id') == parent_id:
                 child = {
                     "description": item["description"],
                     "market_group_id": item["market_group_id"],
-                    "name": item["name"],
+                    "name": item["marketGroupName"],
+                    "iconFile": item["iconFile"],
                     "types": item["types"]
                 }
                 child['children'] = find_children(item["market_group_id"])
                 children.append(child)
         return children
 
-    root_items = [item for item in data if "parent_group_id" not in item]
+    # Only root items are those that don't have a 'parent_group_id' 
+    # or their 'parent_group_id' value doesn't exist in any other item's 'marketGroupID'.
+    root_items = [item for item in data if not item.get('parent_group_id') or not any(x['market_group_id'] == item['parent_group_id'] for x in data)]
     hierarchy = []
 
-    for root in tqdm(root_items, total=100):
+    for root in root_items:
         root_data = {
             "description": root["description"],
             "market_group_id": root["market_group_id"],
-            "name": root["name"],
+            "name": root["marketGroupName"],
+            "iconFile": root["iconFile"],
             "types": root["types"],
             "children": find_children(root["market_group_id"])
         }
