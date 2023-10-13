@@ -13,6 +13,7 @@ function App() {
   const [tableData, setTableData] = useState(null);
   const [graphData, setGraphData] = useState(null);
   const [theme, colorMode] = useMode();
+  const [selectedItemName, setSelectedItemName] = useState(null);
 
   const options = Object.keys(ItemEnum).map(key => ({
     label: key,
@@ -28,13 +29,14 @@ function App() {
   const nonBuyOrders = tableData ? tableData.filter(order => order.is_buy_order === false) : [];
     
   const handleSidebarClick = async (selectedValue) => {
-    const selectedItemName = REVERSED_ITEM_ENUM[selectedValue];
+    const name = REVERSED_ITEM_ENUM[selectedValue];
+    setSelectedItemName(name);
     // You might use the type_id here to fetch relevant data
     try {
-        const tableResponse = await axios.get(`http://127.0.0.1:5000/get_item/${selectedItemName}`);
+        const tableResponse = await axios.get(`http://127.0.0.1:5000/get_item/${name}`);
         setTableData(tableResponse.data);
 
-        const graphResponse = await axios.post(`http://127.0.0.1:5000/get_graph_data/${ selectedItemName }`);
+        const graphResponse = await axios.post(`http://127.0.0.1:5000/get_graph_data`, { selectedValue: name });
         setGraphData(graphResponse.data);
       
     } catch (error) {
@@ -56,8 +58,8 @@ function App() {
             </div>
             <main className='content'>
               <h1>My React App </h1>
-              <div style={{ display: "flex", justifyContent: 'center' }}>
-                {graphData && <Graph data={graphData} />}
+              <div style={{ display: "flex"}}>
+                {graphData && <Graph data={graphData} itemName={selectedItemName}/>}
               </div>
               
               <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>

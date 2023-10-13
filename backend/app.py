@@ -21,9 +21,7 @@ def index():
 @app.route('/get_item/<item_name>')
 def get_item(item_name: str):
     df = db.syncPullData(item_name)
-    print(df)
     df = df.sort_values(by=['issued'], ascending=False)
-    print(df)
     if df is not None:
         return df.to_json(orient="records"), 200
     return jsonify({"error": "Data not found for the given ID"}), 404
@@ -34,10 +32,9 @@ def get_graph_data():
     # Extract selected value from request
     data = request.json
     selected_value = data.get('selectedValue')
+    print(selected_value)
     if not selected_value:
         return jsonify({"error": "selectedValue not provided in the request."}), 400
-
-    print(f"Selected value: {selected_value}")
 
     # Process data based on selected value...
     df = db.syncPullData(selected_value)
@@ -45,7 +42,6 @@ def get_graph_data():
         return jsonify({"error": "No data found for the selected value."}), 404
 
     df = df.sort_values(by=['issued'], ascending=False)
-    print(df)
 
     return df.to_json(orient="records"), 200
 
