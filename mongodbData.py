@@ -69,18 +69,18 @@ class mongoData():
         print(f"Deleted {dbName}")
 
 
-async def main():
-    puller = s3PullData.PullData()
-    db = mongoData('eve-market-order-history-the-forge')
-    await db.checkConnection()
+# async def main():
+#     puller = s3PullData.PullData()
+#     db = mongoData('eve-market-order-history-the-forge')
+#     await db.checkConnection()
 
-    for object in puller.getS3ObjectList():
-        for items in item:
-            print(f'================== {items.name} ==================')
-            object = object.replace('\\', '/')
-            print(object)
-            result = await puller.getItemData(items.value, regionId=10000002, path=object)
-            await db.pushData(result, items.name)
+#     for object in puller.getS3ObjectList():
+#         for items in item:
+#             print(f'================== {items.name} ==================')
+#             object = object.replace('\\', '/')
+#             print(object)
+#             result = await puller.getItemData(items.value, regionId=10000002, path=object)
+#             await db.pushData(result, items.name)
 
         
-asyncio.run(main())
+# asyncio.run(main())
