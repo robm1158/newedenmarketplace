@@ -16,23 +16,36 @@ h1 {
 .mainWrapper {
   display: flex;
   flex-grow: 1;
+  background-color: #282c34;
 }
 
 .sidebar {
-  width: 330px;  /* Adjust this width as needed, increased from 250px */
+  width: 350px;  
   background-color: #282c34;
-  flex-grow: 1;  /* This will make the sidebar take up all available space */
-  /* color: white; */
   padding: 4px;
   box-sizing: border-box;
-  overflow-y: auto; /* Allow scrolling only if content exceeds the height */
+  overflow-y: auto;  /* Allow scrolling */
+  max-height: 100vh;  /* Make sure it doesn't grow beyond viewport height */
 }
 
 .content {
   flex-grow: 1;
   padding: 16px;
-  overflow-y: auto;
+  /* overflow-y: auto; */
+  display: flex;
+  flex-direction: column; /* ensure the content inside is stacked vertically */
 }
+
+.pro-sidebar .pro-menu .pro-menu-item  {
+   font-size:  1em; /*Change to your desired font size */
+    /*Optional: if you want the font to be bold */
+  /* color: #333; Optional: if you want to change the font color */
+}
+.pro-sidebar .pro-menu .pro-sub-menu .pro-menu-item .pro-menu-item .pro-menu-item {
+  font-size: 0.8em ; /* adjust as needed */
+  font-weight: bold;
+}
+
 
 /* Mobile responsiveness */
 @media (max-width: 768px) {
