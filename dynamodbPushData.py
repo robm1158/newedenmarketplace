@@ -51,7 +51,7 @@ class PushData:
 
     # This just updates the table
     async def updatePriceHistoryTable(self, table, table_name, item_id):
-        itemjson = await itemPrices.getItemsPriceHistory(item_id, region.THE_FORGE.value)
+        itemjson = json.dumps(await itemPrices.getItemsPriceHistory(item_id, region.THE_FORGE.value))
         jsondata = json.loads(itemjson, parse_float=Decimal)# type: ignore
 
         async with table.batch_writer() as batch:
