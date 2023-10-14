@@ -17,7 +17,7 @@ class mongoData():
         Parameters:
             dbName (str): The name of the MongoDB database.
         """
-        self.uri = f"mongodb+srv://{passwords.mongoUser.value}:{passwords.mongoPassword.value}@serverlessinstance0.drbmrdi.mongodb.net/?retryWrites=true&w=majority"
+        self.uri = f"mongodb+srv://{passwords.mongoUser.value}:{passwords.mongoPassword.value}@evestoragecluster.4jc1x.mongodb.net/?retryWrites=true&w=majority"
         
         # Create a new asynchronous client and connect to the server
         self.client = AsyncIOMotorClient(self.uri)
@@ -107,6 +107,55 @@ class mongoData():
         """
         await self.client.drop_database(dbName)
         print(f"Deleted {dbName}")
+        
+    async def pullAllCollectionDocuments(self, collectionName: str) -> None:
+        """
+        Asynchronously pull all documents from the specified MongoDB collection.
+
+        Parameters:
+            collectionName (str): The name of the collection to pull documents from.
+
+        Returns:
+            list: A list containing all documents from the specified collection.
+        """
+        def ensure_list(value):
+            """Convert scalar values to single-item list or return the value if it's already a list-like."""
+            if value is None:
+                return [None]
+            elif isinstance(value, (list, pd.Series)):
+                return value
+            else:
+                return [value]
+        db = self.client[self.dbName]
+        collection = db[collectionName]
+        documents = await collection.find({}).to_list(length=None)
+        db.client.close()
+        
+        df = pd.DataFrame(columns=['date','average','highest',
+                          'lowest','order_count','volume','item_name'])
+
+        for document in documents:
+
+            date_data = ensure_list(document.get('date'))
+            average_data = ensure_list(document.get('average'))
+            highest_data = ensure_list(document.get('highest'))
+            lowest_data = ensure_list(document.get('lowest'))
+            order_count_data = ensure_list(document.get('order_count'))
+            volume_data = ensure_list(document.get('volume'))
+            item_name = collectionName
+        
+            df1 = pd.DataFrame({
+                'date': date_data,
+                'average': average_data,
+                'highest': highest_data,
+                'lowest': lowest_data,
+                'order_count': order_count_data,
+                'volume': volume_data,
+                'item_name': item_name
+                })
+            df = pd.concat([df, df1])
+
+        return df
 
 
 # The main function and its calls are commented out, but it serves to:

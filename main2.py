@@ -1,11 +1,11 @@
 import pandas as pd
-import utilities
+import utils.utilities as utilities
 import matplotlib.pyplot as plt
 import numpy as np
-import itemPrices as ip
+import utils.itemPrices as ip
 from ItemIdEnum import item
 import pathlib
-import s3PullData
+import utils.s3PullData as s3PullData
 import asyncio
 import gc
 from dash import Dash, dcc, html, Input, Output

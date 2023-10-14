@@ -15,7 +15,7 @@ from scipy.stats import norm, uniform
 import createLSTM
 from ItemIdEnum import item
 import pathlib
-import s3PullData
+import utils.s3PullData as s3PullData
 import asyncio
 import gc
 from motor.motor_asyncio import AsyncIOMotorClient
