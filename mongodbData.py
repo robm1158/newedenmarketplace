@@ -1,4 +1,3 @@
-
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from passwordsEnum import passwords
@@ -12,13 +11,22 @@ from motor.motor_asyncio import AsyncIOMotorClient
 
 class mongoData():
     def __init__(self, dbName:str) -> None:
+        """
+        Initialize the mongoData class with the specified database name.
+
+        Parameters:
+            dbName (str): The name of the MongoDB database.
+        """
         self.uri = f"mongodb+srv://{passwords.mongoUser.value}:{passwords.mongoPassword.value}@serverlessinstance0.drbmrdi.mongodb.net/?retryWrites=true&w=majority"
         
-        # Create a new client and connect to the server
+        # Create a new asynchronous client and connect to the server
         self.client = AsyncIOMotorClient(self.uri)
         self.dbName = dbName
 
     async def checkConnection(self):
+        """
+        Asynchronously check if a connection to the MongoDB server is established by pinging it.
+        """
         try:
             await self.client.admin.command('ping')
             print("Pinged your deployment. You successfully connected to MongoDB!")
@@ -26,7 +34,12 @@ class mongoData():
             print(e)
 
     async def createCollection(self, collectionName: str) -> None:
-        print(collectionName in await self.client[self.dbName].list_collection_names())
+        """
+        Asynchronously create a collection with the specified name in the database.
+
+        Parameters:
+            collectionName (str): The name of the collection to be created.
+        """
         if collectionName in await self.client[self.dbName].list_collection_names():
             print("Collection already exists")
         else:   
@@ -35,11 +48,24 @@ class mongoData():
             print("Created Collection")
 
     async def getCollectionList(self) -> list:
+        """
+        Asynchronously retrieve a list of all collection names in the database.
+
+        Returns:
+            list: A list containing the names of all collections in the database.
+        """
         db = self.client[self.dbName]
         collection_names = await db.list_collection_names()
         return collection_names
     
     async def pushData(self, data: pd.DataFrame, collectionName: str) -> None:
+        """
+        Asynchronously push data from a pandas DataFrame to the specified MongoDB collection.
+
+        Parameters:
+            data (pd.DataFrame): The data to be pushed to MongoDB.
+            collectionName (str): The name of the collection to push the data to.
+        """
         await self.createCollection(collectionName)
         db = self.client[self.dbName]
         collection = db[collectionName]
@@ -48,9 +74,17 @@ class mongoData():
         print("Finished Pushing Data")
     
     async def pullData(self, collectionName: str):
+        """
+        Asynchronously pull data from the specified MongoDB collection and return it as a pandas DataFrame.
+
+        Parameters:
+            collectionName (str): The name of the collection to pull data from.
+
+        Returns:
+            pd.DataFrame: The pulled data in a pandas DataFrame format.
+        """
         db = self.client[self.dbName]
         collection = db[collectionName]
-
         documents = collection.find({}, {"issued": 1, "price": 1, "is_buy_order": 1, "_id": 0})
         df = pd.DataFrame(list(documents))
         all_data = []
@@ -65,15 +99,24 @@ class mongoData():
         return flattened_df
 
     async def deleteDB(self, dbName: str) -> None:
+        """
+        Asynchronously delete the specified database from the MongoDB server.
+
+        Parameters:
+            dbName (str): The name of the database to be deleted.
+        """
         await self.client.drop_database(dbName)
         print(f"Deleted {dbName}")
 
 
+# The main function and its calls are commented out, but it serves to:
+# - Establish a connection to MongoDB.
+# - Fetch data from an S3 bucket using the s3PullData module.
+# - Push this data to the MongoDB instance.
 # async def main():
 #     puller = s3PullData.PullData()
 #     db = mongoData('eve-market-order-history-the-forge')
 #     await db.checkConnection()
-
 #     for object in puller.getS3ObjectList():
 #         for items in item:
 #             print(f'================== {items.name} ==================')
@@ -81,6 +124,4 @@ class mongoData():
 #             print(object)
 #             result = await puller.getItemData(items.value, regionId=10000002, path=object)
 #             await db.pushData(result, items.name)
-
-        
 # asyncio.run(main())
