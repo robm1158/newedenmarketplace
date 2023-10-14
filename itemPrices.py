@@ -6,12 +6,34 @@ from decimal import Decimal
 import requests
 from tqdm import tqdm
 
+async def fetch(type_id: int, region_id: int, retries=3, backoff=1):
+    for i in range(retries):
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(f"https://esi.evetech.net/latest/markets/{region_id}/history/?datasource=tranquility&type_id={type_id}") as response:
+                    if response.status == 200:
+                        return await response.json()
+                    else:
+                        print(f"Error fetching data for type_id {type_id}: {response.status}")
+                        return {}
+        except aiohttp.client_exceptions.ServerDisconnectedError:
+            if i < retries - 1:  # i is zero indexed
+                print("waiting to retry...")
+                await asyncio.sleep(backoff)
+                backoff *= 2
+            else:
+                raise
+
+
 # an async function that kicks off requests to EVE ESI/API and returns that items price history
 async def getItemsPriceHistory(type_id: int, region_id: int) -> Dict:
     async with aiohttp.ClientSession() as session:
         async with session.get(f"https://esi.evetech.net/latest/markets/{region_id}/history/?datasource=tranquility&type_id={type_id}") as response:
-            data = await response.json()
-            return json.dumps(data) # type: ignore
+            if response.status == 200:
+                return await response.json()
+            else:
+                print(f"Error fetching data for type_id {type_id}: {response.status}")
+                return {}
 
 # An async function that kicks off requests to EVE ESI/API that returns that items current orders
 async def getAllItemOrderHistory(type_id: int, region_id: int) -> Dict:
@@ -45,9 +67,9 @@ async def getGroups() -> list:
             return data
         
 
-async def fetch(session, url):
-    async with session.get(url) as response:
-        return await response.json()
+# async def fetch(session, url):
+#     async with session.get(url) as response:
+#         return await response.json()
 
 async def unravelGroupsAsync(data: list) -> list:
     async with aiohttp.ClientSession() as session:

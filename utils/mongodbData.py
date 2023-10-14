@@ -9,11 +9,13 @@ import asyncio
 import pandas as pd
 from json import loads, dumps
 from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo.errors import WriteConcernError
+
 
 class mongodbData():
     def __init__(self, dbName:str) -> None:
-        self.uri = f"mongodb+srv://{passwords.mongoUser.value}:{passwords.mongoPassword.value}@serverlessinstance0.drbmrdi.mongodb.net/?retryWrites=true&w=majority"
-        
+        self.uri = f"mongodb+srv://{passwords.mongoUser.value}:{passwords.mongoPassword.value}@evestoragecluster.4jc1x.mongodb.net/?retryWrites=true&w=majority"
+
         # Create a new client and connect to the server
         self.client = AsyncIOMotorClient(self.uri)
         self.comClient = MongoClient(self.uri)
@@ -27,13 +29,12 @@ class mongodbData():
             print(e)
 
     async def createCollection(self, collectionName: str) -> None:
-        print(collectionName in await self.client[self.dbName].list_collection_names())
         if collectionName in await self.client[self.dbName].list_collection_names():
-            print("Collection already exists")
+            print(f"Collection {collectionName} already exists")
         else:   
             db = self.client[self.dbName]
             collection = db[collectionName]
-            print("Created Collection")
+            print(f"Created Collection {collectionName}")
 
     async def getCollectionList(self) -> list:
         db = self.client[self.dbName]
@@ -89,6 +90,22 @@ class mongodbData():
     async def deleteDB(self, dbName: str) -> None:
         await self.client.drop_database(dbName)
         print(f"Deleted {dbName}")
+
+    async def pushData_with_retry(self, data: pd.DataFrame, collectionName: str, max_retries: int = 3) -> None:
+        retries = 0
+        while retries < max_retries:
+            try:
+                await self.pushData(data, collectionName)
+                return
+            except WriteConcernError as e:
+                if 'RetryableWriteError' in e.details.get('errorLabels', []):
+                    retries += 1
+                    print(f"Retryable write error encountered. Retrying {retries}/{max_retries}...")
+                    await asyncio.sleep(2**retries)  # Exponential backoff
+                else:
+                    print(f"Non-retryable write error encountered: {e.details.get('errmsg')}")
+                    break
+        print(f"Failed to push data to {collectionName} after {max_retries} attempts.")
 
 
 # async def main():
