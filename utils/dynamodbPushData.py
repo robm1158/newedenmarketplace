@@ -2,7 +2,7 @@ import json
 import asyncio
 import aioboto3
 from createNewTable import CreateNewTable
-import itemPrices
+import utils.itemPrices as itemPrices
 from ItemIdEnum import item
 from RegionIdEnum import region
 import logging
