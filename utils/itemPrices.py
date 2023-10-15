@@ -2,6 +2,8 @@ from typing import Dict
 import aiohttp
 import json
 from decimal import Decimal
+import asyncio
+
 
 # Define a header with necessary details for API requests.
 header = {
@@ -42,8 +44,24 @@ async def getAllItemOrderHistory(type_id: int, region_id: int) -> Dict:
     """
     async with aiohttp.ClientSession() as session:
         async with session.get(f"https://esi.evetech.net/latest/markets/{region_id}/orders/?datasource=tranquility&order_type=all&page=1&type_id={type_id}", headers=header) as response:
-            data = await response.json()
+            try:
+                data = await response.json()
+            except aiohttp.client_exceptions.ContentTypeError:
+                print(f"Failed to decode JSON for type_id {type_id}. URL: {response.url}")
+                data = None
+
             return json.dumps(data)  # type: ignore
+
+async def fetch_page(session, url) -> tuple:
+    """Fetch a single page from the API."""
+    async with session.get(url) as response:
+        content_type = response.headers.get('Content-Type')
+        
+        # If not JSON or 500, treat as end of pagination
+        if response.status == 500 or (content_type and 'application/json' not in content_type):
+            return None, response.headers
+        
+        return await response.json(), response.headers
 
 async def getRegionOrderIds(region_id: int) -> list:
     """
@@ -57,18 +75,18 @@ async def getRegionOrderIds(region_id: int) -> list:
         list: A list containing all order IDs for the given region.
     """
     idList = []
-    pageNum = 1
 
     async with aiohttp.ClientSession() as session:
-        while True:
-            async with session.get(f"https://esi.evetech.net/latest/markets/{region_id}/types/?datasource=tranquility&page={pageNum}", headers=header) as response:
-                # Exit the loop if a 404 status is returned (indicating no further data)
-                if response.status == 404:
-                    break
+        # Fetch the first page to get total number of pages from the headers
+        _, headers = await fetch_page(session, f"https://esi.evetech.net/latest/markets/{region_id}/types/?datasource=tranquility&page=1")
+        print(headers)
+        total_pages = int(headers.get('X-Pages', 1))
 
-                data = await response.json()
-                idList.append(data)
+        tasks = [fetch_page(session, f"https://esi.evetech.net/latest/markets/{region_id}/types/?datasource=tranquility&page={i}") for i in range(1, total_pages + 1)]
+        results = await asyncio.gather(*tasks)
 
-                pageNum += 1
+        for page, _ in results:
+            if page is not None:
+                idList.extend(page)
 
     return idList
