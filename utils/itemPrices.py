@@ -44,11 +44,20 @@ async def getAllItemOrderHistory(type_id: int, region_id: int) -> Dict:
     """
     async with aiohttp.ClientSession() as session:
         async with session.get(f"https://esi.evetech.net/latest/markets/{region_id}/orders/?datasource=tranquility&order_type=all&page=1&type_id={type_id}", headers=header) as response:
-            try:
-                data = await response.json()
-            except aiohttp.client_exceptions.ContentTypeError:
-                print(f"Failed to decode JSON for type_id {type_id}. URL: {response.url}")
-                data = None
+            retries = 3
+
+            for attempt in range(retries):
+                try:
+                    data = await response.json()
+                    break  # If successful, break out of the loop
+                except aiohttp.client_exceptions.ContentTypeError:
+                    if attempt < retries - 1:  # If we have not reached the maximum number of retries
+                        wait_time = 3 ** attempt  # Exponential backoff
+                        print(f"Failed to decode JSON for type_id {type_id} on attempt {attempt + 1}. Retrying in {wait_time} seconds...")
+                        await asyncio.sleep(wait_time)
+                    else:  # If we have reached the maximum number of retries
+                        print(f"Failed to decode JSON for type_id {type_id} after {retries} attempts. URL: {response.url}")
+                        data = None
 
             return json.dumps(data)  # type: ignore
 
