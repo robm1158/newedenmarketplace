@@ -1,5 +1,7 @@
+#!/usr/local/bin/python
+
 import sys
-sys.path.append('/root/code/eve-aws/')
+sys.path.append('/root/code/eve-aws/utils')
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -15,56 +17,60 @@ from typing import List, Dict, Union
 import utils.mongodbData as mdb
 import utils.utilities as utils
 import aiohttp
+import time
+from typing import Dict
+import aiohttp
+import json
+from decimal import Decimal
+import asyncio
+import requests
+import utils.mongodbData as mdb
 
-def check_values_exist(values: list) -> list:
-    not_exist = []
-    enum_values = [e.value for e in item.item]
-    for val in values:
-        if val not in enum_values:
-            not_exist.append(val)
-    return not_exist
+# from utils.passwordsEnum import passwords
 
-async def fetch_and_push(id, db):
-    
-    # Check if the ID is a valid enum member
-    if id not in [e.value for e in item.item]:
-        print(f"ID {id} not found in the enum. Skipping...")
-        return
-
-    # Fetching item order history for the given id
-    result = await ip.getAllItemOrderHistory(id, region.region.THE_FORGE.value)
-    result = json.loads(result)
-
-    print(result)
-    if isinstance(result, dict) and all(isinstance(val, (int, float, str)) for val in result.values()):
-        # This handles the case where result is a dictionary of scalar values
-        df = pd.DataFrame([result])
-    else:
-        df = pd.DataFrame(result)
-
-    # Pushing the data to MongoDB
-    await db.pushData(df, item.item(id).name)  # Note: Using `item(id).name` directly, assuming id is valid.
-
-
-async def pullTheForgeOrders():
+async def updateForgeEtags() -> None:
     """
     Asynchronously pull all order IDs for The Forge region from the EVE Online ESI API.
     """
-    # Pull all order IDs for The Forge region
-    orderIds = await ip.getRegionOrderIds(region.region.THE_FORGE.value)
-    db = mdb.mongoData('eve-orders-the-forge')
-    
-    # Check which orderIds don't exist in the enum
-    missing_ids = check_values_exist(orderIds)
-    
-    # Use asyncio.gather to fetch and push data concurrently only for IDs that exist in the enum
-    valid_ids = set(orderIds) - set(missing_ids)
-    await asyncio.gather(*(fetch_and_push(id, db) for id in valid_ids))
-    if missing_ids:
-        print(f"The following IDs are missing from the enum: {missing_ids}")
-    # await db.deleteDB('eve-orders-the-forge')
+async def fetch(session, url):
+    async with session.get(url) as response:
+        if response.status == 200:
+            return await response.text(), response.headers.get('etag').strip('"'), int(response.headers.get('X-Pages'))
+        else:
+            print(f"Error: {response.status}")
+            
 
-    
+async def updateEtags():
+    db = mdb.mongoData('etag-storage')
+    df = pd.read_csv('/root/code/current_forge_etags.csv', header=0, usecols=['url', 'etag'])
+    start = time.time()
+    url = f"https://esi.evetech.net/latest/markets/10000002/orders/?datasource=tranquility&order_type=all"
 
+    async with aiohttp.ClientSession() as session:
+        text, etag, xPages = await fetch(session, url)
 
-asyncio.run(pullTheForgeOrders())
+        if len(df) > xPages:
+            n = len(df) - xPages
+            df = df.iloc[:-n]
+        else:
+            df = pd.DataFrame(columns=['url', 'etag'])
+            tasks = []
+            for i in range(1, xPages+1):
+                url = f"https://esi.evetech.net/latest/markets/10000002/orders/?datasource=tranquility&order_type=all&page={i}"
+                tasks.append(fetch(session, url))
+
+            results = await asyncio.gather(*tasks)
+
+            for text, etag, _ in results:
+                df.loc[len(df.index)] = [url, etag]
+
+    end = time.time()
+    df.index = np.arange(1, len(df) + 1)
+    await db.pushData(df,'the-forge-etags',True)
+    print(len(df))
+    print(end-start)
+    df.to_csv('/root/code/current_forge_etags.csv')
+
+# Run the async main function
+if __name__ == "__main__":
+    asyncio.run(updateEtags())

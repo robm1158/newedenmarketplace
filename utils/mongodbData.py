@@ -2,12 +2,10 @@ from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from passwordsEnum import passwords
 from ItemIdEnum import item
-import pathlib
-import s3PullData
-import asyncio
 import pandas as pd
 from json import loads, dumps
 from motor.motor_asyncio import AsyncIOMotorClient
+from datetime import datetime
 
 class mongoData():
     def __init__(self, dbName:str) -> None:
@@ -41,7 +39,8 @@ class mongoData():
             collectionName (str): The name of the collection to be created.
         """
         if collectionName in await self.client[self.dbName].list_collection_names():
-            print("Collection already exists")
+            # print("Collection already exists")
+            pass
         else:   
             db = self.client[self.dbName]
             collection = db[collectionName]
@@ -58,7 +57,7 @@ class mongoData():
         collection_names = await db.list_collection_names()
         return collection_names
     
-    async def pushData(self, data: pd.DataFrame, collectionName: str) -> None:
+    async def pushData(self, data: pd.DataFrame, collectionName: str, use_time_for_id=False) -> None:
         """
         Asynchronously push data from a pandas DataFrame to the specified MongoDB collection.
 
@@ -69,7 +68,11 @@ class mongoData():
         await self.createCollection(collectionName)
         db = self.client[self.dbName]
         collection = db[collectionName]
-        result = data.to_dict(orient="list")
+        result = data.to_dict(orient="list")  # Convert DataFrame to list of dicts
+        
+        if use_time_for_id:
+            result['_id'] = datetime.now().isoformat()  # Unique string based on the current time
+
         await collection.insert_one(result)
         print("Finished Pushing Data")
     

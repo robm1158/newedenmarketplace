@@ -1,21 +1,21 @@
-aioboto3
+# aioboto3
 aiohttp
 requests
-pandas
-pathlib
-scipy
-asyncio
-tensorflow
-scikit-learn
-pydot
-graphviz
-seaborn
-matplotlib
-statsmodels
+# numpy
+# pandas
+# pathlib
+# scipy
+# asyncio
+# tensorflow
+# scikit-learn
+# pydot
+# graphviz
+# seaborn
+# matplotlib
+# statsmodels
 pymongo
-dask
-tensorflow_addons
-pymongo
-s3fs
-dash
+# dask
+# tensorflow_addons
+# s3fs
+# dash
 motor
