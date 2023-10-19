@@ -10,7 +10,8 @@ header = {
     "In-Game-Name": "XiT Statik Daphiti",
     "Discord-Name": "xit_statik",
     "email": "mullins097956@gmail.com",
-    "application": "EVE-AWS"
+    "application": "EVE-AWS",
+    "If-None-Match":""
 }
 
 async def getItemsPriceHistory(type_id: int, region_id: int) -> Dict:
