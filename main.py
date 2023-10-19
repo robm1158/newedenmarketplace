@@ -1,36 +1,60 @@
+import sys
+sys.path.append('/root/code/eve-aws/utils')
 import pandas as pd
-import utilities
+import utils.utilities
 import matplotlib.pyplot as plt
 import numpy as np
-import tensorflow as tf
-import sklearn as sk
-from sklearn.preprocessing import MinMaxScaler, StandardScaler
-from sklearn.metrics import mean_squared_error
-from sklearn.metrics import mean_absolute_percentage_error
-from sklearn.model_selection import train_test_split
-from sklearn.model_selection import TimeSeriesSplit
-import seaborn as sns
-from statsmodels.graphics.gofplots import qqplot
-from scipy.stats import norm, uniform
-import createLSTM
-from ItemIdEnum import item
+from utils.ItemIdEnum import item
 import pathlib
-import utils.s3PullData as s3PullData
 import asyncio
-import gc
 from motor.motor_asyncio import AsyncIOMotorClient
-from mongodbData import mongoData
+from utils.mongodbData import mongoData
+import aiohttp
+from io import StringIO
+import time
 
+header = {
+    "In-Game-Name": "XiT Statik Daphiti",
+    "Discord-Name": "xit_statik",
+    "email": "mullins097956@gmail.com",
+    "application": "EVE-AWS",
+    "If-None-Match":""
+}
 
+df = pd.read_csv('/root/code/current_forge_etags.csv', header=0, usecols=['url', 'etag'])
 
-pd.set_option('display.max_rows', 10)
-pd.set_option('display.max_columns', 17)
-pd.set_option('display.width', 250)
+async def fetch(session, url, header):
+    async with session.get(url, headers=header) as response:
+        if response.status == 200:
+            text = await response.text()
+            return text
+        else:
+            print(f"Error: {response.status}")
+            return None  # or handle it in a way you prefer
 
 async def main():
-    puller = s3PullData.PullData()
-    db = mongoData('eve-market-order-history-the-forge')
-    await db.deleteDB('eve-market-order-history-the-forge')
+    start = time.time()
+    dfs = []
+    tasks = []
+    url = f"https://esi.evetech.net/latest/markets/10000002/orders/?datasource=tranquility&order_type=all"
+
+    async with aiohttp.ClientSession() as session:
+        for etag in df['etag']:
+            header["If-None-Match"] = etag
+            task = asyncio.create_task(fetch(session, url, header))
+            tasks.append(task)
+
+        responses = await asyncio.gather(*tasks)
+
+        for response_text in responses:
+            if response_text:  # check if not None
+                df_temp = pd.read_json(StringIO(response_text))
+                dfs.append(df_temp)
+
+    main_df = pd.concat(dfs, ignore_index=True)
+    end = time.time()
+    print(main_df)
+    print(end-start)
 
 # Run the main coroutine using asyncio's event loop
 asyncio.run(main())
