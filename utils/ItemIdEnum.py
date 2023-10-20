@@ -16781,3 +16781,13 @@ class item(Enum):
     ZORYAS_LIGHT_ENTROPIC_DISINTEGRATOR = 52236
     ZORYAS_SUPRATIDAL_ENTROPIC_DISINTEGRATOR = 52240
     ZYDRINE = 39
+    
+# Convert enum to dictionary
+items_dict = {str(member.name): str(member.value) for member in item}
+
+# Optionally, if you want to write this dictionary to a Python file:
+with open('items_dict.py', 'w') as file:
+    file.write('items = {\n')
+    for k, v in items_dict.items():
+        file.write(f"    {v}: '{k}',\n")  # writing each item in the dictionary, values as integers
+    file.write('}\n')

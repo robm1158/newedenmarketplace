@@ -9,13 +9,15 @@ import aiohttp
 import asyncio
 import utils.mongodbData as mdb  # Assuming utils is a package with mongodbData module
 
-async def fetch(session, url):
+async def fetch(url):
     try:
-        async with session.get(url) as response:
-            if response.status == 200:
-                return url, response.headers.get('etag').strip('"'), int(response.headers.get('X-Pages'))
-            else:
-                print(f"Error with {url}: {response.status}")
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                if response.status == 200:
+                    return url, response.headers.get('etag').strip('"'), int(response.headers.get('X-Pages'))
+                else:
+                    print(f"Error with {url}: {response.status}")
+                    return None 
     except Exception as e:
         print(f"Exception with {url}: {str(e)}")
         return None  # or some error indicator
@@ -28,7 +30,7 @@ async def updateEtags():
     url = f"https://esi.evetech.net/latest/markets/10000002/orders/?datasource=tranquility&order_type=all"
     tasks = []
     async with aiohttp.ClientSession() as session:
-        url, etag, xPages = await fetch(session, url)
+        url, etag, xPages = await fetch(url)
         print(xPages)
 
         if len(df) > xPages:
@@ -41,7 +43,7 @@ async def updateEtags():
             for i in range(1, xPages+1):
                 url = f"https://esi.evetech.net/latest/markets/10000002/orders/?datasource=tranquility&order_type=all&page={i}"
                 print(f"Here {i}")
-                tasks.append(fetch(session, url))
+                tasks.append(fetch(url))
             print("gather")
             results = await asyncio.gather(*tasks)
             print("Here2")
