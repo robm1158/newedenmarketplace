@@ -3,72 +3,57 @@
 import sys
 sys.path.append('/root/code/eve-aws/utils')
 import pandas as pd
-import matplotlib.pyplot as plt
 import numpy as np
-import utils.itemPrices as ip
-import utils.ItemIdEnum as item
-import utils.RegionIdEnum as region
-import asyncio
-from dash import Dash, dcc, html, Input, Output
-import plotly.express as px
-import plotly.graph_objects as go
-import json
-from typing import List, Dict, Union
-import utils.mongodbData as mdb
-import utils.utilities as utils
-import aiohttp
 import time
-from typing import Dict
 import aiohttp
-import json
-from decimal import Decimal
 import asyncio
-import requests
-import utils.mongodbData as mdb
-
-# from utils.passwordsEnum import passwords
-
+import utils.mongodbData as mdb  # Assuming utils is a package with mongodbData module
 
 async def fetch(session, url):
-    async with session.get(url) as response:
-        if response.status == 200:
-            text = await response.text()
-            return url, response.headers.get('etag').strip('"'), int(response.headers.get('X-Pages'))
-        else:
-            print(f"Error: {response.status}")
-            
+    try:
+        async with session.get(url) as response:
+            if response.status == 200:
+                return url, response.headers.get('etag').strip('"'), int(response.headers.get('X-Pages'))
+            else:
+                print(f"Error with {url}: {response.status}")
+    except Exception as e:
+        print(f"Exception with {url}: {str(e)}")
+        return None  # or some error indicator
+
 
 async def updateEtags():
     db = mdb.mongoData('etag-storage')
-    df = pd.read_csv('/root/code/current_forge_etags.csv', header=0, usecols=['url', 'etag'])
+    df = pd.read_csv('current_forge_etags.csv', header=0, usecols=['url', 'etag'])
     start = time.time()
     url = f"https://esi.evetech.net/latest/markets/10000002/orders/?datasource=tranquility&order_type=all"
-
+    tasks = []
     async with aiohttp.ClientSession() as session:
         url, etag, xPages = await fetch(session, url)
+        print(xPages)
 
         if len(df) > xPages:
             n = len(df) - xPages
             df = df.iloc[:-n]
         else:
+            print("Here1")
             df = pd.DataFrame(columns=['url', 'etag'])
-            tasks = []
+            
             for i in range(1, xPages+1):
                 url = f"https://esi.evetech.net/latest/markets/10000002/orders/?datasource=tranquility&order_type=all&page={i}"
+                print(f"Here {i}")
                 tasks.append(fetch(session, url))
-
+            print("gather")
             results = await asyncio.gather(*tasks)
-
+            print("Here2")
             for url, etag, _ in results:
                 df.loc[len(df.index)] = [url, etag]
 
     end = time.time()
     df.index = np.arange(1, len(df) + 1)
-    await db.pushData(df,'the-forge-etags',True)
-    print(len(df))
+    await db.pushData(df, 'the-forge-etags', True)
     print(end-start)
-    df.to_csv('/root/code/current_forge_etags.csv')
+    df.to_csv('current_forge_etags.csv')
 
-# Run the async main function
+# Run the async function
 if __name__ == "__main__":
     asyncio.run(updateEtags())

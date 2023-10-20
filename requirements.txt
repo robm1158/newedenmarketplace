@@ -19,3 +19,4 @@ pymongo
 # s3fs
 # dash
 motor
+aenum

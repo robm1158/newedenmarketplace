@@ -65,6 +65,7 @@ class mongoData():
             data (pd.DataFrame): The data to be pushed to MongoDB.
             collectionName (str): The name of the collection to push the data to.
         """
+        print("Starting to push data")
         await self.createCollection(collectionName)
         db = self.client[self.dbName]
         collection = db[collectionName]
@@ -74,7 +75,7 @@ class mongoData():
             result['_id'] = datetime.now().isoformat()  # Unique string based on the current time
 
         await collection.insert_one(result)
-        print("Finished Pushing Data")
+        print(f"Finished Pushing {collectionName} Data")
     
     async def pullData(self, collectionName: str):
         """
