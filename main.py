@@ -1,17 +1,11 @@
 import sys
-sys.path.append('/root/code/eve-aws/utils')
 import pandas as pd
-import utils.utilities
-import matplotlib.pyplot as plt
-import numpy as np
-# from utils.ItemIdEnum import item
-import pathlib
-import asyncio
-from motor.motor_asyncio import AsyncIOMotorClient
-import utils.mongodbData as mdb
 import aiohttp
+import asyncio
 from io import StringIO
 import time
+from motor.motor_asyncio import AsyncIOMotorClient
+import utils.mongodbData as mdb
 from items_dict import items
 
 header = {
@@ -19,7 +13,7 @@ header = {
     "Discord-Name": "xit_statik",
     "email": "mullins097956@gmail.com",
     "application": "EVE-AWS",
-    "If-None-Match":""
+    "If-None-Match": ""
 }
 
 df = pd.read_csv('current_forge_etags.csv', header=0, usecols=['url', 'etag'])
@@ -27,15 +21,14 @@ df = pd.read_csv('current_forge_etags.csv', header=0, usecols=['url', 'etag'])
 async def fetch(session, url, header):
     async with session.get(url, headers=header) as response:
         if response.status == 200:
-            text = await response.text()
-            return text
+            return await response.text()
         else:
             print(f"Error: {response.status}")
-            return None  # or handle it in a way you prefer
+            return None
 
 async def get_names_from_ids(ids):
     url = "https://esi.evetech.net/latest/universe/names/?datasource=tranquility"
-
+    ids = [int(id) for id in ids]
     async with aiohttp.ClientSession() as session:
         async with session.post(url, json=ids) as resp:
             if resp.status == 200:
@@ -50,52 +43,57 @@ async def get_names_from_ids(ids):
 
 async def main():
     start = time.time()
-    db = mdb.mongoData('eve-orders-the-forge')
+    db = mdb.mongoData('eve-orders-the-forge') 
     dfs = []
     tasks = []
-    url = f"https://esi.evetech.net/latest/markets/10000002/orders/?datasource=tranquility&order_type=all"
+    urls = [f"https://esi.evetech.net/latest/markets/10000002/orders/?datasource=tranquility&order_type=all&page={i}" for i in range(1, len(df) + 1)] 
 
     async with aiohttp.ClientSession() as session:
-        # ... [the rest of your session setup] ...
-        
+        for url, etag in zip(urls, df['etag']):  
+            header["If-None-Match"] = etag
+            tasks.append(asyncio.create_task(fetch(session, url, header)))
+
         responses = await asyncio.gather(*tasks)
 
         for response_text in responses:
-            if response_text:  # check if not None
-                df_temp = pd.read_json(StringIO(response_text))
-                dfs.append(df_temp)
+            if response_text:
+                dfs.append(pd.read_json(StringIO(response_text)))
 
-        main_df = pd.concat(dfs, ignore_index=True)
+        if dfs:  
+            main_df = pd.concat(dfs, ignore_index=True)
+            type_ids = main_df['type_id'].unique()  
 
-        item_set = set(items.values())
+            # Convert the values of the dictionary to a set (assuming they are integers)
+            item_values = set(items.keys())
 
-        missing_type_ids = set(id for id in main_df['type_id'] if id not in item_set)
+            # Get unique type_ids as integers
+            type_ids = main_df['type_id'].unique()
 
-        if missing_type_ids:
-            id_name_mapping = await get_names_from_ids(session, list(missing_type_ids))
+            # Find items in type_ids that are not in item_values
+            missing_type_ids = [type_id for type_id in type_ids if type_id not in item_values]
 
-            for entity in id_name_mapping:
-                type_id = entity.get('id')
-                type_name = entity.get('name').upper().replace(" ", "_")  # Formatting the name
-                items[type_id] = type_name
+
+
+            if missing_type_ids:
+                id_name_mapping = await get_names_from_ids(list(missing_type_ids))  # Don't forget to pass the session here
+                for entity in id_name_mapping:
+                    type_id = entity.get('id')  # Keep the ID as an integer, don't convert to string
+                    type_name = entity.get('name').upper().replace(" ", "_").replace("'", "").replace("\\", "").replace("/", "")  # Formatting the name
+                    items[type_id] = type_name  # Set the item name as the key and the ID as the value
 
             with open('items_dict.py', 'w') as file:
                 file.write('items = {\n')
                 for k, v in items.items():
-                    file.write(f"    {k}: '{v}',\n")  # writing each item in the dictionary
+                    file.write(f"    {k}: '{v}',\n")  # Write the item's name and ID without quotes around the value
                 file.write('}\n')
 
-        unique_type_ids = main_df['type_id'].unique()
+            for type_id in type_ids:
+                type_name = items.get(type_id)
+                temp_df = main_df[main_df['type_id'] == type_id]  
+                await db.pushData(temp_df, type_name)
 
-        for type_id in unique_type_ids:
-            temp_df = main_df[main_df['type_id'] == type_id]
-            type_name = items.get(type_id, f"UNKNOWN_ITEM_{type_id}")
-            await db.pushData(temp_df, type_name)
+    end = time.time()
+    print(f"Execution time: {end - start}")
 
-        print(missing_type_ids)
-        end = time.time()
-        print(end - start)
-    
 # Run the main coroutine using asyncio's event loop
 asyncio.run(main())
-

@@ -1,3 +1,5 @@
+import sys
+sys.path.append('/root/code/eve-aws/utils')
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from passwordsEnum import passwords
