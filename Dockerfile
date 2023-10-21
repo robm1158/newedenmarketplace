@@ -19,6 +19,11 @@ RUN npm -v
 
 # Upgrade pip (if needed)
 RUN pip install --upgrade pip
+RUN apt-get update && apt-get install -y curl && \
+    curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
+    apt-get install -y nodejs
+# RUN npm install
+
 
 # Install Python dependencies
 COPY requirements.txt /code
