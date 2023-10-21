@@ -10,6 +10,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from datetime import datetime
 
 class mongoData():
+    CLIENT = None
     def __init__(self, dbName:str) -> None:
         """
         Initialize the mongoData class with the specified database name.
@@ -17,10 +18,13 @@ class mongoData():
         Parameters:
             dbName (str): The name of the MongoDB database.
         """
-        self.uri = f"mongodb+srv://{passwords.mongoUser.value}:{passwords.mongoPassword.value}@evestoragecluster.4jc1x.mongodb.net/?retryWrites=true&w=majority"
+        self.uri = f"mongodb+srv://{passwords.mongoUser.value}:{passwords.mongoPassword.value}@evestoragecluster.4jc1x.mongodb.net/?retryWrites=true&w=majority&maxPoolSize=150"
         
+        # If CLIENT is not instantiated, create it
+        if mongoData.CLIENT is None:
+            mongoData.CLIENT = AsyncIOMotorClient(self.uri)
         # Create a new asynchronous client and connect to the server
-        self.client = AsyncIOMotorClient(self.uri)
+        # self.client = AsyncIOMotorClient(self.uri)
         self.dbName = dbName
 
     async def checkConnection(self):
@@ -28,7 +32,7 @@ class mongoData():
         Asynchronously check if a connection to the MongoDB server is established by pinging it.
         """
         try:
-            await self.client.admin.command('ping')
+            await self.CLLIENT.admin.command('ping')
             print("Pinged your deployment. You successfully connected to MongoDB!")
         except Exception as e:
             print(e)
@@ -40,13 +44,13 @@ class mongoData():
         Parameters:
             collectionName (str): The name of the collection to be created.
         """
-        if collectionName in await self.client[self.dbName].list_collection_names():
+        if collectionName in await self.CLIENT[self.dbName].list_collection_names():
             # print("Collection already exists")
             pass
         else:   
-            db = self.client[self.dbName]
+            db = self.CLIENT[self.dbName]
             collection = db[collectionName]
-            print("Created Collection")
+            print(f"Created Collection {collectionName}")
 
     async def getCollectionList(self) -> list:
         """
@@ -55,7 +59,7 @@ class mongoData():
         Returns:
             list: A list containing the names of all collections in the database.
         """
-        db = self.client[self.dbName]
+        db = self.CLIENT[self.dbName]
         collection_names = await db.list_collection_names()
         return collection_names
     
@@ -67,17 +71,15 @@ class mongoData():
             data (pd.DataFrame): The data to be pushed to MongoDB.
             collectionName (str): The name of the collection to push the data to.
         """
-        print("Starting to push data")
         await self.createCollection(collectionName)
-        db = self.client[self.dbName]
+        db = self.CLIENT[self.dbName]
         collection = db[collectionName]
         result = data.to_dict(orient="list")  # Convert DataFrame to list of dicts
         
-        if use_time_for_id:
-            result['_id'] = datetime.now().isoformat()  # Unique string based on the current time
+        result['_id'] = datetime.now().isoformat()  # Unique string based on the current time
 
         await collection.insert_one(result)
-        print(f"Finished Pushing {collectionName} Data")
+        # print(f"Finished Pushing {collectionName} Data")
     
     async def pullData(self, collectionName: str):
         """
@@ -89,7 +91,7 @@ class mongoData():
         Returns:
             pd.DataFrame: The pulled data in a pandas DataFrame format.
         """
-        db = self.client[self.dbName]
+        db = self.CLIENT[self.dbName]
         collection = db[collectionName]
         documents = collection.find({}, {"issued": 1, "price": 1, "is_buy_order": 1, "_id": 0})
         df = pd.DataFrame(list(documents))
@@ -111,7 +113,7 @@ class mongoData():
         Parameters:
             dbName (str): The name of the database to be deleted.
         """
-        await self.client.drop_database(dbName)
+        await self.CLIENT.drop_database(dbName)
         print(f"Deleted {dbName}")
         
     async def pullAllCollectionDocuments(self, collectionName: str) -> None:
@@ -132,10 +134,10 @@ class mongoData():
                 return value
             else:
                 return [value]
-        db = self.client[self.dbName]
+        db = self.CLIENT[self.dbName]
         collection = db[collectionName]
         documents = await collection.find({}).to_list(length=None)
-        db.client.close()
+        db.CLIENT.close()
         
         df = pd.DataFrame(columns=['date','average','highest',
                           'lowest','order_count','volume','item_name'])

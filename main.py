@@ -23,7 +23,7 @@ async def fetch(session, url, header):
         if response.status == 200:
             return await response.text()
         else:
-            print(f"Error: {response.status}")
+            print(f"Error: {response.status}: {url}")
             return None
 
 async def get_names_from_ids(ids):
@@ -73,7 +73,7 @@ async def main():
             missing_type_ids = [type_id for type_id in type_ids if type_id not in item_values]
 
 
-
+            print(f"Missing type_ids: {missing_type_ids}, len: {len(missing_type_ids)}")
             if missing_type_ids:
                 id_name_mapping = await get_names_from_ids(list(missing_type_ids))  # Don't forget to pass the session here
                 for entity in id_name_mapping:
@@ -86,11 +86,15 @@ async def main():
                 for k, v in items.items():
                     file.write(f"    {k}: '{v}',\n")  # Write the item's name and ID without quotes around the value
                 file.write('}\n')
-
-            for type_id in type_ids:
+                
+            print(f'unique ids in this fetch: {len(type_ids)}')
+            async def push_single_document(type_id):
                 type_name = items.get(type_id)
-                temp_df = main_df[main_df['type_id'] == type_id]  
+                temp_df = main_df[main_df['type_id'] == type_id]
                 await db.pushData(temp_df, type_name)
+
+            tasks = [push_single_document(type_id) for type_id in type_ids]
+            await asyncio.gather(*tasks)
 
     end = time.time()
     print(f"Execution time: {end - start}")
