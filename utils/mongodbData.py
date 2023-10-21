@@ -18,7 +18,7 @@ class mongoData():
         Parameters:
             dbName (str): The name of the MongoDB database.
         """
-        self.uri = f"mongodb+srv://{passwords.mongoUser.value}:{passwords.mongoPassword.value}@evestoragecluster.4jc1x.mongodb.net/?retryWrites=true&w=majority&maxPoolSize=250"
+        self.uri = f"mongodb+srv://{passwords.mongoUser.value}:{passwords.mongoPassword.value}@evestoragecluster.4jc1x.mongodb.net/?retryWrites=true&w=majority&maxPoolSize=350"
         
         # If CLIENT is not instantiated, create it
         if mongoData.CLIENT is None:
@@ -26,6 +26,25 @@ class mongoData():
         # Create a new asynchronous client and connect to the server
         # self.client = AsyncIOMotorClient(self.uri)
         self.dbName = dbName
+
+    async def pushData(self, data: pd.DataFrame, collectionName: str, use_time_for_id=False) -> None:
+        """
+        Asynchronously push data from a pandas DataFrame to the specified MongoDB collection.
+
+        Parameters:
+            data (pd.DataFrame): The data to be pushed to MongoDB.
+            collectionName (str): The name of the collection to push the data to.
+        """
+        await self.createCollection(collectionName)
+        db = self.CLIENT[self.dbName]
+        collection = db[collectionName]
+        result = data.to_dict(orient="list")  # Convert DataFrame to list of dicts
+        
+        result['_id'] = datetime.now().isoformat()  # Unique string based on the current time
+
+        await collection.insert_one(result)
+        # print(f"Finished Pushing {collectionName} Data")
+    
 
     async def checkConnection(self):
         """
@@ -63,24 +82,7 @@ class mongoData():
         collection_names = await db.list_collection_names()
         return collection_names
     
-    async def pushData(self, data: pd.DataFrame, collectionName: str, use_time_for_id=False) -> None:
-        """
-        Asynchronously push data from a pandas DataFrame to the specified MongoDB collection.
-
-        Parameters:
-            data (pd.DataFrame): The data to be pushed to MongoDB.
-            collectionName (str): The name of the collection to push the data to.
-        """
-        await self.createCollection(collectionName)
-        db = self.CLIENT[self.dbName]
-        collection = db[collectionName]
-        result = data.to_dict(orient="list")  # Convert DataFrame to list of dicts
-        
-        result['_id'] = datetime.now().isoformat()  # Unique string based on the current time
-
-        await collection.insert_one(result)
-        # print(f"Finished Pushing {collectionName} Data")
-    
+   
     async def pullData(self, collectionName: str):
         """
         Asynchronously pull data from the specified MongoDB collection and return it as a pandas DataFrame.
