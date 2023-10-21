@@ -1,0 +1,7 @@
+.graphContainer {
+    width: 100%;
+}
+/* For submenu titles */
+.pro-sidebar .pro-sub-menu-title {
+    font-size: 0.9em; /* Adjust this value as per your needs */
+}
