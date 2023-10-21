@@ -1,7 +1,7 @@
 #!/usr/local/bin/python
 
 import sys
-sys.path.append('/root/code/eve-aws/utils')
+sys.path.append('D:\\Code\\eve-aws\\utils')
 import pandas as pd
 import numpy as np
 import time
