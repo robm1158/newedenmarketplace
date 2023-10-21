@@ -1,0 +1,83 @@
+.App {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+body, html {
+  height: 100%;
+  margin: 0;
+}
+
+h1 {
+  text-align: center;
+}
+
+.mainWrapper {
+  display: flex;
+  flex-grow: 1;
+  background-color: #282c34;
+}
+
+.sidebar {
+  width: 350px;  
+  background-color: #282c34;
+  padding: 4px;
+  box-sizing: border-box;
+  overflow-y: auto;  /* Allow scrolling */
+  max-height: 100vh;  /* Make sure it doesn't grow beyond viewport height */
+}
+
+.content {
+  flex-grow: 1;
+  padding: 16px;
+  /* overflow-y: auto; */
+  display: flex;
+  flex-direction: column; /* ensure the content inside is stacked vertically */
+}
+
+.pro-sidebar .pro-menu .pro-menu-item  {
+   font-size:  1em; /*Change to your desired font size */
+    /*Optional: if you want the font to be bold */
+  /* color: #333; Optional: if you want to change the font color */
+}
+.pro-sidebar .pro-menu .pro-sub-menu .pro-menu-item .pro-menu-item .pro-menu-item {
+  font-size: 0.8em ; /* adjust as needed */
+  font-weight: bold;
+}
+
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .App {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+  }
+}
+
+/* Other styles remain unchanged */
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

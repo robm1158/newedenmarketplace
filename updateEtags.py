@@ -1,5 +1,3 @@
-#!/usr/local/bin/python
-
 import sys
 sys.path.append('/root/code/eve-aws/utils')
 import pandas as pd
@@ -7,7 +5,7 @@ import numpy as np
 import time
 import aiohttp
 import asyncio
-import utils.mongodbData as mdb  # Assuming utils is a package with mongodbData module
+import utils.mongodbData as mdb 
 
 async def fetch(url):
     try:

@@ -41,6 +41,18 @@ async def get_names_from_ids(ids):
                 headers=resp.headers,
             )
 
+def save_to_file(data, filename='final_enum.json'):
+    with open(filename, 'w') as file:
+        json.dump(data, file, indent=4)
+    print(f"Saved to {filename}")
+    
+def extract_types(data):
+    types = []
+    for item in data:
+        types.extend(item['types'])  # Add types from current item
+        types.extend(extract_types(item['children']))  # Recursively get types from children
+    return types
+
 async def main():
     start = time.time()
     db = mdb.mongoData('eve-orders-the-forge') 
