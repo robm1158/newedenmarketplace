@@ -1,6 +1,7 @@
 aioboto3
 aiohttp
 requests
+numpy
 pandas
 pathlib
 scipy
@@ -15,7 +16,6 @@ statsmodels
 pymongo
 dask
 tensorflow_addons
-pymongo
 s3fs
 dash
 motor

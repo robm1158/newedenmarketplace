@@ -1,6 +1,29 @@
-from enum import Enum
+from aenum import Enum, extend_enum
 
 class item(Enum):
+    TETRIMON_RESISTANCE_BOOSTER_I = 78322
+    ETRIMON_RESISTANCE_BOOSTER_II =78323
+    EXPIRED_IMPERIAL_DAMAGE_BOOSTER_I = 76050
+    EXPIRED_IMPERIAL_DAMAGE_BOOSTER_II = 76051
+    EXPIRED_IMPERIAL_DAMAGE_BOOSTER_III = 76052
+    EXPIRED_IMPERIAL_DAMAGE_BOOSTER_IV = 76054
+    TETRIMON_CAPACITOR_BOOSTER_I = 78318
+    TETRIMON_CAPACITOR_BOOSTER_II = 78319
+    TETRIMON_CAPACITOR_BOOSTER_III = 78320
+    BASIC_RADIANCE_CEREBRAL_ACCELERATOR = 78287
+    EXPIRED_STATE_APPLICATION_BOOSTER_I = 76106
+    PHOENIX_DEATHGLOW_REMNANT_SKIN = 78787
+    HARVEST_DAMAGE_BOOSTER_I = 78307
+    HARVEST_DAMAGE_BOOSTER_II = 78311
+    HARVEST_DAMAGE_BOOSTER_III = 78312
+    HARVEST_DAMAGE_BOOSTER_IV = 78313
+    TENGU_UNION_DAY_EXECUTIVE_SKIN = 78821
+    AUGOROR_ORDER_OF_TETRIMON_SKIN = 73463
+    EVENT_82PROVING_FILAMENT = 72986
+    EXPIRED_IMPERIAL_PROJECTION_BOOSTER_III = 76056
+    MEGATHRON_IMMORTAL_EDEN_SKIN = 78688
+    ROKH_DEATHGLOW_REMNANT_SKIN = 78785
+    SNEAKS_IN_A_CLASSIC = 33060
     _100_AURUM_TOKEN = 32792
     _1000_AURUM_TOKEN = 2833
     _10000MN_AFTERBURNER_I = 41236
@@ -16758,3 +16781,13 @@ class item(Enum):
     ZORYAS_LIGHT_ENTROPIC_DISINTEGRATOR = 52236
     ZORYAS_SUPRATIDAL_ENTROPIC_DISINTEGRATOR = 52240
     ZYDRINE = 39
+    
+# Convert enum to dictionary
+# items_dict = {str(member.name): str(member.value) for member in item}
+
+# Optionally, if you want to write this dictionary to a Python file:
+# with open('items_dict.py', 'w') as file:
+#     file.write('items = {\n')
+#     for k, v in items_dict.items():
+#         file.write(f"    {v}: '{k}',\n")  # writing each item in the dictionary, values as integers
+#     file.write('}\n')

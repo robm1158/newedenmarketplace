@@ -1,3 +1,4 @@
+#!/usr/local/bin/python
 import sys
 import pandas as pd
 import aiohttp
@@ -7,6 +8,7 @@ import time
 from motor.motor_asyncio import AsyncIOMotorClient
 import utils.mongodbData as mdb
 from items_dict import items
+from updateEtags import updateEtags
 
 header = {
     "In-Game-Name": "XiT Statik Daphiti",
@@ -17,7 +19,7 @@ header = {
 }
 
 df = pd.read_csv('current_forge_etags.csv', header=0, usecols=['url', 'etag'])
-
+updateEtags()
 async def fetch(session, url, header):
     async with session.get(url, headers=header) as response:
         if response.status == 200:
@@ -40,18 +42,6 @@ async def get_names_from_ids(ids):
                 message=resp.reason,
                 headers=resp.headers,
             )
-
-def save_to_file(data, filename='final_enum.json'):
-    with open(filename, 'w') as file:
-        json.dump(data, file, indent=4)
-    print(f"Saved to {filename}")
-    
-def extract_types(data):
-    types = []
-    for item in data:
-        types.extend(item['types'])  # Add types from current item
-        types.extend(extract_types(item['children']))  # Recursively get types from children
-    return types
 
 async def main():
     start = time.time()
