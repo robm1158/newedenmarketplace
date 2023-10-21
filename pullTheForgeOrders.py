@@ -1,3 +1,4 @@
+#!/usr/local/bin/python
 import sys
 import pandas as pd
 import aiohttp
@@ -7,6 +8,7 @@ import time
 from motor.motor_asyncio import AsyncIOMotorClient
 import utils.mongodbData as mdb
 from items_dict import items
+from updateEtags import updateEtags
 
 header = {
     "In-Game-Name": "XiT Statik Daphiti",
@@ -17,7 +19,7 @@ header = {
 }
 
 df = pd.read_csv('current_forge_etags.csv', header=0, usecols=['url', 'etag'])
-
+updateEtags()
 async def fetch(session, url, header):
     async with session.get(url, headers=header) as response:
         if response.status == 200:
