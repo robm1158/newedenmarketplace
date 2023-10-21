@@ -37,16 +37,12 @@ async def updateEtags():
             n = len(df) - xPages
             df = df.iloc[:-n]
         else:
-            print("Here1")
             df = pd.DataFrame(columns=['url', 'etag'])
             
             for i in range(1, xPages+1):
                 url = f"https://esi.evetech.net/latest/markets/10000002/orders/?datasource=tranquility&order_type=all&page={i}"
-                print(f"Here {i}")
                 tasks.append(fetch(url))
-            print("gather")
             results = await asyncio.gather(*tasks)
-            print("Here2")
             for url, etag, _ in results:
                 df.loc[len(df.index)] = [url, etag]
 
