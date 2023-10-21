@@ -16783,11 +16783,11 @@ class item(Enum):
     ZYDRINE = 39
     
 # Convert enum to dictionary
-items_dict = {str(member.name): str(member.value) for member in item}
+# items_dict = {str(member.name): str(member.value) for member in item}
 
 # Optionally, if you want to write this dictionary to a Python file:
-with open('items_dict.py', 'w') as file:
-    file.write('items = {\n')
-    for k, v in items_dict.items():
-        file.write(f"    {v}: '{k}',\n")  # writing each item in the dictionary, values as integers
-    file.write('}\n')
+# with open('items_dict.py', 'w') as file:
+#     file.write('items = {\n')
+#     for k, v in items_dict.items():
+#         file.write(f"    {v}: '{k}',\n")  # writing each item in the dictionary, values as integers
+#     file.write('}\n')
