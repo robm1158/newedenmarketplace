@@ -5,7 +5,6 @@ import numpy as np
 import tensorflow as tf
 import sklearn as sk
 import pathlib
-from ItemIdEnum import item
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import mean_absolute_percentage_error
@@ -16,6 +15,7 @@ from statsmodels.graphics.gofplots import qqplot
 from scipy.stats import norm, uniform
 from keras import backend as K
 from tensorflow_addons.metrics import RSquare
+from keras.regularizers import l2
 
 
 pd.set_option('display.max_rows', 10)
@@ -28,7 +28,10 @@ def coeff_determination(y_true, y_pred):
     return ( 1 - SS_res/(SS_tot + K.epsilon()) )
 
 def Sequential_Input_LSTM(df, input_sequence):
-    df_np = df.to_numpy()
+    if isinstance(df, np.ndarray):
+        df_np = df
+    else:
+        df_np = df.to_numpy()
     X = []
     y = []
     
@@ -165,3 +168,141 @@ def createLSTM(itemName: str, data: pd.DataFrame, n_input: int, n_features: int,
         plt.savefig(f'{path/itemName}_root_mean_squared_error_plot.png')
         plt.clf()
     plt.close('all')
+
+
+
+def createHistoryLSTM(itemName: str, data: pd.DataFrame, n_input: int, n_features: int, epochs: int, batch_size: int, save: bool, savePlot: bool) -> None:
+    cwd = pathlib.Path().cwd()
+    path = cwd.joinpath("LSTM_models/"+itemName)
+    try:
+        path.mkdir(mode=0o777,parents=True, exist_ok=False)
+    except FileExistsError as e:
+        print(e)
+        pass
+    # early_stop = tf.keras.callbacks.EarlyStopping(monitor = 'r_square', patience = 10)
+    date_time = pd.to_datetime(data['date'])
+    data.set_index('date', inplace=True)
+
+    plt.figure()
+    data['average'].hist()
+    plt.savefig(f'{path/itemName}_predata_standarize_hist.png')
+    plt.clf()
+    plt.figure()
+    data['average'].plot(ylabel='average')
+    plt.savefig(f'{path/itemName}_predata_standarize_plot.png')
+    plt.clf()
+
+    # Adjustments begin here
+    xFeat = data.copy()
+
+    # Separate scaler for the 'average' column
+    sc_target = MinMaxScaler()
+    df_min_model_data = xFeat['average'].values.reshape(-1, 1)
+    df_min_model_data_scaled = sc_target.fit_transform(df_min_model_data)
+
+    # For the entire dataframe
+    sc = MinMaxScaler()
+    X_ft = sc.fit_transform(xFeat)
+    X_ft = pd.DataFrame(X_ft, index=data.index, columns=data.columns)
+
+    # Replacing the 'average' column in X_ft with the scaled version
+    X_ft['average'] = df_min_model_data_scaled
+
+    # Adjustments end here
+
+    plt.figure()
+    X_ft['average'].hist()
+    plt.savefig(f'{path/itemName}_postdata_standarize_hist.png')
+    plt.clf()
+    plt.figure()
+    X_ft['average'].plot()
+    plt.savefig(f'{path/itemName}_postdata_standarize_plot.png')
+    plt.clf()
+
+    n_input = n_input  
+    X, y = Sequential_Input_LSTM(df_min_model_data_scaled, n_input)
+    trainSplit = 0.8
+    splitIDX = int(np.floor(len(X)*trainSplit))
+    XTrain, xTest = X[:splitIDX], X[splitIDX:]
+    yTrain, yTest = y[:splitIDX], y[splitIDX:]
+    dateIndex = date_time
+    XTrainDates, xTestDates = dateIndex[:splitIDX], dateIndex[splitIDX+n_input:]
+
+    batchLimiter = len(XTrain[:,0])
+    # if batchLimiter < 800:
+    #     batch_size = 16
+    # elif batchLimiter < 2000:
+    #     batch_size = 16
+    # elif batchLimiter < 5000:
+    #     batch_size = 32
+    # else:
+    #     batch_size = 64
+
+    n_features = n_features
+    lstm = tf.keras.models.Sequential()
+    lstm.add(tf.keras.layers.InputLayer((n_input, n_features)))
+    lstm.add(tf.keras.layers.LSTM(30, return_sequences=True, activation='tanh', kernel_regularizer=l2(0.01)))
+    lstm.add(tf.keras.layers.Dropout(0.3))
+    # lstm.add(tf.keras.layers.LSTM(30, return_sequences=True, activation='tanh', kernel_regularizer=l2(0.01)))
+    lstm.add(tf.keras.layers.LSTM(20))
+    lstm.add(tf.keras.layers.Dense(50, activation='tanh'))
+    lstm.add(tf.keras.layers.Dense(1))
+    optimizer = tf.keras.optimizers.Adam(learning_rate=0.0008)
+    lstm.compile(loss='logcosh', optimizer=optimizer, metrics=[tf.keras.metrics.RootMeanSquaredError(), RSquare()])
+    lstm.summary()
+
+    history = lstm.fit(XTrain, yTrain, epochs=epochs, batch_size=batch_size, shuffle=False, validation_data=(xTest, yTest), verbose=1)
+    lstm.evaluate(xTest, yTest, verbose=0)
+    if save == True:
+        tf.keras.models.save_model(lstm, f"D:\\Code\\eve-aws\\LSTM_models\\{itemName}_lstm_model.keras")
+
+    test_predictions1 = lstm.predict(xTest).flatten()
+    test_predictions1_original = sc_target.inverse_transform(test_predictions1.reshape(-1, 1)).flatten()
+    yTest_original = sc_target.inverse_transform(yTest.reshape(-1, 1)).flatten()
+
+    X_test_list = []
+    for i in range(len(xTest)):
+        X_test_list.append(xTest[i][0])
+    test_predictions_df1 = pd.DataFrame({'Actual': list(yTest_original), 'LSTM Prediction': list(test_predictions1_original)})
+    test_predictions_df1.index = xTestDates
+    test_predictions_df1.plot(title=f'{itemName} LSTM Prediction vs Actual', ylabel='average')
+    # plt.show()
+
+    print(f'================== {itemName} ==================')
+    if savePlot == True:
+        plt.figure()
+        test_predictions_df1.plot(title=f'{itemName} LSTM Prediction vs Actual', ylabel='average')
+        plt.savefig(f'{path/itemName}_prediction_plot.png')
+
+        print(history.history.keys())
+        plt.figure()
+        plt.plot(history.history['loss'],label='loss')
+        plt.plot(history.history['val_loss'],label='val_loss')
+        plt.title('loss')
+        plt.ylabel('loss')
+        plt.xlabel('epoch')
+        plt.legend()
+        plt.savefig(f'{path/itemName}_loss_plot.png')
+        plt.clf()
+        plt.figure()
+        plt.plot(history.history['r_square'],label='r_square')
+        plt.plot(history.history['val_r_square'],label='val_r_square')
+        plt.ylim(0, 1)
+        plt.title('r_square')
+        plt.ylabel('r_square')
+        plt.xlabel('epoch')
+        plt.legend()
+        plt.savefig(f'{path/itemName}_r_square_plot.png')
+        plt.clf()
+        plt.figure()
+        plt.plot(history.history['root_mean_squared_error'],label='root_mean_squared_error')
+        plt.plot(history.history['val_root_mean_squared_error'],label='val_root_mean_squared_error')
+        plt.title('root_mean_squared_error')
+        plt.ylabel('root_mean_squared_values')
+        plt.xlabel('epoch')
+        plt.legend()
+        plt.savefig(f'{path/itemName}_root_mean_squared_error_plot.png')
+        plt.clf()
+    plt.close('all')
+
+    

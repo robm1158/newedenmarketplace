@@ -27,7 +27,7 @@ class mongoData():
         # self.client = AsyncIOMotorClient(self.uri)
         self.dbName = dbName
 
-    async def pushData(self, data: pd.DataFrame, collectionName: str, use_time_for_id=False) -> None:
+    async def pushData(self, data: pd.DataFrame, collectionName: str) -> None:
         """
         Asynchronously push data from a pandas DataFrame to the specified MongoDB collection.
 
@@ -51,7 +51,7 @@ class mongoData():
         Asynchronously check if a connection to the MongoDB server is established by pinging it.
         """
         try:
-            await self.CLLIENT.admin.command('ping')
+            await self.CLIENT.admin.command('ping')
             print("Pinged your deployment. You successfully connected to MongoDB!")
         except Exception as e:
             print(e)
@@ -139,7 +139,7 @@ class mongoData():
         db = self.CLIENT[self.dbName]
         collection = db[collectionName]
         documents = await collection.find({}).to_list(length=None)
-        db.CLIENT.close()
+        self.CLIENT.close()
         
         df = pd.DataFrame(columns=['date','average','highest',
                           'lowest','order_count','volume','item_name'])

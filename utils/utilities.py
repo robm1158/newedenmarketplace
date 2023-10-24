@@ -16,7 +16,6 @@ from dash import Dash, dcc, html, Input, Output
 import plotly.express as px
 import json
 from typing import List, Dict, Union
-import utils
 
 def removeOutliers(df: pd.DataFrame) -> pd.DataFrame:
     dfzscores = ((df['price'] - df['price'].mean()) / df['price'].std()).abs()

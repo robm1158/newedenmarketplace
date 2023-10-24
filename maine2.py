@@ -1,35 +1,35 @@
 import sys
-sys.path.append('/root/code/eve-aws/utils')
 import pandas as pd
-import utils
-import matplotlib.pyplot as plt
-import numpy as np
-from ItemIdEnum import item
-import pathlib
-import s3PullData
+import aiohttp
 import asyncio
-import mongodbData as mdb
-import itemPrices as ip
-import datetime as dt
+from io import StringIO
+import time
+from motor.motor_asyncio import AsyncIOMotorClient
+import utils.mongodbData as mdb
+from items_dict import items
+import pathlib
 
-
-async def process_item(db, item):
-    result = await ip.fetch(item.value, 10000002)
-    df = pd.DataFrame().from_dict(result)
-    await db.pushData_with_retry(df, item.name)
 
 async def main():
-    start = dt.datetime.now()
-    db = mdb.mongodbData('eve-historical-daily-the-forge')
-    await db.checkConnection()
+    db = mdb.mongoData('eve-historical-daily-the-forge')
+    await db.deleteDB('eve-historical-daily-the-forge')
+    # await db.checkConnection()
     
-    # Create tasks for processing items concurrently
-    tasks = [process_item(db, items) for items in item]
-    
-    # Run tasks concurrently
-    await asyncio.gather(*tasks)
-    end = dt.datetime.now()
-    print(end-start)
-
+    # path = pathlib.Path("/root/code/market-history/data.everef.net/market-history/2022/")
+    # for key in items.keys():
+    #     dfs = []
+    #     print(items[key])
+        # for csv in path.rglob("*.csv.bz2"):
+    # df = pd.read_csv("/root/code/market-history/data.everef.net/market-history/2022/market-history-2022-12-31.csv.bz2")
+    # print(df[(df["type_id"] == 34) & (df["region_id"] == 10000002)])
+        #     filtered_df = df[df["type_id"] == key]
+        #     if not filtered_df.empty:
+        #         dfs.append(filtered_df)
+        # if dfs:
+        #     main_df = pd.concat(dfs, ignore_index=True).sort_values(by=['date'])
+        #     await db.pushData(main_df, items[key])
+        #     print(items[key])
+        #     print(main_df)
+            
 # Run the main coroutine using asyncio's event loop
 asyncio.run(main())

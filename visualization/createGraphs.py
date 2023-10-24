@@ -55,6 +55,7 @@ class graphs():
         
         df = await self.db.pullAllCollectionDocuments(item.item.TRITANIUM.name)
         df = df.drop_duplicates()
+        df = df.sort_values(by='date')
  
         # Create a line trace for average price
         line_trace = go.Scatter(x=df['date'], y=df["average"], mode='lines', name='Average Price')
@@ -79,8 +80,8 @@ class graphs():
         # Update layout to include the secondary y-axis
         fig.update_layout(
             bargap=0.5,
-            legend_title_text='Item Name',
-            title=f"{collectionName} Year History",
+            legend_title_text=f'{collectionName}',
+            title=f"{collectionName} History",
             xaxis=dict(
                 rangeselector=dict(
                     buttons=list([
@@ -101,7 +102,8 @@ class graphs():
             yaxis2=dict(
                 title="Volume",
                 overlaying='y',
-                side='right'
+                side='right',
+                range=[df["volume"].min(), df["volume"].max()]
             ),
             updatemenus=[
                 dict(type="buttons",
