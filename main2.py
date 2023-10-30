@@ -18,11 +18,15 @@ pd.set_option('display.width', 250)
 
 async def main():
     db = mdb.mongoData('eve-historical-daily-the-forge')
-    df = await db.pullAllCollectionDocuments(items[34])
-    df = df.drop_duplicates()
-    df = df.sort_values(by='date')
-    df = df.drop(columns=['item_name'])
-    createHistoryLSTM(items[34],df,30, 1, 200, 16, True, True)
+    blah = [34,35,36,37,38]
+    # blah = 34
+    for key in blah:
+        df = await db.pullAllCollectionDocuments(items[key])
+        df = df.drop_duplicates()
+        df = df.sort_values(by='date')
+        df = df.drop(columns=['item_name','volume'])
+        createHistoryLSTM(items[key],df,30, 4, 100, 32, True, True)
+        print(len(df))
  
 
 asyncio.run(main())

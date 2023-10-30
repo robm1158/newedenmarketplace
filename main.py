@@ -13,11 +13,11 @@ async def main():
     db = mdb.mongoData('eve-historical-daily-the-forge')
     await db.checkConnection()
     
-    path = pathlib.Path("/root/code/market-history/data.everef.net/market-history/2023/")
+    path = pathlib.Path("/root/code/market-history/market-history-2017/")
 
     dfs = []
     main_df =None
-    for csv in path.rglob("*.csv.bz2"):
+    for csv in path.rglob("*.csv"):
             df = pd.read_csv(csv)
             filtered_df =  df[df["region_id"] == 10000002]
             if not filtered_df.empty:

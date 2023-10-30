@@ -43,6 +43,15 @@ def Sequential_Input_LSTM(df, input_sequence):
         
     return np.array(X), np.array(y)
 
+def multi_feature_sequential_input(df, n_input):
+    X, y = [], []
+    for i in range(len(df) - n_input):
+        seq = df[i:i + n_input].values  # This will fetch n_input rows (i.e., a sequence)
+        X.append(seq[:-1])  # All rows except last one
+        y.append(seq[-1][0])  # Last row, 'average' value
+    return np.array(X), np.array(y)
+
+
 def createLSTM(itemName: str, data: pd.DataFrame, n_input: int, n_features: int, epochs: int, batch_size: int, save: bool, savePlot: bool) -> None:
     cwd = pathlib.Path().cwd()
     path = cwd.joinpath("LSTM_models/"+itemName)
@@ -170,6 +179,8 @@ def createLSTM(itemName: str, data: pd.DataFrame, n_input: int, n_features: int,
     plt.close('all')
 
 
+def rmse_loss(y_true, y_pred):
+    return tf.sqrt(tf.reduce_mean(tf.square(y_pred - y_true)))
 
 def createHistoryLSTM(itemName: str, data: pd.DataFrame, n_input: int, n_features: int, epochs: int, batch_size: int, save: bool, savePlot: bool) -> None:
     cwd = pathlib.Path().cwd()
@@ -179,7 +190,7 @@ def createHistoryLSTM(itemName: str, data: pd.DataFrame, n_input: int, n_feature
     except FileExistsError as e:
         print(e)
         pass
-    # early_stop = tf.keras.callbacks.EarlyStopping(monitor = 'r_square', patience = 10)
+    early_stop = tf.keras.callbacks.EarlyStopping(monitor = 'val_r_square', patience = 50)
     date_time = pd.to_datetime(data['date'])
     data.set_index('date', inplace=True)
 
@@ -192,37 +203,26 @@ def createHistoryLSTM(itemName: str, data: pd.DataFrame, n_input: int, n_feature
     plt.savefig(f'{path/itemName}_predata_standarize_plot.png')
     plt.clf()
 
-    # Adjustments begin here
-    xFeat = data.copy()
-
-    # Separate scaler for the 'average' column
-    sc_target = MinMaxScaler()
-    df_min_model_data = xFeat['average'].values.reshape(-1, 1)
-    df_min_model_data_scaled = sc_target.fit_transform(df_min_model_data)
-
-    # For the entire dataframe
-    sc = MinMaxScaler()
-    X_ft = sc.fit_transform(xFeat)
-    X_ft = pd.DataFrame(X_ft, index=data.index, columns=data.columns)
-
-    # Replacing the 'average' column in X_ft with the scaled version
-    X_ft['average'] = df_min_model_data_scaled
-
+    scaler = MinMaxScaler()
+    scaled_data = scaler.fit_transform(data)
+    scaled_data = pd.DataFrame(scaled_data, columns=data.columns, index=data.index)
+    scaler_avg = MinMaxScaler()
+    scaled_data['average'] = scaler_avg.fit_transform(data[['average']])
     # Adjustments end here
 
     plt.figure()
-    X_ft['average'].hist()
+    scaled_data['average'].hist()
     plt.savefig(f'{path/itemName}_postdata_standarize_hist.png')
     plt.clf()
     plt.figure()
-    X_ft['average'].plot()
+    scaled_data['average'].plot()
     plt.savefig(f'{path/itemName}_postdata_standarize_plot.png')
     plt.clf()
 
     n_input = n_input  
-    X, y = Sequential_Input_LSTM(df_min_model_data_scaled, n_input)
+    X, y = multi_feature_sequential_input(scaled_data, n_input)
     trainSplit = 0.8
-    splitIDX = int(np.floor(len(X)*trainSplit))
+    splitIDX = int(np.floor(len(X) * trainSplit))
     XTrain, xTest = X[:splitIDX], X[splitIDX:]
     yTrain, yTest = y[:splitIDX], y[splitIDX:]
     dateIndex = date_time
@@ -238,31 +238,34 @@ def createHistoryLSTM(itemName: str, data: pd.DataFrame, n_input: int, n_feature
     # else:
     #     batch_size = 64
 
-    n_features = n_features
+    # n_features = scaled_data.shape[1]
+    print(n_features)
     lstm = tf.keras.models.Sequential()
-    lstm.add(tf.keras.layers.InputLayer((n_input, n_features)))
-    lstm.add(tf.keras.layers.LSTM(30, return_sequences=True, activation='tanh', kernel_regularizer=l2(0.01)))
-    lstm.add(tf.keras.layers.Dropout(0.3))
-    # lstm.add(tf.keras.layers.LSTM(30, return_sequences=True, activation='tanh', kernel_regularizer=l2(0.01)))
-    lstm.add(tf.keras.layers.LSTM(20))
-    lstm.add(tf.keras.layers.Dense(50, activation='tanh'))
+    lstm.add(tf.keras.layers.InputLayer((n_input-1, n_features)))
+    lstm.add(tf.keras.layers.LSTM(100, return_sequences=True, activation='tanh'))
+    # lstm.add(tf.keras.layers.Dropout(0.1))
+    # lstm.add(tf.keras.layers.LSTM(100, return_sequences=True, activation='tanh'))
+    # lstm.add(tf.keras.layers.Dropout(0.2))
+    lstm.add(tf.keras.layers.LSTM(100))
+    lstm.add(tf.keras.layers.Dense(20, activation='tanh'))
     lstm.add(tf.keras.layers.Dense(1))
-    optimizer = tf.keras.optimizers.Adam(learning_rate=0.0008)
+    optimizer = tf.keras.optimizers.Adam(learning_rate=0.0003)
     lstm.compile(loss='logcosh', optimizer=optimizer, metrics=[tf.keras.metrics.RootMeanSquaredError(), RSquare()])
     lstm.summary()
 
-    history = lstm.fit(XTrain, yTrain, epochs=epochs, batch_size=batch_size, shuffle=False, validation_data=(xTest, yTest), verbose=1)
+    history = lstm.fit(XTrain, yTrain, epochs=epochs, batch_size=batch_size, shuffle=False, validation_data=(xTest, yTest), callbacks = [early_stop], verbose=1)
     lstm.evaluate(xTest, yTest, verbose=0)
     if save == True:
         tf.keras.models.save_model(lstm, f"D:\\Code\\eve-aws\\LSTM_models\\{itemName}_lstm_model.keras")
 
     test_predictions1 = lstm.predict(xTest).flatten()
-    test_predictions1_original = sc_target.inverse_transform(test_predictions1.reshape(-1, 1)).flatten()
-    yTest_original = sc_target.inverse_transform(yTest.reshape(-1, 1)).flatten()
+    test_predictions1_original = scaler_avg.inverse_transform(test_predictions1.reshape(-1, 1)).flatten()
+    yTest_original = scaler_avg.inverse_transform(yTest.reshape(-1, 1)).flatten()
 
-    X_test_list = []
-    for i in range(len(xTest)):
-        X_test_list.append(xTest[i][0])
+
+    # X_test_list = []
+    # for i in range(len(xTest)):
+    #     X_test_list.append(xTest[i][0])
     test_predictions_df1 = pd.DataFrame({'Actual': list(yTest_original), 'LSTM Prediction': list(test_predictions1_original)})
     test_predictions_df1.index = xTestDates
     test_predictions_df1.plot(title=f'{itemName} LSTM Prediction vs Actual', ylabel='average')
@@ -270,6 +273,11 @@ def createHistoryLSTM(itemName: str, data: pd.DataFrame, n_input: int, n_feature
 
     print(f'================== {itemName} ==================')
     if savePlot == True:
+        mean_loss = history.history['loss'][-1]
+        mean_val_loss = history.history['val_loss'][-1]
+        mean_r_square = history.history['r_square'][-1]
+        mean_val_r_square = history.history['val_r_square'][-1]
+        
         plt.figure()
         test_predictions_df1.plot(title=f'{itemName} LSTM Prediction vs Actual', ylabel='average')
         plt.savefig(f'{path/itemName}_prediction_plot.png')
@@ -282,6 +290,8 @@ def createHistoryLSTM(itemName: str, data: pd.DataFrame, n_input: int, n_feature
         plt.ylabel('loss')
         plt.xlabel('epoch')
         plt.legend()
+        plt.text(1, 0.50, f'Mean Loss: {mean_loss:.4f}', horizontalalignment='right', verticalalignment='center', transform=plt.gca().transAxes)
+        plt.text(1, 0.55, f'Mean Val Loss: {mean_val_loss:.4f}', horizontalalignment='right', verticalalignment='center', transform=plt.gca().transAxes)
         plt.savefig(f'{path/itemName}_loss_plot.png')
         plt.clf()
         plt.figure()
@@ -292,6 +302,8 @@ def createHistoryLSTM(itemName: str, data: pd.DataFrame, n_input: int, n_feature
         plt.ylabel('r_square')
         plt.xlabel('epoch')
         plt.legend()
+        plt.text(1, 0.50, f'Mean Loss: {mean_r_square:.4f}', horizontalalignment='right', verticalalignment='center', transform=plt.gca().transAxes)
+        plt.text(1, 0.55, f'Mean Val Loss: {mean_val_r_square:.4f}', horizontalalignment='right', verticalalignment='center', transform=plt.gca().transAxes)
         plt.savefig(f'{path/itemName}_r_square_plot.png')
         plt.clf()
         plt.figure()

@@ -139,7 +139,6 @@ class mongoData():
         db = self.CLIENT[self.dbName]
         collection = db[collectionName]
         documents = await collection.find({}).to_list(length=None)
-        self.CLIENT.close()
         
         df = pd.DataFrame(columns=['date','average','highest',
                           'lowest','order_count','volume','item_name'])
