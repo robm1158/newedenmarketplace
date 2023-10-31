@@ -57,20 +57,24 @@ function App() {
 
             </div>
             <main className='content'>
-              <h1>My React App </h1>
+              {/* <h1>My React App </h1> */}
               <div style={{ display: "flex"}}>
                 {graphData && <Graph data={graphData} itemName={selectedItemName}/>}
               </div>
               
-              <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-                  <div>
-                      <h2>Buy Orders</h2>
-                      <PagedTable data={buyOrders} headers={['issued', 'order_id','system_id', 'price']} />
-                  </div>
+              <div class="flex-container" style={{ display: 'flex', justifyContent: 'space-evenly' }}>
                   <div>
                       <h2>Sell Orders</h2>
                       <PagedTable data={nonBuyOrders} headers={['issued', 'order_id','system_id', 'price']} />
                   </div>
+              </div>  
+              <div class="flex-container" style={{ display: 'flex', justifyContent: 'space-evenly' }}>
+                  <div>
+                      <h2>Buy Orders</h2>
+                      <PagedTable data={buyOrders} headers={['issued', 'order_id','system_id', 'price']} />
+              </div>
+                  
+                  
               </div>
             </main>
           </div>
