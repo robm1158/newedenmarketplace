@@ -55,6 +55,7 @@ class graphs():
         
         df = await self.db.pullAllCollectionDocuments(item.item.TRITANIUM.name)
         df = df.drop_duplicates()
+        df = df.sort_values(by=['date'], ascending=False)
  
         # Create a line trace for average price
         line_trace = go.Scatter(x=df['date'], y=df["average"], mode='lines', name='Average Price')

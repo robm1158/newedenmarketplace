@@ -8,6 +8,8 @@ import pandas as pd
 from json import loads, dumps
 from motor.motor_asyncio import AsyncIOMotorClient
 from datetime import datetime
+from pymongo import DESCENDING
+
 
 class mongoData():
     CLIENT = None
@@ -19,7 +21,7 @@ class mongoData():
             dbName (str): The name of the MongoDB database.
         """
         self.uri = f"mongodb+srv://{passwords.mongoUser.value}:{passwords.mongoPassword.value}@evestoragecluster.4jc1x.mongodb.net/?retryWrites=true&w=majority&maxPoolSize=200"
-        
+        self.syncClient = MongoClient(self.uri)
         # If CLIENT is not instantiated, create it
         if mongoData.CLIENT is None:
             mongoData.CLIENT = AsyncIOMotorClient(self.uri)
@@ -139,7 +141,6 @@ class mongoData():
         db = self.CLIENT[self.dbName]
         collection = db[collectionName]
         documents = await collection.find({}).to_list(length=None)
-        db.CLIENT.close()
         
         df = pd.DataFrame(columns=['date','average','highest',
                           'lowest','order_count','volume','item_name'])
@@ -165,6 +166,83 @@ class mongoData():
                 })
             df = pd.concat([df, df1])
 
+        return df
+    
+    def syncPullAllCollectionDocuments(self, collectionName: str) -> None:
+        """
+        Pull all documents from the specified MongoDB collection.
+
+        Parameters:
+            collectionName (str): The name of the collection to pull documents from.
+
+        Returns:
+            DataFrame: A dataframe containing all documents from the specified collection.
+        """
+        def ensure_list(value):
+            """Convert scalar values to single-item list or return the value if it's already a list-like."""
+            if value is None:
+                return [None]
+            elif isinstance(value, (list, pd.Series)):
+                return value
+            else:
+                return [value]
+
+        db = self.syncClient[self.dbName]
+        collection = db[collectionName]
+        
+        # Use pymongo's find method directly
+        documents = list(collection.find({}))
+
+        df = pd.DataFrame(columns=['date','average','highest',
+                        'lowest','order_count','volume','item_name'])
+
+        for document in documents:
+
+            date_data = ensure_list(document.get('date'))
+            average_data = ensure_list(document.get('average'))
+            highest_data = ensure_list(document.get('highest'))
+            lowest_data = ensure_list(document.get('lowest'))
+            order_count_data = ensure_list(document.get('order_count'))
+            volume_data = ensure_list(document.get('volume'))
+            item_name = collectionName
+
+            df1 = pd.DataFrame({
+                'date': date_data,
+                'average': average_data,
+                'highest': highest_data,
+                'lowest': lowest_data,
+                'order_count': order_count_data,
+                'volume': volume_data,
+                'item_name': item_name
+                })
+            df = pd.concat([df, df1])
+
+        return df
+
+    def syncPullData(self, collectionName: str) -> dict:
+        """
+        Pull the last document from the specified MongoDB collection.
+
+        Parameters:
+            collectionName (str): The name of the collection to pull the last document from.
+
+        Returns:
+            dict: The last document in the specified collection.
+        """
+        db = self.syncClient[self.dbName]
+        collection = db[collectionName]
+
+        # Sort by the 'date' field (or replace 'date' with your custom field name)
+        last_document = collection.find_one(sort=[("_id", DESCENDING)])
+        
+        # Convert the result to a DataFrame
+        df = pd.DataFrame(last_document)
+        df = df.drop(columns=['_id'])
+        # df = df.explode('order_id')
+        # df = df.explode('issued')
+        # df = df.explode('is_buy_order')
+        # df = df.explode('price')
+        # df = df.explode('system_id')
         return df
 
 

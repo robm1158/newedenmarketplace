@@ -65,11 +65,11 @@ function App() {
               <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
                   <div>
                       <h2>Buy Orders</h2>
-                      <PagedTable data={buyOrders} headers={['issued', 'station_id', 'price']} />
+                      <PagedTable data={buyOrders} headers={['issued', 'order_id','system_id', 'price']} />
                   </div>
                   <div>
                       <h2>Sell Orders</h2>
-                      <PagedTable data={nonBuyOrders} headers={['issued', 'station_id', 'price']} />
+                      <PagedTable data={nonBuyOrders} headers={['issued', 'order_id','system_id', 'price']} />
                   </div>
               </div>
             </main>
