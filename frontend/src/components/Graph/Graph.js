@@ -19,32 +19,32 @@ function Graph({ data, itemName }) {
     name: 'Volume',
     yaxis: 'y2',
     marker: { color: 'blue' },
-    visible: false
+    // visible: false
   };
 
-  const updatemenus = [
-    {
-      buttons: [
-        {
-          label: 'Line Only',
-          method: 'update',
-          args: [{ 'visible': [true, false] }, { title: itemName+' Average Price' }]
-        },
-        {
-          label: 'Bar Only',
-          method: 'update',
-          args: [{ 'visible': [false, true] }, { title: itemName+' Volume' }]
-        },
-        {
-          label: 'Both',
-          method: 'update',
-          args: [{ 'visible': [true, true] }, { title: itemName+' Average Price and Volume' }]
-        }
-      ],
-      font: { color: 'orange' },
-      bgcolor: 'rgba(0, 0, 0, 0.7)',
-    }
-  ];
+  // const updatemenus = [
+  //   {
+  //     buttons: [
+  //       {
+  //         label: 'Line Only',
+  //         method: 'update',
+  //         args: [{ 'visible': [true, false] }, { title: itemName+' Average Price' }]
+  //       },
+  //       {
+  //         label: 'Bar Only',
+  //         method: 'update',
+  //         args: [{ 'visible': [false, true] }, { title: itemName+' Volume' }]
+  //       },
+  //       {
+  //         label: 'Both',
+  //         method: 'update',
+  //         args: [{ 'visible': [true, true] }, { title: itemName+' Average Price and Volume' }]
+  //       }
+  //     ],
+  //     font: { color: 'orange' },
+  //     bgcolor: 'rgba(0, 0, 0, 0.7)',
+  //   }
+  // ];
 
   return (
     <Plot
@@ -53,6 +53,11 @@ function Graph({ data, itemName }) {
         autosize: true,
         plot_bgcolor: "transparent",
         paper_bgcolor: "transparent",
+        legend: {
+          font: {
+            color: 'white' // This sets the legend text color to white
+        }
+      },
         title: {
           text: itemName,
           font: {
@@ -86,7 +91,7 @@ function Graph({ data, itemName }) {
           overlaying: 'y',
           side: 'right'
         },
-        updatemenus: updatemenus
+        // updatemenus: updatemenus
       }}
       style={{ width: "100%", height: "100%" }}
       useResizeHandler={true}

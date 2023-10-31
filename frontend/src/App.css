@@ -25,7 +25,7 @@ h1 {
   padding: 4px;
   box-sizing: border-box;
   overflow-y: auto;  /* Allow scrolling */
-  max-height: 100vh;  /* Make sure it doesn't grow beyond viewport height */
+  max-height: 110vh;  /* Make sure it doesn't grow beyond viewport height */
 }
 
 .content {
