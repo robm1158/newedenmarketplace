@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Graph from './components/Graph/Graph';
 import { ItemEnum } from './constants/ItemEnum';
 import PagedTable from './components/PagedTable/PagedTable';
+import { LocationEnum } from '/root/code/eve-aws/frontend/src/constants/locationEnum';
 import { ColorModeContext, useMode } from './theme';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import Topbar from './scenes/global/Topbar';
@@ -24,6 +25,19 @@ function App() {
     obj[ItemEnum[key]] = key;
     return obj;
 }, {});
+
+  function transformDataWithLocation(data) {
+    return data.map(row => {
+      // Replace the location_id with the corresponding string from LocationEnum
+      // If the ID doesn't exist in the enum, it will leave the id as is.
+      const locationName = LocationEnum[row.location_id] || row.location_id;
+      return {
+        ...row,
+        location_id: locationName,
+      };
+    });
+  }
+
 
   const buyOrders = tableData ? tableData.filter(order => order.is_buy_order === true) : [];
   const nonBuyOrders = tableData ? tableData.filter(order => order.is_buy_order === false) : [];
@@ -62,19 +76,29 @@ function App() {
                 {graphData && <Graph data={graphData} itemName={selectedItemName}/>}
               </div>
               
-              <div class="flex-container" style={{ display: 'flex', justifyContent: 'space-evenly' }}>
+              <div class="flex-container" style={{ display: 'flex', justifyContent: 'left' }}>
                   <div>
                       <h2>Sell Orders</h2>
-                      <PagedTable data={nonBuyOrders} headers={['issued', 'order_id','system_id', 'price']} />
+                      <PagedTable  data={transformDataWithLocation(nonBuyOrders)} headers={[
+                        { displayName: 'Date', dataKey: 'issued' },
+                        { displayName: 'Order ID', dataKey: 'order_id' },
+                        { displayName: 'Location', dataKey: 'location_id' },
+                        { displayName: 'Price', dataKey: 'price' },
+                        { displayName: 'Volume', dataKey: 'volume_remain'}
+                      ]} />
                   </div>
               </div>  
-              <div class="flex-container" style={{ display: 'flex', justifyContent: 'space-evenly' }}>
+              <div class="flex-container" style={{ display: 'flex', justifyContent: 'left' }}>
                   <div>
                       <h2>Buy Orders</h2>
-                      <PagedTable data={buyOrders} headers={['issued', 'order_id','system_id', 'price']} />
-              </div>
-                  
-                  
+                      <PagedTable data={transformDataWithLocation(buyOrders)} headers={[
+                              { displayName: 'Date', dataKey: 'issued' },
+                              { displayName: 'Order ID', dataKey: 'order_id' },
+                              { displayName: 'Location', dataKey: 'location_id' },
+                              { displayName: 'Price', dataKey: 'price' },
+                              { displayName: 'Volume', dataKey: 'volume_remain'}
+                            ]} />
+              </div> 
               </div>
             </main>
           </div>

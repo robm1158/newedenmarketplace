@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 import pymongo
 import sys
-sys.path.append('/workspaces/eve-aws')
+sys.path.append('/root/code/eve-aws')
 from utils import mongodbData as mdb
 import pandas as pd
 from utils import ItemIdEnum as item
@@ -23,6 +23,7 @@ def index():
 def get_item(item_name: str):
     df = db.syncPullData(item_name)
     df = df.sort_values(by=['issued'], ascending=False)
+    print(pd.unique(df['location_id']))
     print(df)
     if df is not None:
         return df.to_json(orient="records"), 200

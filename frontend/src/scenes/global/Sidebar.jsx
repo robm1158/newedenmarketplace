@@ -1,8 +1,8 @@
 import 'react-pro-sidebar/dist/css/styles.css';
 import React from 'react';
 import { ProSidebar, Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
-import marketGroupsJSON from '/workspaces/eve-aws/frontend/src/constants/marketGroups.json';
-import { ItemEnum } from '/workspaces/eve-aws/frontend/src/constants/ItemEnum';
+import marketGroupsJSON from '/root/code/eve-aws/frontend/src/constants/marketGroups.json';
+import { ItemEnum } from '/root/code/eve-aws/frontend/src/constants/ItemEnum';
 
 const CustomSidebar = ({ handleSidebarClick }) => {
 
