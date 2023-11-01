@@ -39,7 +39,6 @@ export const LocationEnum = {
     60002233 : "Vasala V - Moon 15 - Ishukone Corporation Factory",
     60003079 : "Nomaa I - Expert Housing Production Plant",
     1029209158478 : "Personal Structure",
-    1029209158478 : "Personal Structure",
     60004228 : "Unpas IX - Moon 5 - Spacelane Patrol Logistic Support",
     60015002 : "Aokannitoh VII - Moon 2 - School of Applied Knowledge",
     60003109 : "Hykkota IV - Moon 7 - Expert Housing Production Plant",

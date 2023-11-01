@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Graph from './components/Graph/Graph';
+import BubbleGraph from './components/BubbleGraph/BubbleGraph';
 import { ItemEnum } from './constants/ItemEnum';
 import PagedTable from './components/PagedTable/PagedTable';
 import { LocationEnum } from '/root/code/eve-aws/frontend/src/constants/locationEnum';
@@ -13,6 +14,7 @@ import './App.css';
 function App() {
   const [tableData, setTableData] = useState(null);
   const [graphData, setGraphData] = useState(null);
+  const [bubbleGraphData, setBubbleGraphData] = useState(null);
   const [theme, colorMode] = useMode();
   const [selectedItemName, setSelectedItemName] = useState(null);
 
@@ -52,60 +54,66 @@ function App() {
 
         const graphResponse = await axios.post(`http://127.0.0.1:5000/get_graph_data`, { selectedValue: name });
         setGraphData(graphResponse.data);
-      
+
+        const bubbleGraphResponse = await axios.post(`http://127.0.0.1:5000/get_bubble_data`, { selectedValue: selectedValue });
+        setBubbleGraphData(bubbleGraphResponse.data);
     } catch (error) {
         console.error("Error fetching data:", error);
     }
 };
 
 
-  return (
-    <ColorModeContext.Provider value={colorMode}>
+return (
+  <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <div className="App">
-          <Topbar />
-          <div className="mainWrapper">
-            <div className="sidebar">
-            <CustomSidebar handleSidebarClick={handleSidebarClick} setTableData={setTableData} setGraphData={setGraphData} />
-
-            </div>
-            <main className='content'>
-              {/* <h1>My React App </h1> */}
-              <div style={{ display: "flex"}}>
-                {graphData && <Graph data={graphData} itemName={selectedItemName}/>}
-              </div>
-              
-              <div class="flex-container" style={{ display: 'flex', justifyContent: 'left' }}>
-                  <div>
-                      <h2>Sell Orders</h2>
-                      <PagedTable  data={transformDataWithLocation(nonBuyOrders)} headers={[
-                        { displayName: 'Date', dataKey: 'issued' },
-                        { displayName: 'Order ID', dataKey: 'order_id' },
-                        { displayName: 'Location', dataKey: 'location_id' },
-                        { displayName: 'Price', dataKey: 'price' },
-                        { displayName: 'Volume', dataKey: 'volume_remain'}
-                      ]} />
+          <CssBaseline />
+          <div className="App">
+              <Topbar />
+              <div className="mainWrapper">
+                  <div className="sidebar">
+                      <CustomSidebar handleSidebarClick={handleSidebarClick} setTableData={setTableData} setGraphData={setGraphData} />
                   </div>
-              </div>  
-              <div class="flex-container" style={{ display: 'flex', justifyContent: 'left' }}>
-                  <div>
-                      <h2>Buy Orders</h2>
-                      <PagedTable data={transformDataWithLocation(buyOrders)} headers={[
-                              { displayName: 'Date', dataKey: 'issued' },
-                              { displayName: 'Order ID', dataKey: 'order_id' },
-                              { displayName: 'Location', dataKey: 'location_id' },
-                              { displayName: 'Price', dataKey: 'price' },
-                              { displayName: 'Volume', dataKey: 'volume_remain'}
-                            ]} />
-              </div> 
+                  <main className='content'>
+                      <div style={{ display: "flex"}}>
+                          {graphData && <Graph data={graphData} itemName={selectedItemName}/>}
+                      </div>
+
+                      <div className="flex-container" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <div style={{ flex: 1 }}>
+                              <h2>Sell Orders</h2>
+                              <PagedTable data={transformDataWithLocation(nonBuyOrders)} headers={[
+                                  { displayName: 'Date', dataKey: 'issued' },
+                                  { displayName: 'Order ID', dataKey: 'order_id' },
+                                  { displayName: 'Location', dataKey: 'location_id' },
+                                  { displayName: 'Price', dataKey: 'price' },
+                                  { displayName: 'Volume', dataKey: 'volume_remain'}
+                              ]} />
+                          </div>
+
+                          <div style={{ flex: 1 }}>
+                              {bubbleGraphData && <BubbleGraph data={bubbleGraphData} itemName={selectedItemName}/>}
+                          </div>
+                      </div>
+
+                      <div className="flex-container" style={{ display: 'flex', justifyContent: 'left', marginTop: '-110px' }}>
+                          <div>
+                              <h2>Buy Orders</h2>
+                              <PagedTable data={transformDataWithLocation(buyOrders)} headers={[
+                                  { displayName: 'Date', dataKey: 'issued' },
+                                  { displayName: 'Order ID', dataKey: 'order_id' },
+                                  { displayName: 'Location', dataKey: 'location_id' },
+                                  { displayName: 'Price', dataKey: 'price' },
+                                  { displayName: 'Volume', dataKey: 'volume_remain'}
+                              ]} />
+                          </div>
+                      </div>
+                  </main>
               </div>
-            </main>
           </div>
-        </div>
       </ThemeProvider>
-    </ColorModeContext.Provider>
+  </ColorModeContext.Provider>
 );
+
 }
 
 export default App;

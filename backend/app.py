@@ -4,8 +4,11 @@ import pymongo
 import sys
 sys.path.append('/root/code/eve-aws')
 from utils import mongodbData as mdb
+from utils import utilities as utils
 import pandas as pd
+import json
 from utils import ItemIdEnum as item
+import numpy as np
 
 app = Flask(__name__)
 
@@ -19,9 +22,38 @@ dbh = mdb.mongoData('eve-historical-daily-the-forge')
 def index():
     return jsonify(message="Hello from Flask!")
 
+@app.route('/get_bubble_data', methods=['POST'])
+def get_bubble_data():
+    # Ensure type_id is defined; this can be passed as a parameter if needed
+    data = request.json
+    type_id = data.get('selectedValue')
+    print(type_id)
+    if not type_id:
+        return jsonify({"error": "selectedValue not provided in the request."}), 400
+    with open("/root/code/eve-aws/visualization/marketGroups.json", "r") as f:
+        market_data = json.load(f)
+    
+    # Extract types for a specific market group id
+    all_entries = utils.extract_types_for_market_group(market_data, type_id)
+    # Fetch data for these types
+    combined_df = pd.DataFrame()
+    for entry in all_entries:
+        temp_df = pd.DataFrame(dbh.syncPullAllCollectionDocuments(entry['item_name']))
+        temp_df = temp_df.sort_values(by=['date'], ascending=False)
+        top_row = temp_df.iloc[[0]] # Note: Using [[0]] will ensure we still get a DataFrame, not a Series
+        top_row["percent_profit"] = (top_row['average'] - top_row['lowest']) / top_row['lowest'] * 100
+        combined_df = pd.concat([combined_df, top_row], ignore_index=True) # Combine the dataframes
+    combined_df['volume'] = combined_df['volume'].astype(float)
+    combined_df['adjusted_volume'] = np.sqrt(combined_df['volume'])
+    combined_df = combined_df.sort_values(by='percent_profit', ascending=False)
+    print(combined_df)
+    
+    # Convert DataFrame to JSON and return
+    return combined_df.to_json(orient="records"), 200
+
 @app.route('/get_item/<item_name>')
 def get_item(item_name: str):
-    df = db.syncPullData(item_name)
+    df = db.syncPullLastDocument(item_name)
     df = df.sort_values(by=['issued'], ascending=False)
     print(pd.unique(df['location_id']))
     print(df)

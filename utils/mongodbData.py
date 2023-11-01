@@ -219,7 +219,7 @@ class mongoData():
 
         return df
 
-    def syncPullData(self, collectionName: str) -> dict:
+    def syncPullLastDocument(self, collectionName: str) -> dict:
         """
         Pull the last document from the specified MongoDB collection.
 

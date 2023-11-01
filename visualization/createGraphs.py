@@ -20,14 +20,16 @@ class graphs():
     def __init__(self,dbName='eve-historical-daily-the-forge') -> None:
         self.db = mdb.mongoData(dbName)
     async def createBubbleGraph(self,type_id = 7):
-        type_id = 7
+        type_id = 1857
         
         # Load JSON data
-        with open("marketGroups.json", "r") as f:
+        with open("/root/code/eve-aws/visualization/marketGroups.json", "r") as f:
             market_data = json.load(f)
         name = utils.find_name_by_market_group_id(market_data, type_id)
+        print(name)
         # Extract types for a specific market group id
         all_entries = utils.extract_types_for_market_group(market_data, type_id)
+        print(all_entries)
 
         # Fetch data for these types (This is an asynchronous function)
         combined_df = await utils.fetch_data_for_types(all_entries)
@@ -114,4 +116,4 @@ class graphs():
         
 
 graph = graphs()
-asyncio.run(graph.createHistoryGraph())
+asyncio.run(graph.createBubbleGraph())
