@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Graph from './components/Graph/Graph';
 import BubbleGraph from './components/BubbleGraph/BubbleGraph';
 import { ItemEnum } from './constants/ItemEnum';
 import PagedTable from './components/PagedTable/PagedTable';
+import Home from './components/Home/Home';
 import { LocationEnum } from '/root/code/eve-aws/frontend/src/constants/locationEnum';
 import { ColorModeContext, useMode } from './theme';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import Topbar from './scenes/global/Topbar';
 import CustomSidebar from "./scenes/global/Sidebar";
+import Dashboard from "./components/Dashboard/Dashboard";
 import axios from 'axios';
 import './App.css';
 
@@ -62,58 +65,39 @@ function App() {
     }
 };
 
-
 return (
   <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
           <CssBaseline />
-          <div className="App">
-              <Topbar />
-              <div className="mainWrapper">
-                  <div className="sidebar">
-                      <CustomSidebar handleSidebarClick={handleSidebarClick} setTableData={setTableData} setGraphData={setGraphData} />
+          <Router>
+              <div className="App">
+                  <Topbar />
+                  <div className="mainWrapper">
+                      <div className="sidebar">
+                          <CustomSidebar handleSidebarClick={handleSidebarClick} setTableData={setTableData} setGraphData={setGraphData} />
+                      </div>
+                      <main className='content'>
+                          <Routes>
+                              <Route path="/" element={<Home />} exact />
+                              <Route path="/dashboard" element={
+                                  <Dashboard 
+                                      graphData={graphData}
+                                      selectedItemName={selectedItemName}
+                                      nonBuyOrders={nonBuyOrders}
+                                      bubbleGraphData={bubbleGraphData}
+                                      buyOrders={buyOrders}
+                                      transformDataWithLocation={transformDataWithLocation}
+                                  />
+                              } />
+                              {/* ... Other routes ... */}
+                          </Routes>
+                      </main>
                   </div>
-                  <main className='content'>
-                      <div style={{ display: "flex"}}>
-                          {graphData && <Graph data={graphData} itemName={selectedItemName}/>}
-                      </div>
-
-                      <div className="flex-container" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <div style={{ flex: 1 }}>
-                              <h2>Sell Orders</h2>
-                              <PagedTable data={transformDataWithLocation(nonBuyOrders)} headers={[
-                                  { displayName: 'Date', dataKey: 'issued' },
-                                  { displayName: 'Order ID', dataKey: 'order_id' },
-                                  { displayName: 'Location', dataKey: 'location_id' },
-                                  { displayName: 'Price', dataKey: 'price' },
-                                  { displayName: 'Volume', dataKey: 'volume_remain'}
-                              ]} />
-                          </div>
-
-                          <div style={{ flex: 1 }}>
-                              {bubbleGraphData && <BubbleGraph data={bubbleGraphData} itemName={selectedItemName}/>}
-                          </div>
-                      </div>
-
-                      <div className="flex-container" style={{ display: 'flex', justifyContent: 'left', marginTop: '-110px' }}>
-                          <div>
-                              <h2>Buy Orders</h2>
-                              <PagedTable data={transformDataWithLocation(buyOrders)} headers={[
-                                  { displayName: 'Date', dataKey: 'issued' },
-                                  { displayName: 'Order ID', dataKey: 'order_id' },
-                                  { displayName: 'Location', dataKey: 'location_id' },
-                                  { displayName: 'Price', dataKey: 'price' },
-                                  { displayName: 'Volume', dataKey: 'volume_remain'}
-                              ]} />
-                          </div>
-                      </div>
-                  </main>
               </div>
-          </div>
+          </Router>
       </ThemeProvider>
   </ColorModeContext.Provider>
 );
-
 }
 
 export default App;
