@@ -9,6 +9,7 @@ import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SpaceDashboardOutlinedIcon from '@mui/icons-material/SpaceDashboardOutlined';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined'; // <-- Import the new icon
 import { useNavigate } from 'react-router-dom';
+import homeIcon from '/root/code/eve-aws/frontend/src/assets/images/Statik_Logo_grey.png';
 
 const Topbar = ({ ...props }) => {
     const theme = useTheme();
@@ -21,7 +22,7 @@ const Topbar = ({ ...props }) => {
             {/* Home and Search Bar */}
             <Box display="flex" alignItems="center"> 
                 <IconButton onClick={() => navigate("/")}>
-                    <HomeOutlinedIcon /> {/* Home icon that navigates to the home route */}
+                    <img src={homeIcon} alt="Home" style={{ width: '24px', height: '24px' }} /> {/* PNG image as home button */}
                 </IconButton>
                 <Box display="flex" backgroundColor={colors.primary[300]} borderRadius="3" ml={1}>
                     <InputBase sx={{ml: 2, flex: 1}} placeholder="Search..." />
