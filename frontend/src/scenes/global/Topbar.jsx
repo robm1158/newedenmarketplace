@@ -9,7 +9,8 @@ import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SpaceDashboardOutlinedIcon from '@mui/icons-material/SpaceDashboardOutlined';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined'; // <-- Import the new icon
 import { useNavigate } from 'react-router-dom';
-import homeIcon from '/root/code/eve-aws/frontend/src/assets/images/Statik_Logo_grey.png';
+import homeIcon  from '../../assets/images/Statik_Logo_grey.png';
+
 
 const Topbar = ({ ...props }) => {
     const theme = useTheme();
