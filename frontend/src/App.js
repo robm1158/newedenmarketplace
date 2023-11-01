@@ -21,10 +21,10 @@ function App() {
   const [theme, colorMode] = useMode();
   const [selectedItemName, setSelectedItemName] = useState(null);
 
-  const options = Object.keys(ItemEnum).map(key => ({
-    label: key,
-    value: key,
-  }));
+  // const options = Object.keys(ItemEnum).map(key => ({
+  //   label: key,
+  //   value: key,
+  // }));
 
   const REVERSED_ITEM_ENUM = Object.keys(ItemEnum).reduce((obj, key) => {
     obj[ItemEnum[key]] = key;

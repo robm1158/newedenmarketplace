@@ -4,7 +4,7 @@ import Graph from '../Graph/Graph';
 import BubbleGraph from '../BubbleGraph/BubbleGraph';
 // import { ItemEnum } from '/root/code/eve-aws/frontend/src/constants/ItemEnum';
 import PagedTable from '../PagedTable/PagedTable';
-import Home from '../Home/Home';
+// import Home from '../Home/Home';
 
 function Dashboard({ graphData, selectedItemName, nonBuyOrders, bubbleGraphData, buyOrders, transformDataWithLocation }) {
     return (
