@@ -23,6 +23,10 @@ function BubbleGraph({ data, itemName }) {
                 colorscale: 'Viridis',
                 sizemode: 'diameter',
             },
+            hoverinfo: 'text', // Only show the 'text' property on hover
+            text: groupedData[item_name].map(e => 
+            `Item: ${e.item_name}<br>Daily Orders: ${e.order_count}<br>Percent Profit: ${e.percent_profit}`
+            ),
             name: item_name // Set the trace name to item_name for it to appear in the legend
         };
     });
@@ -43,7 +47,7 @@ function BubbleGraph({ data, itemName }) {
             }
         },
         title: {
-            text: `Percent Profit vs Total Order Count`,
+            text: `Percent Profit vs Total Order Count vs Market Volume`,
             font: {
                 color: 'white' // Setting main title color to white
             }
