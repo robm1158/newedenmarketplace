@@ -5,7 +5,7 @@ import BubbleGraph from './components/BubbleGraph/BubbleGraph';
 import { ItemEnum } from './constants/ItemEnum';
 import PagedTable from './components/PagedTable/PagedTable';
 import Home from './components/Home/Home';
-import { LocationEnum } from '/root/code/eve-aws/frontend/src/constants/locationEnum';
+import { LocationEnum } from './constants/locationEnum';
 import { ColorModeContext, useMode } from './theme';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import Topbar from './scenes/global/Topbar';
