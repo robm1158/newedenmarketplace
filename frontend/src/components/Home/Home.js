@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import videoSource from '/root/code/eve-aws/frontend/src/assets/videos/3D Spinny Logo.avi';
 
 function Home() {
     const [homeData, setHomeData] = useState(null);
