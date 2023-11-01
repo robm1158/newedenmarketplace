@@ -7,9 +7,9 @@
         "types": [],
         "children": [
             {
-                "description": "",
+                "description": "Blueprints of capsuleer spaceships",
                 "market_group_id": 204,
-                "name": "",
+                "name": "Ships",
                 "iconFile": "/items/9_64_15.png",
                 "types": [],
                 "children": [
@@ -511,9 +511,9 @@
                                 "children": []
                             },
                             {
-                                "description": "",
+                                "description": "Blueprints of Gallente heavy assault cruiser designs.",
                                 "market_group_id": 456,
-                                "name": "",
+                                "name": "Gallente",
                                 "iconFile": "/items/9_64_15.png",
                                 "types": [
                                     12024,
@@ -1269,9 +1269,9 @@
                                 "types": [],
                                 "children": [
                                     {
-                                        "description": "",
+                                        "description": "Blueprints of large hybrid turrets.",
                                         "market_group_id": 289,
-                                        "name": "",
+                                        "name": "Large",
                                         "iconFile": "/items/9_64_15.png",
                                         "types": [
                                             1122,
@@ -2508,9 +2508,9 @@
                         ]
                     },
                     {
-                        "description": "",
+                        "description": "Harvesting equipment",
                         "market_group_id": 1711,
-                        "name": "",
+                        "name": "Harvesting Equipment",
                         "iconFile": "/items/9_64_15.png",
                         "types": [],
                         "children": [
@@ -4495,9 +4495,9 @@
                                 ]
                             },
                             {
-                                "description": "",
+                                "description": "Blueprints of Advanced Capital Ship Components.",
                                 "market_group_id": 1097,
-                                "name": "",
+                                "name": "Advanced Capital Ship Components",
                                 "iconFile": "/items/9_64_15.png",
                                 "types": [],
                                 "children": [
@@ -4734,7 +4734,7 @@
                             {
                                 "description": "",
                                 "market_group_id": 1920,
-                                "name": "",
+                                "name": "Fuel Blocks",
                                 "iconFile": "/items/9_64_15.png",
                                 "types": [
                                     4313,
@@ -4892,7 +4892,7 @@
                             {
                                 "description": "",
                                 "market_group_id": 1842,
-                                "name": "",
+                                "name": "Mobile Micro Jump Units",
                                 "iconFile": "/items/9_64_15.png",
                                 "types": [
                                     33592
@@ -5922,7 +5922,7 @@
                             {
                                 "description": "",
                                 "market_group_id": 2185,
-                                "name": "",
+                                "name": "Guided Bomb Launchers",
                                 "iconFile": "/items/9_64_15.png",
                                 "types": [
                                     37008
@@ -6073,9 +6073,9 @@
                         "types": [],
                         "children": [
                             {
-                                "description": "",
+                                "description": "Caldari frigate designs.",
                                 "market_group_id": 61,
-                                "name": "",
+                                "name": "Caldari",
                                 "iconFile": "/items/MarketIcon_16px_Caldari.png",
                                 "types": [
                                     582,
@@ -6457,9 +6457,9 @@
                                         "children": []
                                     },
                                     {
-                                        "description": "",
+                                        "description": "Gallente Logistics Frigates",
                                         "market_group_id": 2149,
-                                        "name": "",
+                                        "name": "Gallente",
                                         "iconFile": "/items/MarketIcon_16px_Gallente.png",
                                         "types": [
                                             37459
@@ -6502,9 +6502,9 @@
                 ]
             },
             {
-                "description": "",
+                "description": "Medium-sized spaceships intended for a variety of roles",
                 "market_group_id": 1367,
-                "name": "",
+                "name": "Cruisers",
                 "iconFile": "/items/9_64_5.png",
                 "types": [],
                 "children": [
@@ -6543,9 +6543,9 @@
                                 "children": []
                             },
                             {
-                                "description": "",
+                                "description": "Caldari cruiser designs.",
                                 "market_group_id": 75,
-                                "name": "",
+                                "name": "Caldari",
                                 "iconFile": "/items/MarketIcon_16px_Caldari.png",
                                 "types": [
                                     632,
@@ -7062,7 +7062,7 @@
                                     {
                                         "description": "",
                                         "market_group_id": 1952,
-                                        "name": "",
+                                        "name": "Amarr",
                                         "iconFile": "/items/MarketIcon_16px_Amarr.png",
                                         "types": [
                                             34317
@@ -7450,9 +7450,9 @@
                         "types": [],
                         "children": [
                             {
-                                "description": "",
+                                "description": "Battleship-Class vessels, designed to operate behind enemy lines.",
                                 "market_group_id": 1075,
-                                "name": "",
+                                "name": "Black Ops",
                                 "iconFile": "/items/9_64_5.png",
                                 "types": [],
                                 "children": [
@@ -7526,9 +7526,9 @@
                                         "children": []
                                     },
                                     {
-                                        "description": "",
+                                        "description": "Gallente marauder designs.",
                                         "market_group_id": 1083,
-                                        "name": "",
+                                        "name": "Gallente",
                                         "iconFile": "/items/MarketIcon_16px_Gallente.png",
                                         "types": [
                                             28661
@@ -7866,9 +7866,9 @@
                                 "children": []
                             },
                             {
-                                "description": "",
+                                "description": "Caldari titan designs.",
                                 "market_group_id": 814,
-                                "name": "",
+                                "name": "Caldari",
                                 "iconFile": "/items/MarketIcon_16px_Caldari.png",
                                 "types": [
                                     3764
@@ -8180,9 +8180,9 @@
                         ]
                     },
                     {
-                        "description": "",
+                        "description": "Advanced haulers are modified for specific purposes.",
                         "market_group_id": 1385,
-                        "name": "",
+                        "name": "Advanced Haulers",
                         "iconFile": "/items/9_64_5.png",
                         "types": [],
                         "children": [
@@ -8331,9 +8331,9 @@
                         "children": []
                     },
                     {
-                        "description": "",
+                        "description": "Frigates which have been offered to capsuleers on occasion for limited periods.",
                         "market_group_id": 1619,
-                        "name": "",
+                        "name": "Special Edition Frigates",
                         "iconFile": "/items/9_64_5.png",
                         "types": [
                             3532,
@@ -10292,9 +10292,9 @@
                         ]
                     },
                     {
-                        "description": "",
+                        "description": "Nano-assembler technology at its best. Repair armor on the fly.",
                         "market_group_id": 134,
-                        "name": "",
+                        "name": "Armor Repairers",
                         "iconFile": "/items/1_64_11.png",
                         "types": [],
                         "children": [
@@ -10479,9 +10479,9 @@
                                 "children": []
                             },
                             {
-                                "description": "",
+                                "description": "The extra bulk this expansion adds to a starship reduces its speed, but gives it more room to store cargo.",
                                 "market_group_id": 1197,
-                                "name": "",
+                                "name": "Expanded Cargoholds",
                                 "iconFile": "/items/4_64_13.png",
                                 "types": [
                                     21855,
@@ -12011,9 +12011,9 @@
                                 "children": []
                             },
                             {
-                                "description": "",
+                                "description": "The smallest of the shield transporters, for when CPU and powergrid are scarce.",
                                 "market_group_id": 604,
-                                "name": "",
+                                "name": "Micro",
                                 "iconFile": "/items/1_64_16.png",
                                 "types": [
                                     406
@@ -12237,9 +12237,9 @@
                         "types": [],
                         "children": [
                             {
-                                "description": "",
+                                "description": "Frigate-class shield boosters.",
                                 "market_group_id": 609,
-                                "name": "",
+                                "name": "Small",
                                 "iconFile": "/items/2_64_3.png",
                                 "types": [
                                     13952,
@@ -12561,9 +12561,9 @@
                                 "children": []
                             },
                             {
-                                "description": "",
+                                "description": "Shield Hardeners that can be reconfigured on the fly using scripts.",
                                 "market_group_id": 2246,
-                                "name": "",
+                                "name": "Scriptable Shield Hardeners",
                                 "iconFile": "/items/2_64_2.png",
                                 "types": [
                                     41528,
@@ -13046,9 +13046,9 @@
                         ]
                     },
                     {
-                        "description": "",
+                        "description": "Provide a boost to the capacitor's recharge rate.",
                         "market_group_id": 665,
-                        "name": "",
+                        "name": "Capacitor Rechargers",
                         "iconFile": "/items/1_64_1.png",
                         "types": [
                             23813,
@@ -13621,9 +13621,9 @@
                         "children": []
                     },
                     {
-                        "description": "",
+                        "description": "Auxiliary systems giving a boost to sensor strength for a short time.",
                         "market_group_id": 685,
-                        "name": "",
+                        "name": "ECCM",
                         "iconFile": "/items/4_64_10.png",
                         "types": [],
                         "children": [
@@ -14022,9 +14022,9 @@
                         "children": []
                     },
                     {
-                        "description": "",
+                        "description": "For analysis of the composition of asteroids and other celestial objects.",
                         "market_group_id": 714,
-                        "name": "",
+                        "name": "Survey Scanners",
                         "iconFile": "/items/3_64_12.png",
                         "types": [
                             6569,
@@ -14596,9 +14596,9 @@
                 "types": [],
                 "children": [
                     {
-                        "description": "",
+                        "description": "Standard hybrid slugs.",
                         "market_group_id": 848,
-                        "name": "",
+                        "name": "Standard Charges",
                         "iconFile": "/items/15_64_9.png",
                         "types": [],
                         "children": [
@@ -14680,9 +14680,9 @@
                         "types": [],
                         "children": [
                             {
-                                "description": "",
+                                "description": "Large advanced hybrid shells, fired by battleship-sized guns.",
                                 "market_group_id": 860,
-                                "name": "",
+                                "name": "Large",
                                 "iconFile": "/items/15_64_10.png",
                                 "types": [
                                     12787,
@@ -15101,9 +15101,9 @@
                         "types": [],
                         "children": [
                             {
-                                "description": "",
+                                "description": "Large advanced beam laser crystals, for use with battleship-sized lasers.",
                                 "market_group_id": 866,
-                                "name": "",
+                                "name": "Large",
                                 "iconFile": "/items/8_64_8.png",
                                 "types": [
                                     12824,
@@ -15544,9 +15544,9 @@
                         ]
                     },
                     {
-                        "description": "",
+                        "description": "Hundreds of tiny bites will wear away even the toughest opponent.",
                         "market_group_id": 118,
-                        "name": "",
+                        "name": "Rockets",
                         "iconFile": "/items/21_64_15.png",
                         "types": [],
                         "children": [
@@ -16511,9 +16511,9 @@
                         ]
                     },
                     {
-                        "description": "",
+                        "description": "Advanced Condenser Packs",
                         "market_group_id": 2730,
-                        "name": "",
+                        "name": "Advanced Condenser Packs",
                         "iconFile": "/items/upwell_ammo_large_black.png",
                         "types": [],
                         "children": [
@@ -17119,9 +17119,9 @@
                         "children": []
                     },
                     {
-                        "description": "",
+                        "description": "Guristas identification tags.",
                         "market_group_id": 745,
-                        "name": "",
+                        "name": "Guristas",
                         "iconFile": "/items/42_64_16.png",
                         "types": [
                             12544,
@@ -19283,9 +19283,9 @@
                                 "children": []
                             },
                             {
-                                "description": "",
+                                "description": "Other Boosters",
                                 "market_group_id": 2506,
-                                "name": "",
+                                "name": "Other",
                                 "iconFile": "/items/62_64_2.png",
                                 "types": [
                                     3898,
@@ -20712,9 +20712,9 @@
                                 "types": [],
                                 "children": [
                                     {
-                                        "description": "",
+                                        "description": "Sub-types of arkonor ore.",
                                         "market_group_id": 512,
-                                        "name": "",
+                                        "name": "Arkonor",
                                         "iconFile": "/items/23_64_5.png",
                                         "types": [
                                             28385,
@@ -22900,7 +22900,7 @@
                     {
                         "description": "",
                         "market_group_id": 1833,
-                        "name": "",
+                        "name": "Mobile Tractor Units",
                         "iconFile": "/items/26_64_11.png",
                         "types": [
                             33475,
@@ -23040,9 +23040,9 @@
                         "children": []
                     },
                     {
-                        "description": "",
+                        "description": "Upgrades which are installed into the Infrastructure Hub.",
                         "market_group_id": 1276,
-                        "name": "",
+                        "name": "Infrastructure Upgrades",
                         "iconFile": "/items/95_64_4.png",
                         "types": [],
                         "children": [
@@ -24249,9 +24249,9 @@
                         "types": [],
                         "children": [
                             {
-                                "description": "",
+                                "description": "Modifications that affect a small starship's hybrid weapons.",
                                 "market_group_id": 1228,
-                                "name": "",
+                                "name": "Small Hybrid Weapon Rigs",
                                 "iconFile": "/items/68_64_3.png",
                                 "types": [
                                     31520,
@@ -24904,9 +24904,9 @@
                         "types": [],
                         "children": [
                             {
-                                "description": "",
+                                "description": "Caldari Core Subsystems",
                                 "market_group_id": 1123,
-                                "name": "",
+                                "name": "Caldari Core Subsystems",
                                 "iconFile": "/items/76_64_7.png",
                                 "types": [
                                     45625,
@@ -25466,7 +25466,7 @@
                             {
                                 "description": "",
                                 "market_group_id": 2517,
-                                "name": "",
+                                "name": "Ballistic Control System Mutaplasmids",
                                 "iconFile": "/items/default.png",
                                 "types": [
                                     49739,
@@ -26702,9 +26702,9 @@
         "types": [],
         "children": [
             {
-                "description": "",
+                "description": "Special Edition Tournament Cards",
                 "market_group_id": 1660,
-                "name": "",
+                "name": "Special Edition Tournament Cards",
                 "iconFile": "/items/114_64_1.png",
                 "types": [],
                 "children": [
@@ -28640,7 +28640,7 @@
                             {
                                 "description": "",
                                 "market_group_id": 2109,
-                                "name": "",
+                                "name": "Black Ops",
                                 "iconFile": "/items/skin-icon-16.png",
                                 "types": [],
                                 "children": [
@@ -28674,7 +28674,7 @@
                                     {
                                         "description": "",
                                         "market_group_id": 2111,
-                                        "name": "",
+                                        "name": "Caldari",
                                         "iconFile": "/items/MarketIcon_16px_Caldari.png",
                                         "types": [
                                             36355,
@@ -29550,7 +29550,7 @@
                                     {
                                         "description": "",
                                         "market_group_id": 2383,
-                                        "name": "",
+                                        "name": "Pirate Faction",
                                         "iconFile": "/items/skin-icon-16.png",
                                         "types": [
                                             46824,
@@ -29633,7 +29633,7 @@
                             {
                                 "description": "",
                                 "market_group_id": 2098,
-                                "name": "",
+                                "name": "Minmatar",
                                 "iconFile": "/items/MarketIcon_16px_Minmatar.png",
                                 "types": [
                                     55680,
@@ -29694,7 +29694,7 @@
                     {
                         "description": "",
                         "market_group_id": 2277,
-                        "name": "",
+                        "name": "Force Auxiliaries",
                         "iconFile": "/items/skin-icon-16.png",
                         "types": [],
                         "children": [
@@ -30412,7 +30412,7 @@
                                     {
                                         "description": "",
                                         "market_group_id": 2070,
-                                        "name": "",
+                                        "name": "Caldari",
                                         "iconFile": "/items/MarketIcon_16px_Caldari.png",
                                         "types": [
                                             47105,
@@ -32878,7 +32878,7 @@
                                     {
                                         "description": "",
                                         "market_group_id": 2139,
-                                        "name": "",
+                                        "name": "Gallente",
                                         "iconFile": "/items/MarketIcon_16px_Gallente.png",
                                         "types": [
                                             40323,
@@ -33601,7 +33601,7 @@
             {
                 "description": "",
                 "market_group_id": 2306,
-                "name": "",
+                "name": "Corvettes",
                 "iconFile": "/items/skin-icon-16.png",
                 "types": [],
                 "children": [
@@ -33704,7 +33704,7 @@
                     {
                         "description": "",
                         "market_group_id": 2316,
-                        "name": "",
+                        "name": "Special Shuttles",
                         "iconFile": "/items/skin-icon-16.png",
                         "types": [
                             49794,
@@ -33840,7 +33840,7 @@
                     {
                         "description": "",
                         "market_group_id": 2214,
-                        "name": "",
+                        "name": "Target Painters",
                         "iconFile": "/items/56_64_1.png",
                         "types": [
                             35947,
@@ -33976,7 +33976,7 @@
                     {
                         "description": "",
                         "market_group_id": 2224,
-                        "name": "",
+                        "name": "Capacitor Batteries",
                         "iconFile": "/items/1_64_4.png",
                         "types": [
                             47352,
@@ -34139,9 +34139,9 @@
                 ]
             },
             {
-                "description": "",
+                "description": "Quantum Cores are FTL communications facillities vital to the efficient operation of Upwell structures.",
                 "market_group_id": 2749,
-                "name": "",
+                "name": "Quantum Cores",
                 "iconFile": "/items/127_64_8.png",
                 "types": [
                     56201,
@@ -34158,9 +34158,9 @@
         ]
     },
     {
-        "description": "",
+        "description": "Rigs that improve functionality in Structures",
         "market_group_id": 2203,
-        "name": "",
+        "name": "Structure Modifications",
         "iconFile": "/items/55_64_13.png",
         "types": [],
         "children": [

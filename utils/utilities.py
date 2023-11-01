@@ -67,21 +67,22 @@ def extract_types_for_market_group(data: list, target_id: int) -> List[Dict[str,
     Returns:
         list: A list of dictionaries containing the details of types for the given market group ID.
     """
-    
-    # Iterate over each market group in the provided data
     for entry in data:
-        # Check if the current entry's market group ID matches the target ID
+        # If the current entry's market group ID matches the target ID, return all types associated
         if entry["market_group_id"] == target_id:
-            # If a match is found, extract all types associated with this market group
             return extract_all_types(entry)
-        
+
+        # If the target_id is one of the types in the current entry, return all types of this entry
+        if target_id in entry.get("types", []):
+            return extract_all_types(entry)
+
         # If the entry has children, recursively search through them
         types_from_children = extract_types_for_market_group(entry.get("children", []), target_id)
-        
+
         # If types are found in a child, return them
         if types_from_children:
             return types_from_children
-    
+
     # If no matching market group ID is found, return an empty list
     return []
 
@@ -141,5 +142,30 @@ async def fetch_data_for_types(all_entries):
     
     return combined_df
 
-# The find_name_by_market_group_id function has already been commented above.
-
+def find_name_by_market_group_id(data: list, target_id: int) -> str:
+    """
+    Recursively search through a nested structure of market groups to find
+    the name associated with a specific market group ID.
+    
+    Parameters:
+        data (list): The nested data structure to search through.
+        target_id (int): The market group ID to search for.
+    
+    Returns:
+        str: The name associated with the found market group ID or an 
+             empty string if not found.
+    """
+    for entry in data:
+        # Check if the current entry's market group ID matches the target ID
+        if entry["market_group_id"] == target_id:
+            return entry["name"]
+        
+        # Recursive call: If the entry has children, search through them
+        found_name = find_name_by_market_group_id(entry.get("children", []), target_id)
+        
+        # If the name was found in a child, return it
+        if found_name:
+            return found_name
+    
+    # If the function hasn't returned by this point, the ID was not found
+    return ""

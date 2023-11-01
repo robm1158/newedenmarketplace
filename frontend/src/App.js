@@ -1,17 +1,23 @@
 import React, { useState } from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Graph from './components/Graph/Graph';
+import BubbleGraph from './components/BubbleGraph/BubbleGraph';
 import { ItemEnum } from './constants/ItemEnum';
 import PagedTable from './components/PagedTable/PagedTable';
+import Home from './components/Home/Home';
+import { LocationEnum } from '/root/code/eve-aws/frontend/src/constants/locationEnum';
 import { ColorModeContext, useMode } from './theme';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import Topbar from './scenes/global/Topbar';
 import CustomSidebar from "./scenes/global/Sidebar";
+import Dashboard from "./components/Dashboard/Dashboard";
 import axios from 'axios';
 import './App.css';
 
 function App() {
   const [tableData, setTableData] = useState(null);
   const [graphData, setGraphData] = useState(null);
+  const [bubbleGraphData, setBubbleGraphData] = useState(null);
   const [theme, colorMode] = useMode();
   const [selectedItemName, setSelectedItemName] = useState(null);
 
@@ -24,6 +30,19 @@ function App() {
     obj[ItemEnum[key]] = key;
     return obj;
 }, {});
+
+  function transformDataWithLocation(data) {
+    return data.map(row => {
+      // Replace the location_id with the corresponding string from LocationEnum
+      // If the ID doesn't exist in the enum, it will leave the id as is.
+      const locationName = LocationEnum[row.location_id] || row.location_id;
+      return {
+        ...row,
+        location_id: locationName,
+      };
+    });
+  }
+
 
   const buyOrders = tableData ? tableData.filter(order => order.is_buy_order === true) : [];
   const nonBuyOrders = tableData ? tableData.filter(order => order.is_buy_order === false) : [];
@@ -38,45 +57,46 @@ function App() {
 
         const graphResponse = await axios.post(`http://127.0.0.1:5000/get_graph_data`, { selectedValue: name });
         setGraphData(graphResponse.data);
-      
+
+        const bubbleGraphResponse = await axios.post(`http://127.0.0.1:5000/get_bubble_data`, { selectedValue: selectedValue });
+        setBubbleGraphData(bubbleGraphResponse.data);
     } catch (error) {
         console.error("Error fetching data:", error);
     }
 };
 
-
-  return (
-    <ColorModeContext.Provider value={colorMode}>
+return (
+  <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <div className="App">
-          <Topbar />
-          <div className="mainWrapper">
-            <div className="sidebar">
-            <CustomSidebar handleSidebarClick={handleSidebarClick} setTableData={setTableData} setGraphData={setGraphData} />
-
-            </div>
-            <main className='content'>
-              <h1>My React App </h1>
-              <div style={{ display: "flex"}}>
-                {graphData && <Graph data={graphData} itemName={selectedItemName}/>}
-              </div>
-              
-              <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-                  <div>
-                      <h2>Buy Orders</h2>
-                      <PagedTable data={buyOrders} headers={['issued', 'station_id', 'price']} />
+          <CssBaseline />
+          <Router>
+              <div className="App">
+                  <Topbar />
+                  <div className="mainWrapper">
+                      <div className="sidebar">
+                          <CustomSidebar handleSidebarClick={handleSidebarClick} setTableData={setTableData} setGraphData={setGraphData} />
+                      </div>
+                      <main className='content'>
+                          <Routes>
+                              <Route path="/" element={<Home />} exact />
+                              <Route path="/dashboard" element={
+                                  <Dashboard 
+                                      graphData={graphData}
+                                      selectedItemName={selectedItemName}
+                                      nonBuyOrders={nonBuyOrders}
+                                      bubbleGraphData={bubbleGraphData}
+                                      buyOrders={buyOrders}
+                                      transformDataWithLocation={transformDataWithLocation}
+                                  />
+                              } />
+                              {/* ... Other routes ... */}
+                          </Routes>
+                      </main>
                   </div>
-                  <div>
-                      <h2>Sell Orders</h2>
-                      <PagedTable data={nonBuyOrders} headers={['issued', 'station_id', 'price']} />
-                  </div>
               </div>
-            </main>
-          </div>
-        </div>
+          </Router>
       </ThemeProvider>
-    </ColorModeContext.Provider>
+  </ColorModeContext.Provider>
 );
 }
 
