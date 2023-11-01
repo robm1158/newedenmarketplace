@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Graph from './components/Graph/Graph';
-import BubbleGraph from './components/BubbleGraph/BubbleGraph';
+// import Graph from './components/Graph/Graph';
+// import BubbleGraph from './components/BubbleGraph/BubbleGraph';
 import { ItemEnum } from './constants/ItemEnum';
-import PagedTable from './components/PagedTable/PagedTable';
+// import PagedTable from './components/PagedTable/PagedTable';
 import Home from './components/Home/Home';
 import { LocationEnum } from './constants/locationEnum';
 import { ColorModeContext, useMode } from './theme';

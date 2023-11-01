@@ -16,7 +16,6 @@ function BubbleGraph({ data, itemName }) {
         return {
             x: groupedData[item_name].map(e => e.order_count),
             y: groupedData[item_name].map(e => e.percent_profit),
-            text: groupedData[item_name].map(e => e.item_name),
             mode: 'markers',
             marker: {
                 size: groupedData[item_name].map(e => e.adjusted_volume),

@@ -7,7 +7,7 @@ import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SpaceDashboardOutlinedIcon from '@mui/icons-material/SpaceDashboardOutlined';
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined'; // <-- Import the new icon
+// import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined'; // <-- Import the new icon
 import { useNavigate } from 'react-router-dom';
 import homeIcon  from '../../assets/images/Statik_Logo_grey.png';
 
