@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import image from '../../assets/images/portrait.jpg'
 
 function Home() {
     const [homeData, setHomeData] = useState(null);
@@ -21,9 +22,9 @@ function Home() {
         <div>
             {homeData ? (
                 <div>
-                    {homeData.message}
+                    
                     <h1>Welcome to the Homepage</h1>
-                    <img src="https://images.evetech.net/characters/95383397/portrait?tenant=tranquility&size=256" alt="Character Portrait" />
+                    <img src={image} alt="Character Portrait" />
                     {/* Other content of your homepage */}
                 
                 </div>
