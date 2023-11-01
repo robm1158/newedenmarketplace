@@ -1,10 +1,10 @@
 // Dashboard.js
 import React from 'react';
-import Graph from '/root/code/eve-aws/frontend/src/components/Graph/Graph';
-import BubbleGraph from '/root/code/eve-aws/frontend/src/components/BubbleGraph/BubbleGraph';
-import { ItemEnum } from '/root/code/eve-aws/frontend/src/constants/ItemEnum';
-import PagedTable from '/root/code/eve-aws/frontend/src/components/PagedTable/PagedTable';
-import Home from '/root/code/eve-aws/frontend/src/components/Home/Home';
+import Graph from '../Graph/Graph';
+import BubbleGraph from '../BubbleGraph/BubbleGraph';
+// import { ItemEnum } from '/root/code/eve-aws/frontend/src/constants/ItemEnum';
+import PagedTable from '../PagedTable/PagedTable';
+import Home from '../Home/Home';
 
 function Dashboard({ graphData, selectedItemName, nonBuyOrders, bubbleGraphData, buyOrders, transformDataWithLocation }) {
     return (
