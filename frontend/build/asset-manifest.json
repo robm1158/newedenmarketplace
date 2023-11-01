@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/static/css/main.d8f2e576.css",
+    "main.js": "/static/js/main.c8eec6cf.js",
+    "static/media/3D Spinny Logo.avi": "/static/media/3D Spinny Logo.14dd7b6910c85010aeca.avi",
+    "static/media/Statik_Logo_grey.png": "/static/media/Statik_Logo_grey.9a2471c88a6590562528.png",
+    "index.html": "/index.html",
+    "main.d8f2e576.css.map": "/static/css/main.d8f2e576.css.map",
+    "main.c8eec6cf.js.map": "/static/js/main.c8eec6cf.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.d8f2e576.css",
+    "static/js/main.c8eec6cf.js"
+  ]
+}
