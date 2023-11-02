@@ -66,13 +66,11 @@ def extract_types_for_market_group(data: list, target_id: int) -> List[Dict[str,
     Returns:
         list: A list of dictionaries containing the details of types for the given ID.
     """
+    types_from_children = None
+
     for entry in data:
         # First, look for the target_id in the types of the current entry
         if target_id in entry.get("types", []):
-            return extract_all_types(entry)
-
-        # If not found in types, then look for it as a market group ID
-        if entry["market_group_id"] == target_id:
             return extract_all_types(entry)
 
         # If the entry has children, recursively search through them
@@ -82,8 +80,13 @@ def extract_types_for_market_group(data: list, target_id: int) -> List[Dict[str,
         if types_from_children:
             return types_from_children
 
+        # If not found in types or children, then look for it as a market group ID
+        if entry["market_group_id"] == target_id:
+            return extract_all_types(entry)
+
     # If no matching ID is found, return an empty list
-    return []
+    return types_from_children or []
+
 
 
 def extract_all_types(data: dict) -> List[Dict[str, Union[str, int, float]]]:
