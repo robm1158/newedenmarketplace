@@ -33,6 +33,7 @@ def get_bubble_data():
     # Ensure type_id is defined; this can be passed as a parameter if needed
     data = request.json
     type_id = data.get('selectedValue')
+    print(type_id)
     if not type_id:
         return jsonify({"error": "selectedValue not provided in the request."}), 400
     with open(BASE_DIR / "visualization" / "marketGroups.json", "r") as f:
@@ -40,9 +41,11 @@ def get_bubble_data():
     
     # Extract types for a specific market group id
     all_entries = utils.extract_types_for_market_group(market_data, type_id)
+    print(all_entries)
     # Fetch data for these types
     combined_df = pd.DataFrame()
     for entry in all_entries:
+        print(f"Processing {entry['item_name']}")
         temp_df = pd.DataFrame(dbh.syncPullAllCollectionDocuments(entry['item_name']))
         temp_df = temp_df.sort_values(by=['date'], ascending=False)
         if temp_df.empty:
