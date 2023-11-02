@@ -22,6 +22,7 @@ function App() {
   const [selectedItemName, setSelectedItemName] = useState(null);
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+  console.log("BACKEND_URL", BACKEND_URL);
   // const options = Object.keys(ItemEnum).map(key => ({
   //   label: key,
   //   value: key,

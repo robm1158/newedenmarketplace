@@ -2,9 +2,9 @@ import sys
 import os
 sys.path.append('/root/code/eve-aws/utils')
 from pymongo.mongo_client import MongoClient
-from pymongo.server_api import ServerApi
-from passwordsEnum import passwords
-from ItemIdEnum import item
+# from pymongo.server_api import ServerApi
+# from passwordsEnum import passwords
+# from ItemIdEnum import item
 import pandas as pd
 from json import loads, dumps
 from motor.motor_asyncio import AsyncIOMotorClient
