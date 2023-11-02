@@ -46,7 +46,6 @@ def get_bubble_data():
     combined_df['volume'] = combined_df['volume'].astype(float)
     combined_df['adjusted_volume'] = np.sqrt(combined_df['volume'])
     combined_df = combined_df.sort_values(by='percent_profit', ascending=False)
-    print(combined_df)
     
     # Convert DataFrame to JSON and return
     return combined_df.to_json(orient="records"), 200
@@ -55,8 +54,7 @@ def get_bubble_data():
 def get_item(item_name: str):
     df = db.syncPullLastDocument(item_name)
     df = df.sort_values(by=['issued'], ascending=False)
-    print(pd.unique(df['location_id']))
-    print(df)
+
     if df is not None:
         return df.to_json(orient="records"), 200
     return jsonify({"error": "Data not found for the given ID"}), 404
@@ -68,7 +66,6 @@ async def get_graph_data():
     # Extract selected value from request
     data = request.json
     selected_value = data.get('selectedValue')
-    print(selected_value)
     if not selected_value:
         return jsonify({"error": "selectedValue not provided in the request."}), 400
 

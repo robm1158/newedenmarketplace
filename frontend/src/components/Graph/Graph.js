@@ -18,7 +18,7 @@ function Graph({ data, itemName }) {
     type: 'bar',
     name: 'Volume',
     yaxis: 'y2',
-    marker: { color: 'blue' },
+    marker: { color: '#00daff' },
     // visible: false
   };
 
