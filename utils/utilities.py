@@ -57,22 +57,22 @@ def combineItemcsv(path: pathlib.Path, item: item) -> None:
 def extract_types_for_market_group(data: list, target_id: int) -> List[Dict[str, Union[str, int, float]]]:
     """
     Recursively search and extract type details from a nested market group structure 
-    based on a target market group ID.
+    based on a target market group ID or type ID.
     
     Parameters:
         data (list): Nested structure of market groups.
-        target_id (int): The target market group ID to search for.
+        target_id (int): The target ID (can be market group ID or type ID) to search for.
     
     Returns:
-        list: A list of dictionaries containing the details of types for the given market group ID.
+        list: A list of dictionaries containing the details of types for the given ID.
     """
     for entry in data:
-        # If the current entry's market group ID matches the target ID, return all types associated
-        if entry["market_group_id"] == target_id:
+        # First, look for the target_id in the types of the current entry
+        if target_id in entry.get("types", []):
             return extract_all_types(entry)
 
-        # If the target_id is one of the types in the current entry, return all types of this entry
-        if target_id in entry.get("types", []):
+        # If not found in types, then look for it as a market group ID
+        if entry["market_group_id"] == target_id:
             return extract_all_types(entry)
 
         # If the entry has children, recursively search through them
@@ -82,8 +82,9 @@ def extract_types_for_market_group(data: list, target_id: int) -> List[Dict[str,
         if types_from_children:
             return types_from_children
 
-    # If no matching market group ID is found, return an empty list
+    # If no matching ID is found, return an empty list
     return []
+
 
 def extract_all_types(data: dict) -> List[Dict[str, Union[str, int, float]]]:
     """
