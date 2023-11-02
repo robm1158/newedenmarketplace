@@ -32,7 +32,7 @@ def index():
 def get_bubble_data():
     data = request.json
     selected_id = data.get('selectedValue')
-    id_type = data.get('idType') # New parameter. Should be 'group' or 'type'
+    id_type = data.get('itemType') # New parameter. Should be 'group' or 'type'
 
     print(f"Received ID: {selected_id}, ID Type: {id_type}")
 
