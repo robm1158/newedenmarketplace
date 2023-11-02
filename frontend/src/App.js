@@ -60,7 +60,7 @@ function App() {
   }
     // You might use the type_id here to fetch relevant data
     try {
-        const tableResponse = await axios.get(`${BACKEND_URL}/get_item/${name}`);
+        const tableResponse = await axios.get(`${BACKEND_URL}/get_item/${name}/${itemType}`);
         setTableData(tableResponse.data);
 
         const graphResponse = await axios.post(`${BACKEND_URL}/get_graph_data`, { selectedValue: name });

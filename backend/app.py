@@ -67,15 +67,15 @@ def get_bubble_data():
     # Convert DataFrame to JSON and return
     return combined_df.to_json(orient="records"), 200
 
-@app.route('/get_item/<item_name>')
-def get_item(item_name: str):
-    
-    df = db.syncPullLastDocument(item_name)
-    df = df.sort_values(by=['issued'], ascending=False)
+@app.route('/get_item/<item_name>/<item_type>')
+def get_item(item_name: str, item_type: str):
+    if item_type == 'type':
+        df = db.syncPullLastDocument(item_name)
+        df = df.sort_values(by=['issued'], ascending=False)
 
-    if df is not None:
-        return df.to_json(orient="records"), 200
-    return jsonify({"error": "Data not found for the given ID"}), 404
+        if df is not None:
+            return df.to_json(orient="records"), 200
+        return jsonify({"error": "Data not found for the given ID"}), 404
 
 
 @app.route('/get_graph_data', methods=['POST'])
