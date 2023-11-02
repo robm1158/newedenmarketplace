@@ -15,8 +15,8 @@ from pathlib import Path
 app = Flask(__name__)
 
 # Use CORS with your app
-CORS(app, resources={r"/*": {"origins": ["https://elaborate-gnome-ee1359.netlify.app", "http://localhost:3000"]}})
-
+# CORS(app, resources={r"/*": {"origins": ["https://elaborate-gnome-ee1359.netlify.app", "http://localhost:3000"]}})
+CORS(app)
 
 db = mdb.mongoData('eve-orders-the-forge')
 
