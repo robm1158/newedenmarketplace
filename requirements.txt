@@ -6,8 +6,8 @@ pandas
 pathlib
 scipy
 asyncio
-tensorflow
-scikit-learn
+# tensorflow
+# scikit-learn
 pydot
 graphviz
 seaborn
@@ -15,7 +15,7 @@ matplotlib
 statsmodels
 pymongo
 dask
-tensorflow_addons
+# tensorflow_addons
 s3fs
 dash
 motor
