@@ -87,7 +87,20 @@ def extract_types_for_market_group(data: list, target_id: int) -> List[Dict[str,
     # If no matching ID is found, return an empty list
     return types_from_children or []
 
+def extract_types_by_type_id(data: list, target_type_id: int) -> List[Dict[str, Union[str, int, float]]]:
+    for entry in data:
+        if target_type_id in entry.get("types", []):
+            return extract_all_types(entry)
 
+        # If the entry has children, recursively search through them
+        types_from_children = extract_types_by_type_id(entry.get("children", []), target_type_id)
+
+        # If types are found in a child, return them
+        if types_from_children:
+            return types_from_children
+
+    # If no matching type ID is found, return an empty list
+    return []
 
 def extract_all_types(data: dict) -> List[Dict[str, Union[str, int, float]]]:
     """

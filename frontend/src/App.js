@@ -48,7 +48,7 @@ function App() {
   const buyOrders = tableData ? tableData.filter(order => order.is_buy_order === true) : [];
   const nonBuyOrders = tableData ? tableData.filter(order => order.is_buy_order === false) : [];
     
-  const handleSidebarClick = async (selectedValue) => {
+  const handleSidebarClick = async (selectedValue, itemType) => {
     const name = REVERSED_ITEM_ENUM[selectedValue];
     setSelectedItemName(name);
     // You might use the type_id here to fetch relevant data
@@ -59,7 +59,11 @@ function App() {
         const graphResponse = await axios.post(`${BACKEND_URL}/get_graph_data`, { selectedValue: name });
         setGraphData(graphResponse.data);
 
-        const bubbleGraphResponse = await axios.post(`${BACKEND_URL}/get_bubble_data`, { selectedValue: selectedValue });
+        // Adding itemType to the request payload for bubble graph data
+        const bubbleGraphResponse = await axios.post(`${BACKEND_URL}/get_bubble_data`, { 
+            selectedValue: selectedValue,
+            itemType: itemType // include the itemType in the request
+        });
         setBubbleGraphData(bubbleGraphResponse.data);
     } catch (error) {
         console.error("Error fetching data:", error);

@@ -11,16 +11,14 @@ const CustomSidebar = ({ handleSidebarClick }) => {
         return obj;
     }, {});
 
-    // Given that types are now just an array of numbers, 
-    // we don't have the name of the type in the structure anymore.
-    // So, we'll render the number as a placeholder.
     const renderTypes = (types) => {
         return types.map(typeId => {
-            const itemName = REVERSED_ITEM_ENUM[typeId]; // Map typeId to its name
+            const itemName = REVERSED_ITEM_ENUM[typeId];
             return (
                 <MenuItem 
                     key={typeId} 
-                    onClick={() => handleSidebarClick(typeId)}
+                    // Pass both typeId and the itemType as 'type' to the handler
+                    onClick={() => handleSidebarClick(typeId, 'type')}
                 >
                     {itemName} 
                 </MenuItem>
@@ -34,6 +32,8 @@ const CustomSidebar = ({ handleSidebarClick }) => {
                 key={group.market_group_id}
                 title={group.name}
                 icon={<img src={group.iconFile} alt={group.name} style={{ width: '32px', height: '32px' }} />}
+                // Pass both market_group_id and the itemType as 'group' to the handler
+                onClick={() => handleSidebarClick(group.market_group_id, 'group')}
             >
                 {renderTypes(group.types)}
                 {group.children.map(childGroup => renderSidebarItem(childGroup))}

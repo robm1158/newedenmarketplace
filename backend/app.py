@@ -30,17 +30,24 @@ def index():
 
 @app.route('/get_bubble_data', methods=['POST'])
 def get_bubble_data():
-    # Ensure type_id is defined; this can be passed as a parameter if needed
     data = request.json
-    type_id = data.get('selectedValue')
-    print(type_id)
-    if not type_id:
-        return jsonify({"error": "selectedValue not provided in the request."}), 400
+    selected_id = data.get('selectedValue')
+    id_type = data.get('idType') # New parameter. Should be 'group' or 'type'
+
+    print(f"Received ID: {selected_id}, ID Type: {id_type}")
+
+    if not selected_id or not id_type:
+        return jsonify({"error": "selectedValue or idType not provided in the request."}), 400
+    
     with open(BASE_DIR / "visualization" / "marketGroups.json", "r") as f:
         market_data = json.load(f)
     
-    # Extract types for a specific market group id
-    all_entries = utils.extract_types_for_market_group(market_data, type_id)
+    # Depending on the id_type, choose the extraction method
+    if id_type == "type":
+        all_entries = utils.extract_types_by_type_id(market_data, selected_id)
+    else: # Assume it's 'group'
+        all_entries = utils.extract_types_for_market_group(market_data, selected_id)
+    
     print(all_entries)
     # Fetch data for these types
     combined_df = pd.DataFrame()
