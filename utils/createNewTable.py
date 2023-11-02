@@ -1,8 +1,8 @@
 import aioboto3
 from botocore.exceptions import ClientError
-import json
-import requests
-import typing
+# import json
+# import requests
+# import typing
 from decimal import Decimal
 import logging
 import boto3

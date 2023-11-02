@@ -2,21 +2,21 @@ from scipy import stats
 import numpy as np
 import pandas as pd
 import pathlib
-from RegionIdEnum import region
+# from RegionIdEnum import region
 from ItemIdEnum import item
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import numpy as np
 import itemPrices as ip
 from ItemIdEnum import item
 import pathlib
 import s3PullData as s3PullData
-import asyncio
-import gc
-from dash import Dash, dcc, html, Input, Output
-import plotly.express as px
-import json
+# import asyncio
+# import gc
+# from dash import Dash, dcc, html, Input, Output
+# import plotly.express as px
+# import json
 from typing import List, Dict, Union
-import utils
+# import utils
 
 def removeOutliers(df: pd.DataFrame) -> pd.DataFrame:
     dfzscores = ((df['price'] - df['price'].mean()) / df['price'].std()).abs()

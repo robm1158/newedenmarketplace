@@ -1,12 +1,12 @@
-import json
-from ItemIdEnum import item
-from RegionIdEnum import region
+# import json
+# from ItemIdEnum import item
+# from RegionIdEnum import region
 import logging
 import pathlib 
 import boto3
 from botocore.exceptions import ClientError
 from datetime import datetime
-import os
+# import os
 
 
 class PushData():
