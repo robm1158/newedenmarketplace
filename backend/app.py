@@ -45,6 +45,8 @@ def get_bubble_data():
     for entry in all_entries:
         temp_df = pd.DataFrame(dbh.syncPullAllCollectionDocuments(entry['item_name']))
         temp_df = temp_df.sort_values(by=['date'], ascending=False)
+        if temp_df.empty:
+            continue
         top_row = temp_df.iloc[[0]] # Note: Using [[0]] will ensure we still get a DataFrame, not a Series
         top_row["percent_profit"] = (top_row['average'] - top_row['lowest']) / top_row['lowest'] * 100
         combined_df = pd.concat([combined_df, top_row], ignore_index=True) # Combine the dataframes
