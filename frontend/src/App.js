@@ -60,18 +60,20 @@ function App() {
   }
     // You might use the type_id here to fetch relevant data
     try {
-        const tableResponse = await axios.get(`${BACKEND_URL}/get_item/${name}/${itemType}`);
-        setTableData(tableResponse.data);
+      if (itemType === "type" ){
+          const tableResponse = await axios.get(`${BACKEND_URL}/get_item/${name}/${itemType}`);
+          setTableData(tableResponse.data);
 
-        const graphResponse = await axios.post(`${BACKEND_URL}/get_graph_data`, { selectedValue: name });
-        setGraphData(graphResponse.data);
+          const graphResponse = await axios.post(`${BACKEND_URL}/get_graph_data`, { selectedValue: name });
+          setGraphData(graphResponse.data);
 
-        // Adding itemType to the request payload for bubble graph data
-        const bubbleGraphResponse = await axios.post(`${BACKEND_URL}/get_bubble_data`, { 
-            selectedValue: selectedValue,
-            itemType: itemType // include the itemType in the request
-        });
-        setBubbleGraphData(bubbleGraphResponse.data);
+          // Adding itemType to the request payload for bubble graph data
+          const bubbleGraphResponse = await axios.post(`${BACKEND_URL}/get_bubble_data`, { 
+              selectedValue: selectedValue,
+              itemType: itemType // include the itemType in the request
+          });
+          setBubbleGraphData(bubbleGraphResponse.data);
+        }
     } catch (error) {
         console.error("Error fetching data:", error);
     }
