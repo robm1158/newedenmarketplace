@@ -22,7 +22,7 @@ db = mdb.mongoData('eve-orders-the-forge')
 
 dbh = mdb.mongoData('eve-historical-daily-the-forge')
 
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 @app.route('/')
 def index():
