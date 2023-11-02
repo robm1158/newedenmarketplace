@@ -4,11 +4,11 @@ import image from '../../assets/images/portrait.jpg'
 
 function Home() {
     const [homeData, setHomeData] = useState(null);
-
+    const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
     useEffect(() => {
         async function fetchHomeData() {
             try {
-                const response = await axios.get('http://127.0.0.1:5000/');
+                const response = await axios.get(`${BACKEND_URL}/`);
                 setHomeData(response.data);
             } catch (error) {
                 console.error("Error fetching home data:", error);
