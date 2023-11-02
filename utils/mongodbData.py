@@ -56,7 +56,7 @@ class mongoData():
         Asynchronously check if a connection to the MongoDB server is established by pinging it.
         """
         try:
-            await self.CLLIENT.admin.command('ping')
+            await self.CLIENT.admin.command('ping')
             print("Pinged your deployment. You successfully connected to MongoDB!")
         except Exception as e:
             print(e)

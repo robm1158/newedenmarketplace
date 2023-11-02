@@ -97,7 +97,7 @@ def extract_all_types(data: dict) -> List[Dict[str, Union[str, int, float]]]:
     """
     
     # Extract types from the current entry
-    entries = [{"name": data["name"], "type_id": type_id, "percent_profit": None, "item_name": item(type_id).name} 
+    entries = [{"name": data["name"], "type_id": type_id, "percent_profit": None, "item_name": item.item(type_id).name} 
                for type_id in data.get("types", [])]
     
     # If the entry has children, recursively extract types from them

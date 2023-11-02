@@ -41,6 +41,7 @@ def get_bubble_data():
     
     # Extract types for a specific market group id
     all_entries = utils.extract_types_for_market_group(market_data, type_id)
+    print(all_entries)
     # Fetch data for these types
     combined_df = pd.DataFrame()
     for entry in all_entries:
