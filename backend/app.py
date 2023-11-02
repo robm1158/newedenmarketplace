@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import pymongo
+import os
 import sys
 sys.path.append('/root/code/eve-aws')
 from utils import mongodbData as mdb
@@ -14,9 +15,11 @@ from pathlib import Path
 app = Flask(__name__)
 
 # Use CORS with your app
-CORS(app, resources={r"/*": {"origins": "https://elaborate-gnome-ee1359.netlify.app/"}})
+CORS(app, resources={r"/*": {"origins": ["https://elaborate-gnome-ee1359.netlify.app", "http://localhost:3000"]}})
+
 
 db = mdb.mongoData('eve-orders-the-forge')
+
 dbh = mdb.mongoData('eve-historical-daily-the-forge')
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -55,6 +58,7 @@ def get_bubble_data():
 
 @app.route('/get_item/<item_name>')
 def get_item(item_name: str):
+    
     df = db.syncPullLastDocument(item_name)
     df = df.sort_values(by=['issued'], ascending=False)
 
@@ -65,7 +69,7 @@ def get_item(item_name: str):
 
 @app.route('/get_graph_data', methods=['POST'])
 async def get_graph_data():
-    
+    await db.checkConnection()
     # Extract selected value from request
     data = request.json
     selected_value = data.get('selectedValue')
@@ -84,4 +88,5 @@ async def get_graph_data():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
