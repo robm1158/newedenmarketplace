@@ -3,7 +3,6 @@ import numpy as np
 import pandas as pd
 import pathlib
 # from RegionIdEnum import region
-from ItemIdEnum import item
 # import matplotlib.pyplot as plt
 import numpy as np
 import itemPrices as ip
