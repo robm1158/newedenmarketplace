@@ -45,8 +45,8 @@ def get_bubble_data():
     # Depending on the id_type, choose the extraction method
     if id_type == "type":
         all_entries = utils.extract_types_by_type_id(market_data, selected_id)
-    else: # Assume it's 'group'
-        all_entries = utils.extract_types_for_market_group(market_data, selected_id)
+    # else: # Assume it's 'group'
+        # all_entries = utils.extract_types_for_market_group(market_data, selected_id)
     
     print(all_entries)
     # Fetch data for these types
