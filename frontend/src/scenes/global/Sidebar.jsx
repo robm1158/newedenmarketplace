@@ -17,8 +17,10 @@ const CustomSidebar = ({ handleSidebarClick }) => {
             return (
                 <MenuItem 
                     key={typeId} 
-                    // Pass both typeId and the itemType as 'type' to the handler
-                    onClick={() => handleSidebarClick(typeId, 'type')}
+                    onClick={(event) => {
+                        event.stopPropagation(); // Stop the event from bubbling up
+                        handleSidebarClick(typeId, 'type');
+                    }}
                 >
                     {itemName} 
                 </MenuItem>
@@ -32,8 +34,10 @@ const CustomSidebar = ({ handleSidebarClick }) => {
                 key={group.market_group_id}
                 title={group.name}
                 icon={<img src={group.iconFile} alt={group.name} style={{ width: '32px', height: '32px' }} />}
-                // Pass both market_group_id and the itemType as 'group' to the handler
-                onClick={() => handleSidebarClick(group.market_group_id, 'group')}
+                onClick={(event) => {
+                    event.stopPropagation(); // Stop the event from bubbling up
+                    handleSidebarClick(group.market_group_id, 'group');
+                }}
             >
                 {renderTypes(group.types)}
                 {group.children.map(childGroup => renderSidebarItem(childGroup))}

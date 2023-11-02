@@ -49,8 +49,15 @@ function App() {
   const nonBuyOrders = tableData ? tableData.filter(order => order.is_buy_order === false) : [];
     
   const handleSidebarClick = async (selectedValue, itemType) => {
+    console.log("Selected Value:", selectedValue, "Item Type:", itemType);
+
     const name = REVERSED_ITEM_ENUM[selectedValue];
+    console.log("Selected Name:", name);
     setSelectedItemName(name);
+    if (!name) {
+      console.error(`No name found for selectedValue: ${selectedValue}`);
+      return;
+  }
     // You might use the type_id here to fetch relevant data
     try {
         const tableResponse = await axios.get(`${BACKEND_URL}/get_item/${name}`);
