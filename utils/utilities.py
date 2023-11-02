@@ -6,7 +6,7 @@ import pathlib
 # import matplotlib.pyplot as plt
 import numpy as np
 import itemPrices as ip
-from ItemIdEnum import item
+# from ItemIdEnum import item
 import pathlib
 import s3PullData as s3PullData
 # import asyncio
