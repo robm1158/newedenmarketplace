@@ -3,13 +3,14 @@ import axios from 'axios';
 import image from '../../assets/images/portrait.jpg'
 
 function Home() {
-    const [homeData, setHomeData] = useState(null);
+    const [, setHomeData] = useState(null);
     
     useEffect(() => {
         async function fetchHomeData() {
             try {
                 const response = await axios.get('http://127.0.0.1:5000/');
                 setHomeData(response.data);
+                
             } catch (error) {
                 console.error("Error fetching home data:", error);
             }
