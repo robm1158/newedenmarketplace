@@ -21,6 +21,8 @@ function App() {
   const [theme, colorMode] = useMode();
   const [selectedItemName, setSelectedItemName] = useState(null);
 
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+
   // const options = Object.keys(ItemEnum).map(key => ({
   //   label: key,
   //   value: key,
@@ -52,13 +54,13 @@ function App() {
     setSelectedItemName(name);
     // You might use the type_id here to fetch relevant data
     try {
-        const tableResponse = await axios.get(`http://127.0.0.1:5000/get_item/${name}`);
+        const tableResponse = await axios.get(`${BACKEND_URL}/get_item/${name}`);
         setTableData(tableResponse.data);
 
-        const graphResponse = await axios.post(`http://127.0.0.1:5000/get_graph_data`, { selectedValue: name });
+        const graphResponse = await axios.post(`${BACKEND_URL}/get_graph_data`, { selectedValue: name });
         setGraphData(graphResponse.data);
 
-        const bubbleGraphResponse = await axios.post(`http://127.0.0.1:5000/get_bubble_data`, { selectedValue: selectedValue });
+        const bubbleGraphResponse = await axios.post(`${BACKEND_URL}/get_bubble_data`, { selectedValue: selectedValue });
         setBubbleGraphData(bubbleGraphResponse.data);
     } catch (error) {
         console.error("Error fetching data:", error);

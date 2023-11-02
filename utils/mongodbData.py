@@ -1,4 +1,5 @@
 import sys
+import os
 sys.path.append('/root/code/eve-aws/utils')
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
@@ -20,7 +21,9 @@ class mongoData():
         Parameters:
             dbName (str): The name of the MongoDB database.
         """
-        self.uri = f"mongodb+srv://{passwords.mongoUser.value}:{passwords.mongoPassword.value}@evestoragecluster.4jc1x.mongodb.net/?retryWrites=true&w=majority&maxPoolSize=200"
+        MONGO_USER = os.environ.get("MONGO_USER")
+        MONGO_PASSWORD = os.environ.get("MONGO_PASSWORD")
+        self.uri = f"mongodb+srv://{MONGO_USER}:{MONGO_PASSWORD}@evestoragecluster.4jc1x.mongodb.net/?retryWrites=true&w=majority&maxPoolSize=200"
         self.syncClient = MongoClient(self.uri)
         # If CLIENT is not instantiated, create it
         if mongoData.CLIENT is None:

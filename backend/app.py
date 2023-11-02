@@ -9,14 +9,17 @@ import pandas as pd
 import json
 from utils import ItemIdEnum as item
 import numpy as np
+from pathlib import Path
 
 app = Flask(__name__)
 
 # Use CORS with your app
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "https://elaborate-gnome-ee1359.netlify.app/"}})
 
 db = mdb.mongoData('eve-orders-the-forge')
 dbh = mdb.mongoData('eve-historical-daily-the-forge')
+
+BASE_DIR = Path(__file__).resolve().parent
 
 @app.route('/')
 def index():
@@ -30,7 +33,7 @@ def get_bubble_data():
     print(type_id)
     if not type_id:
         return jsonify({"error": "selectedValue not provided in the request."}), 400
-    with open("/root/code/eve-aws/visualization/marketGroups.json", "r") as f:
+    with open(BASE_DIR / "visualization" / "marketGroups.json", "r") as f:
         market_data = json.load(f)
     
     # Extract types for a specific market group id
