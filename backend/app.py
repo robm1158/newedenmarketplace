@@ -69,6 +69,7 @@ def get_bubble_data():
 
 @app.route('/get_item/<item_name>/<item_type>')
 def get_item(item_name: str, item_type: str):
+    print(f"**Received name: {item_name}, Item Type: {item_type}**")
     if item_type == 'type':
         df = db.syncPullLastDocument(item_name)
         df = df.sort_values(by=['issued'], ascending=False)
