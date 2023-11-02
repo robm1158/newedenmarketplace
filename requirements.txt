@@ -19,7 +19,7 @@ dask
 s3fs
 dash
 motor
-Flask
+Flask[async]
 Flask-Cors
 tqdm
 gunicorn
