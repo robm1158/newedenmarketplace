@@ -1,12 +1,9 @@
 import { Box, Typography, IconButton } from '@mui/material';
-import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
-import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
-import SpaceDashboardOutlinedIcon from '@mui/icons-material/SpaceDashboardOutlined';
 import SsidChartOutlinedIcon from '@mui/icons-material/SsidChartOutlined';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { useNavigate } from 'react-router-dom';
-import homeIcon from '../../assets/images/Statik_Logo_grey.png';
+import homeIcon from '../../assets/images/Transparent_White.png';
 import React, { useState } from 'react';
 
 const Topbar = ({ ...props }) => {
@@ -22,11 +19,11 @@ const Topbar = ({ ...props }) => {
     };
 
     return (
-        <Box display="flex" justifyContent="space-between" p={1} alignItems="center"> 
+        <Box display="flex" justifyContent="space-between" p={2} alignItems="center"> 
             {/* Home and Search Bar */}
             <Box display="flex" alignItems="center" flexShrink={0}> 
                 <IconButton onClick={() => navigate("/")}>
-                    <img src={homeIcon} alt="Home" style={{ width: '32px', height: '32px' }} /> {/* PNG image as home button */}
+                    <img src={homeIcon} alt="Home" style={{ width: '196px', height: '42px' }} /> {/* PNG image as home button */}
                 </IconButton>
             </Box>
             
