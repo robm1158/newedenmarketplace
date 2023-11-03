@@ -8,6 +8,7 @@ import Home from './components/Home/Home';
 import { LocationEnum } from './constants/locationEnum';
 import { ColorModeContext, useMode } from './theme';
 import { CssBaseline, ThemeProvider } from '@mui/material';
+import { useLocation } from 'react-router-dom';
 import Topbar from './scenes/global/Topbar';
 import CustomSidebar from "./scenes/global/Sidebar";
 import Dashboard from "./components/Dashboard/Dashboard";
@@ -20,6 +21,7 @@ function App() {
   const [bubbleGraphData, setBubbleGraphData] = useState(null);
   const [theme, colorMode] = useMode();
   const [selectedItemName, setSelectedItemName] = useState(null);
+  const location = useLocation();
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
   // const options = Object.keys(ItemEnum).map(key => ({
@@ -87,9 +89,11 @@ return (
               <div className="App">
                   <Topbar />
                   <div className="mainWrapper">
-                      <div className="sidebar">
-                          <CustomSidebar handleSidebarClick={handleSidebarClick} setTableData={setTableData} setGraphData={setGraphData} />
-                      </div>
+                    <div className="sidebar">
+                      {location.pathname !== "/" && (
+                        <CustomSidebar handleSidebarClick={handleSidebarClick} setTableData={setTableData} setGraphData={setGraphData} />
+                      )}
+                    </div>
                       <main className='content'>
                           <Routes>
                               <Route path="/" element={<Home />} exact />
