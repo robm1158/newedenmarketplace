@@ -8,7 +8,7 @@ import { CssBaseline, ThemeProvider } from '@mui/material';
 import Topbar from './scenes/global/Topbar';
 import CustomSidebar from "./scenes/global/Sidebar";
 import Dashboard from "./components/Dashboard/Dashboard";
-import axios from 'axios';
+import axios from 'axios'; // if you use axios in the handleSidebarClick, keep this
 import './App.css';
 
 function App() {
@@ -16,8 +16,7 @@ function App() {
   const [graphData, setGraphData] = useState(null);
   const [bubbleGraphData, setBubbleGraphData] = useState(null);
   const [theme, colorMode] = useMode();
-  const [selectedItemName, setSelectedItemName] = useState(null);
-
+  
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
   const REVERSED_ITEM_ENUM = Object.keys(ItemEnum).reduce((obj, key) => {
@@ -39,7 +38,28 @@ function App() {
   const nonBuyOrders = tableData ? tableData.filter(order => order.is_buy_order === false) : [];
 
   const handleSidebarClick = async (selectedValue, itemType) => {
-    // ... existing logic ...
+    const name = REVERSED_ITEM_ENUM[selectedValue];
+    if (!name) {
+      console.error(`No name found for selectedValue: ${selectedValue}`);
+      return;
+    }
+    try {
+      if (itemType === "type" ){
+        const tableResponse = await axios.get(`${BACKEND_URL}/get_item/${name}/${itemType}`);
+        setTableData(tableResponse.data);
+
+        const graphResponse = await axios.post(`${BACKEND_URL}/get_graph_data`, { selectedValue: name });
+        setGraphData(graphResponse.data);
+
+        const bubbleGraphResponse = await axios.post(`${BACKEND_URL}/get_bubble_data`, { 
+            selectedValue: selectedValue,
+            itemType: itemType
+        });
+        setBubbleGraphData(bubbleGraphResponse.data);
+      }
+    } catch (error) {
+        console.error("Error fetching data:", error);
+    }
   };
 
   function MainContent() {
@@ -51,7 +71,7 @@ function App() {
         <div className="mainWrapper">
           <div className="sidebar">
             {location.pathname !== "/" && (
-              <CustomSidebar handleSidebarClick={handleSidebarClick} setTableData={setTableData} setGraphData={setGraphData} />
+              <CustomSidebar handleSidebarClick={handleSidebarClick} />
             )}
           </div>
           <main className='content'>
