@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import image from '../../assets/images/portrait.jpg'
+import image from '../../assets/images/Artboard_1_copy.png'
 
 function Home() {
     const [, setHomeData] = useState(null);
@@ -23,8 +23,7 @@ function Home() {
         <div>
                 
                     
-            <h1>Welcome to the Homepage</h1>
-            <img src={image} alt="Character Portrait" />
+            <h1><img src={image} alt="Character Portrait"/></h1>
             {/* Other content of your homepage */}
                 
     
