@@ -21,12 +21,9 @@ function Home() {
 
     return (
         <div>
-                
-                    
             <h1><img src={image} alt="Character Portrait"/></h1>
             {/* Other content of your homepage */}
-                
-    
+
         </div>
     );
 }
