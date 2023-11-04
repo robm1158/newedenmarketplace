@@ -1,50 +1,59 @@
-import { Box, IconButton, useTheme } from '@mui/material';
-import { useContext } from 'react';
-import { ColorModeContext, tokens } from '../../theme';
-import InputBase from '@mui/material/InputBase';
-import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
-import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
-import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
-import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
-import SpaceDashboardOutlinedIcon from '@mui/icons-material/SpaceDashboardOutlined';
-// import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined'; // <-- Import the new icon
+import { Box, Typography, IconButton } from '@mui/material';
+import SsidChartOutlinedIcon from '@mui/icons-material/SsidChartOutlined';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import { useNavigate } from 'react-router-dom';
-import homeIcon  from '../../assets/images/Statik_Logo_grey.png';
-
+import homeIcon from '../../assets/images/Transparent_White.png';
+import React, { useState } from 'react';
 
 const Topbar = ({ ...props }) => {
-    const theme = useTheme();
-    const colors = tokens(theme.palette.mode);
-    const colorMode = useContext(ColorModeContext);
     const navigate = useNavigate();
+    const [anchorEl, setAnchorEl] = useState(null);
+
+    const handleOpenMenu = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleCloseMenu = () => {
+        setAnchorEl(null);
+    };
 
     return (
-        <Box display="flex" justifyContent="space-between" p={2}> 
+        <Box display="flex" justifyContent="space-between" p={2} alignItems="center"> 
             {/* Home and Search Bar */}
-            <Box display="flex" alignItems="center"> 
+            <Box display="flex" alignItems="center" flexShrink={0}> 
                 <IconButton onClick={() => navigate("/")}>
-                    <img src={homeIcon} alt="Home" style={{ width: '24px', height: '24px' }} /> {/* PNG image as home button */}
+                    <img src={homeIcon} alt="Home" style={{ width: '196px', height: '42px' }} /> {/* PNG image as home button */}
                 </IconButton>
-                <Box display="flex" backgroundColor={colors.primary[300]} borderRadius="3" ml={1}>
-                    <InputBase sx={{ml: 2, flex: 1}} placeholder="Search..." />
-                    <IconButton type="button" sx={{p: 1}}>
-                        <SearchOutlinedIcon />
-                    </IconButton>
-                </Box>
             </Box>
-            {/* Icons */}
-            <Box display="flex">
+            
+            {/* Center Box: Use flexGrow to allow this Box to take available space */}
+            <Box display="flex" justifyContent="center" flexGrow={1}>
                 <IconButton onClick={() => navigate("/dashboard")}>
-                    <SpaceDashboardOutlinedIcon />
+                    <SsidChartOutlinedIcon />
+                    <Typography variant="body1" style={{ marginLeft: '8px' }}>Analytics</Typography>
                 </IconButton>
+                <IconButton onClick={handleOpenMenu}>
+                    <Typography variant="body1">Tools</Typography>
+                </IconButton>
+                <Menu
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClose={handleCloseMenu}
+                >
+                    <MenuItem onClick={handleCloseMenu}>Appraisal</MenuItem>
+                    <MenuItem onClick={handleCloseMenu}>Option 2</MenuItem>
+                    <MenuItem onClick={handleCloseMenu}>Option 3</MenuItem>
+                    {/* Add more MenuItem components for more options */}
+                </Menu>
                 <IconButton>
-                    <NotificationsOutlinedIcon />
+                    <Typography variant="body1">About Me</Typography>
                 </IconButton>
+            </Box>
+    
+            <Box flexShrink={0}>
                 <IconButton>
-                    <SearchOutlinedIcon />
-                </IconButton>
-                <IconButton onClick={colorMode.toggleColorMode}>
-                    {theme.palette.mode === 'dark' ? <DarkModeOutlinedIcon /> : <LightModeOutlinedIcon />}
+                    <Typography variant="body1" style={{ marginLeft: '8px' }}>Login Place Holder</Typography>
                 </IconButton>
             </Box>
         </Box>
