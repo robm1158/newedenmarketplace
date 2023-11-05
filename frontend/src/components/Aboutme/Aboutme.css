@@ -1,0 +1,51 @@
+.centered-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Align to the start of the container to avoid image being centered vertically */
+    align-items: center;
+    height: 100%; /* Full height or adjust as needed */
+    text-align: center; /* Center the text for all children */
+}
+
+.centered-container h1 {
+    margin-bottom: 15px; /* Space below the image */
+}
+
+.overview-section {
+    max-width: 600px; /* Adjust the max-width to your preference for better readability */
+}
+
+.overview-section h2 {
+    font-family: 'Consolas', monospace;/* Example font */
+    font-size: 32px; /* Example size */
+    line-height: 1.6;
+    font-weight: 400;
+    color: #00daff;
+    margin-bottom: 10px; /* Space below the h2 */
+    text-decoration: underline;
+}
+
+.overview-section p {
+    text-align: justify;
+    padding: 0 20px; /* Padding for text */
+    margin-bottom: 20px; /* Space below the paragraph */
+}
+
+.stylish-text {
+    font-family: 'Consolas', monospace;/* Example font */
+    font-size: 18px; /* Example size */
+    line-height: 1.6;
+    font-weight: 400;
+    color: #00daff;
+    /* letter-spacing: 0.1px; */
+    /* text-shadow: 1px 1px 2px #eeeeee; */
+    /* background-color: #f8f8f8; */
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px; /* Space below the paragraph, adjust as needed */
+}
+
+/* .stylish-text::first-letter {
+    font-size: 200%;
+    color: #ff6347;
+} */
