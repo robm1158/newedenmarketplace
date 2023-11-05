@@ -46,7 +46,7 @@ const Topbar = ({ ...props }) => {
                     <MenuItem onClick={handleCloseMenu}>Option 3</MenuItem>
                     {/* Add more MenuItem components for more options */}
                 </Menu>
-                <IconButton>
+                <IconButton onClick={() => navigate("/aboutme")}>
                     <Typography variant="body1">About Me</Typography>
                 </IconButton>
             </Box>
