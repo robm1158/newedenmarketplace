@@ -24,9 +24,16 @@ dbh = mdb.mongoData('eve-historical-daily-the-forge')
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-@app.route('/')
-def index():
-    return jsonify(message="Hello from Flask!")
+@app.route('/get_item/<item_name>/<item_type>')
+def get_item(item_name: str, item_type: str):
+    print(f"**Received name: {item_name}, Item Type: {item_type}**")
+    if item_type == 'type':
+        df = db.syncPullLastDocument(item_name)
+        df = df.sort_values(by=['issued'], ascending=False)
+
+        if df is not None:
+            return df.to_json(orient="records"), 200
+    return jsonify({"error": "Data not found for the given ID"}), 404
 
 @app.route('/get_bubble_data', methods=['POST'])
 def get_bubble_data():
@@ -45,8 +52,7 @@ def get_bubble_data():
     # Depending on the id_type, choose the extraction method
     if id_type == "type":
         all_entries = utils.extract_types_by_type_id(market_data, selected_id)
-    # else: # Assume it's 'group'
-        # all_entries = utils.extract_types_for_market_group(market_data, selected_id)
+
     
     print(all_entries)
     # Fetch data for these types
@@ -67,31 +73,22 @@ def get_bubble_data():
     # Convert DataFrame to JSON and return
     return combined_df.to_json(orient="records"), 200
 
-@app.route('/get_item/<item_name>/<item_type>')
-def get_item(item_name: str, item_type: str):
-    print(f"**Received name: {item_name}, Item Type: {item_type}**")
-    if item_type == 'type':
-        df = db.syncPullLastDocument(item_name)
-        df = df.sort_values(by=['issued'], ascending=False)
-
-        if df is not None:
-            return df.to_json(orient="records"), 200
-        return jsonify({"error": "Data not found for the given ID"}), 404
-
 
 @app.route('/get_graph_data', methods=['POST'])
 async def get_graph_data():
-    await db.checkConnection()
     # Extract selected value from request
     data = request.json
-    selected_value = data.get('selectedValue')
-    if not selected_value:
-        return jsonify({"error": "selectedValue not provided in the request."}), 400
-
-    # Process data based on selected value...
-    df = dbh.syncPullAllCollectionDocuments(selected_value)
-    if df is None:
-        return jsonify({"error": "No data found for the selected value."}), 404
+    id_type = data.get('itemType')
+    print(f'**{id_type}**')
+    df = pd.DataFrame()
+    
+    if id_type == "type":
+        selected_value = data.get('selectedValue')
+        if not selected_value:
+            return jsonify({"error": "selectedValue not provided in the request."}), 400
+        df = dbh.syncPullAllCollectionDocuments(selected_value)
+        if df is None:
+            return jsonify({"error": "No data found for the selected value."}), 404
 
     df = df.sort_values(by=['date'], ascending=False)
 
@@ -101,4 +98,5 @@ async def get_graph_data():
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
+    print(f"**Starting app on port {port}**")
     app.run(host='0.0.0.0', port=port, debug=True)
