@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import Home from './components/Home/Home';
+import Aboutme from './components/Aboutme/Aboutme';
 import { ItemEnum } from './constants/ItemEnum';
 import { LocationEnum } from './constants/locationEnum';
 import { ColorModeContext, useMode } from './theme';
@@ -65,7 +66,7 @@ function MainContent() {
             <Topbar />
             <div className="mainWrapper">
                 {
-                    location.pathname !== "/" && (
+                    location.pathname !== "/" && location.pathname !== "/aboutme" && (
                         <div className="sidebar">
                             <CustomSidebar handleSidebarClick={handleSidebarClick} setTableData={setTableData} setGraphData={setGraphData} />
                         </div>
@@ -84,7 +85,7 @@ function MainContent() {
                                 transformDataWithLocation={transformDataWithLocation}
                             />
                         } />
-                        {/* ... Other routes ... */}
+                        <Route path="/aboutme" element={<Aboutme />} exact />
                     </Routes>
                 </main>
             </div>
