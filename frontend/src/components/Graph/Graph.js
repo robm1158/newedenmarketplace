@@ -22,29 +22,6 @@ function Graph({ data, itemName }) {
     // visible: false
   };
 
-  // const updatemenus = [
-  //   {
-  //     buttons: [
-  //       {
-  //         label: 'Line Only',
-  //         method: 'update',
-  //         args: [{ 'visible': [true, false] }, { title: itemName+' Average Price' }]
-  //       },
-  //       {
-  //         label: 'Bar Only',
-  //         method: 'update',
-  //         args: [{ 'visible': [false, true] }, { title: itemName+' Volume' }]
-  //       },
-  //       {
-  //         label: 'Both',
-  //         method: 'update',
-  //         args: [{ 'visible': [true, true] }, { title: itemName+' Average Price and Volume' }]
-  //       }
-  //     ],
-  //     font: { color: 'orange' },
-  //     bgcolor: 'rgba(0, 0, 0, 0.7)',
-  //   }
-  // ];
 
   return (
     <Plot
