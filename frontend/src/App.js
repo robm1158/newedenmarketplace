@@ -19,10 +19,29 @@ function MainContent() {
     const [selectedItemName, setSelectedItemName] = useState(null);
     const location = useLocation();
     const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+
     const REVERSED_ITEM_ENUM = Object.keys(ItemEnum).reduce((obj, key) => {
         obj[ItemEnum[key]] = key;
         return obj;
     }, {});
+
+    // Helper function to check if the word is a Roman numeral
+    const isRomanNumeral = (word) => {
+        // Regex to match a Roman numeral
+        const romanRegex = /^(?=[MDCLXVI])(M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3}))$/i;
+        return romanRegex.test(word);
+    };
+
+    // Function to capitalize each segment of the itemName properly, including Roman numerals
+    const formatItemName = (itemName) => {
+        if (!itemName) return '';
+
+        // Split the itemName into words, then map through each word
+        return itemName.toLowerCase().split('_').map(word => {
+            // If the word is a Roman numeral, capitalize all letters, otherwise just capitalize the first letter
+            return isRomanNumeral(word) ? word.toUpperCase() : word.charAt(0).toUpperCase() + word.slice(1);
+        }).join(' ');
+    };
 
     function transformDataWithLocation(data) {
         return data.map(row => {
