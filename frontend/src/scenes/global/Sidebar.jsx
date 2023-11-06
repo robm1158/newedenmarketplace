@@ -3,6 +3,7 @@ import React from 'react';
 import { ProSidebar, Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
 import marketGroupsJSON from '../../constants/marketGroups.json';
 import { ItemEnum } from '../../constants/ItemEnum';
+import './Sidebar.css';
 
 const CustomSidebar = ({ handleSidebarClick }) => {
 
@@ -29,38 +30,51 @@ const CustomSidebar = ({ handleSidebarClick }) => {
         }).join(' ');
     };
 
-    const renderTypes = (types) => {
+    const renderTypes = (types, depth = 0) => {
         return types.map(typeId => {
-            const itemName = REVERSED_ITEM_ENUM[typeId];
-            const formattedItemName = itemName ? formatItemName(itemName) : '';
-            return (
-                <MenuItem 
-                    key={typeId} 
-                    onClick={(event) => {
-                        event.stopPropagation(); // Stop the event from bubbling up
-                        handleSidebarClick(typeId, 'type');
-                    }}
-                >
-                    {formattedItemName} 
-                </MenuItem>
-            );
-        });
-    };
-
-    const renderSidebarItem = (group) => {
-        return (
-            <SubMenu
-                key={group.market_group_id}
-                title={group.name}
-                icon={<img src={group.iconFile} alt={group.name} style={{ width: '32px', height: '32px' }} />}
-                onClick={(event) => {
-                    event.stopPropagation(); // Stop the event from bubbling up
-                    handleSidebarClick(group.market_group_id, 'group');
-                }}
+          const itemName = REVERSED_ITEM_ENUM[typeId];
+          const formattedItemName = itemName ? formatItemName(itemName) : '';
+          // Define the class name based on depth
+          let itemClassName = 'menuItem';
+          if (depth === 1) {
+            itemClassName = 'submenuItem';
+          } else if (depth > 1) {
+            itemClassName = 'deepSubmenuItem';
+          }
+      
+          return (
+            <MenuItem
+              key={typeId}
+              className={itemClassName} // Use className as a string
+              data-tooltip={formattedItemName} // Tooltip text
+              onClick={(event) => {
+                event.stopPropagation(); // Stop the event from bubbling up
+                handleSidebarClick(typeId, 'type');
+              }}
             >
-                {renderTypes(group.types)}
-                {group.children.map(childGroup => renderSidebarItem(childGroup))}
-            </SubMenu>
+              {formattedItemName}
+            </MenuItem>
+          );
+        });
+      };
+      
+
+    const renderSidebarItem = (group, depth = 0) => {
+        return (
+          <SubMenu
+            key={group.market_group_id}
+            title={group.name}
+            
+            // Use the icon class here as a string if needed
+            icon={<img src={group.iconFile} alt={group.name} className="icon" />} 
+            onClick={(event) => {
+              event.stopPropagation(); // Stop the event from bubbling up
+              handleSidebarClick(group.market_group_id, 'group');
+            }}
+          >
+            {renderTypes(group.types, depth + 1)}
+            {group.children.map(childGroup => renderSidebarItem(childGroup, depth + 1))}
+          </SubMenu>
         );
     };
 
