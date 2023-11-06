@@ -11,6 +11,7 @@ import json
 from utils import ItemIdEnum as item
 import numpy as np
 from pathlib import Path
+import re
 
 app = Flask(__name__)
 
@@ -23,6 +24,27 @@ db = mdb.mongoData('eve-orders-the-forge')
 dbh = mdb.mongoData('eve-historical-daily-the-forge')
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+def is_roman_numeral(word):
+    # Regex to match a Roman numeral
+    roman_regex = re.compile(r'^(?=[MDCLXVI])(M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3}))$', re.IGNORECASE)
+    return bool(roman_regex.match(word))
+
+def format_item_name(item_name):
+    if not item_name:
+        return ''
+
+    # Split the item_name into words, then process each word
+    words = item_name.lower().split('_')
+    formatted_words = []
+    for word in words:
+        # If the word is a Roman numeral, capitalize all letters, otherwise just capitalize the first letter
+        formatted_word = word.upper() if is_roman_numeral(word) else word.capitalize()
+        formatted_words.append(formatted_word)
+
+    # Join the words back together
+    return ' '.join(formatted_words)
+
 
 @app.route('/get_item/<item_name>/<item_type>')
 def get_item(item_name: str, item_type: str):
@@ -84,6 +106,7 @@ async def get_graph_data():
     
     if id_type == "type":
         selected_value = data.get('selectedValue')
+        print(f'{selected_value}***')
         if not selected_value:
             return jsonify({"error": "selectedValue not provided in the request."}), 400
         df = dbh.syncPullAllCollectionDocuments(selected_value)

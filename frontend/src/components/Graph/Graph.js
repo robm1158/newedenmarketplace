@@ -2,7 +2,24 @@ import React from 'react';
 import Plot from 'react-plotly.js';
 
 function Graph({ data, itemName }) {
-  
+
+  const isRomanNumeral = (word) => {
+    // Regex to match a Roman numeral
+    const romanRegex = /^(?=[MDCLXVI])(M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3}))$/i;
+    return romanRegex.test(word);
+  };
+
+  // Function to capitalize each segment of the itemName properly, including Roman numerals
+  const formatItemName = (itemName) => {
+      if (!itemName) return '';
+
+      // Split the itemName into words, then map through each word
+      return itemName.toLowerCase().split('_').map(word => {
+          // If the word is a Roman numeral, capitalize all letters, otherwise just capitalize the first letter
+          return isRomanNumeral(word) ? word.toUpperCase() : word.charAt(0).toUpperCase() + word.slice(1);
+      }).join(' ');
+  };
+  const formattedItemName = itemName ? formatItemName(itemName) : '';
   const lineTrace = {
     x: data.map(d => d.date),
     y: data.map(d => d.average),
@@ -36,7 +53,7 @@ function Graph({ data, itemName }) {
         }
       },
         title: {
-          text: itemName,
+          text: formattedItemName,
           font: {
             color: 'white' // set main title color
           }

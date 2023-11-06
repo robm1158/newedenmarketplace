@@ -1,0 +1,59 @@
+.menuItem {
+    font-size: 32px; /* Adjust the size as needed */
+    color: #333; /* Any color you want */
+    position: relative;
+  }
+  
+  .submenuItem {
+    font-size: 15px; /* Slightly smaller for submenus, adjust as needed */
+    color: #666; /* Darker text for submenu items */
+    position: relative;
+  }
+  
+  .deepSubmenuItem {
+    font-size: 10px !important; /* Even smaller for deeper levels, adjust as needed */
+    padding-right: -20px !important; 
+    position: relative;
+  }
+
+  .icon {
+    width: 32px;
+    height: 32px;
+  }
+  .menuItem,
+  .submenuItem,
+  .deepSubmenuItem {
+    position: relative; /* Necessary for absolute positioning of child elements */
+  }
+/* Tooltip styling */
+.menuItem[data-tooltip]::after,
+.submenuItem[data-tooltip]::after,
+.deepSubmenuItem[data-tooltip]::after {
+  content: attr(data-tooltip);
+  background-color: #333;
+  color: white;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 10px;
+
+  /* Positioning */
+  position: absolute;
+  z-index: 1;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-75%); /* Centers the tooltip */
+  white-space: nowrap; /* Ensures the tooltip text stays on one line */
+
+  /* Visibility */
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s, visibility 0.3s;
+}
+
+/* Tooltip visibility on hover */
+.menuItem:hover[data-tooltip]::after,
+.submenuItem:hover[data-tooltip]::after,
+.deepSubmenuItem:hover[data-tooltip]::after {
+  visibility: visible;
+  opacity: 1;
+}

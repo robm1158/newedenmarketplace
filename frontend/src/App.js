@@ -19,6 +19,7 @@ function MainContent() {
     const [selectedItemName, setSelectedItemName] = useState(null);
     const location = useLocation();
     const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+
     const REVERSED_ITEM_ENUM = Object.keys(ItemEnum).reduce((obj, key) => {
         obj[ItemEnum[key]] = key;
         return obj;
