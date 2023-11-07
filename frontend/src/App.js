@@ -44,6 +44,7 @@ function MainContent() {
     const nonBuyOrders = tableData ? tableData.filter(order => order.is_buy_order === false) : [];
 
     const handleSidebarClick = async (selectedValue, itemType) => {
+        
         if (itemType === "type") {
             const name = REVERSED_ITEM_ENUM[selectedValue];
             setSelectedItemName(name);

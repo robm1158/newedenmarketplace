@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, redirect, request, session, jsonify
 from flask_cors import CORS
 import pymongo
 import os
@@ -13,13 +13,16 @@ import numpy as np
 from pathlib import Path
 import re
 import requests
-from dotenv import load_dotenv
-from flask import current_app
+# from dotenv import load_dotenv
+# from flask_jwt_extended import (
+#     JWTManager, create_access_token, jwt_refresh_token_required, get_jwt_identity
+# )
 
-load_dotenv()
+# load_dotenv()
 
 app = Flask(__name__)
-
+# app.config['JWT_SECRET_KEY'] = 'K2XqZyRlaAsP1lFtd4OLsqnfSExNcIe6P026xIz1nZI'  # Change this!
+# jwt = JWTManager(app)
 # Use CORS with your app
 CORS(app)
 
@@ -52,6 +55,40 @@ def format_item_name(item_name):
     # Join the words back together
     return ' '.join(formatted_words)
 
+
+@app.route('/refresh_token', methods=['POST'])
+def refresh():
+    # This endpoint should require some form of authentication to make sure
+    # that only the authenticated user can refresh their access token
+
+    refresh_token = request.json.get('refresh_token')
+    if not refresh_token:
+        return jsonify({"error": "Refresh token is required"}), 400
+
+    # Prepare the data for the token refresh
+    data = {
+        'grant_type': 'refresh_token',
+        'refresh_token': refresh_token
+    }
+
+    # Prepare the basic auth header
+    auth = requests.auth.HTTPBasicAuth(CLIENT_ID, CLIENT_SECRET)
+
+    # Make the POST request to get the new access token
+    response = requests.post(TOKEN_URL, data=data, auth=auth)
+
+    # If the request is successful, the response should contain the new access token
+    if response.status_code == 200:
+        new_tokens = response.json()
+        print(f"**Received new access token: {new_tokens}**")
+        return jsonify(new_tokens), 200
+    else:
+        # Log error and return the response
+        print(f"Failed to refresh token: {response.json()}")
+        return jsonify(response.json()), response.status_code
+
+
+
 @app.route('/exchange', methods=['POST'])
 def exchange_code_for_token():
     
@@ -74,7 +111,8 @@ def exchange_code_for_token():
     # If the request is successful, the response should contain the access token and refresh token
     if response.status_code == 200:
         tokens = response.json()
-        print(f"**Received tokens: {tokens}**")
+        access_token = tokens['access_token']
+
         return jsonify(tokens), 200
     else:
         return jsonify(response.json()), response.status_code
@@ -151,9 +189,25 @@ async def get_graph_data():
 
     return df.to_json(orient="records"), 200
 
+@app.route('/get_character_id')
+def get_character_id():
+    # Need to pass in access token
+    
+    if not access_token:
+        return 'No access token found. Please login first.'
 
+    headers = {
+        'Authorization': f'Bearer {access_token}'
+    }
+    response = requests.get(VERIFY_URL, headers=headers)
+    print(f"**Received response: {response}**")
+    if response.status_code == 200:
+        character_data = response.json()
+        print(f"**Received character data: {character_data}**")
+        return jsonify(character_data)
+    else:
+        return 'Error retrieving character ID'
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    print(f"**Starting app on port {port}**")
     app.run(host='0.0.0.0', port=port, debug=True)

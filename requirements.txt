@@ -24,3 +24,4 @@ Flask-Cors
 tqdm
 gunicorn
 aenum
+Flask-JWT-Extended
