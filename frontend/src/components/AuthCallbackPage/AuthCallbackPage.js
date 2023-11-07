@@ -1,18 +1,21 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import AuthContext from '../AuthContext/AuthContext'; // Make sure the path is correct
 
 const AuthCallbackPage = () => {
   const navigate = useNavigate();
+  const { setAuth } = useContext(AuthContext); // Destructure the setAuth function from context
+
   useEffect(() => {
     const code = new URLSearchParams(window.location.search).get('code');
     const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
     if (code) {
-      // Replace with your Flask API endpoint that handles the OAuth exchange
       axios.post(`${BACKEND_URL}/exchange`, { code })
         .then(response => {
-          // Process the response, store the tokens, manage login state, etc.
+          // Assuming the response contains your tokens and user information
+          setAuth(response.data); // Update the auth context with the received data
           navigate('/dashboard'); // Redirect to the dashboard or another page
         })
         .catch(error => {
@@ -20,7 +23,7 @@ const AuthCallbackPage = () => {
           navigate('/'); // On error, redirect to home or error page
         });
     }
-  }, [navigate]);
+  }, [navigate, setAuth]); // Include setAuth in the dependency array
 
   return (
     <div>

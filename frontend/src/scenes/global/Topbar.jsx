@@ -60,6 +60,9 @@ const Topbar = ({ ...props }) => {
                 <IconButton onClick={() => navigate("/aboutme")}>
                     <Typography variant="body1">About Me</Typography>
                 </IconButton>
+                <IconButton onClick={() => navigate("/userprofile")}>
+                    <Typography variant="body1">My Profile</Typography>
+                </IconButton>
             </Box>
     
             <Box flexShrink={0}>

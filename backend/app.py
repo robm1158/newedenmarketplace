@@ -21,7 +21,6 @@ load_dotenv()
 app = Flask(__name__)
 
 # Use CORS with your app
-# CORS(app, resources={r"/*": {"origins": ["https://elaborate-gnome-ee1359.netlify.app", "http://localhost:3000"]}})
 CORS(app)
 
 db = mdb.mongoData('eve-orders-the-forge')
@@ -55,7 +54,7 @@ def format_item_name(item_name):
 
 @app.route('/exchange', methods=['POST'])
 def exchange_code_for_token():
-    current_app.logger.info('Exchange endpoint hit')
+    
 
     code = request.json.get('code')
     
@@ -65,18 +64,13 @@ def exchange_code_for_token():
         'code': code,
         'redirect_uri': CALLBACK_URL,
     }
-    current_app.logger.info(f"Code: {code}")
-    current_app.logger.info(f"Data for token exchange: {data}")
+    
     # Prepare the basic auth header
     auth = requests.auth.HTTPBasicAuth(CLIENT_ID, CLIENT_SECRET)
 
     # Make the POST request to get the access token
     response = requests.post(TOKEN_URL, data=data, auth=auth)
-    current_app.logger.info(f"Response: {response.json()}")
-    current_app.logger.info(f"Status Code: {response.status_code}")
-    print("*******")
-    print(response)
-    
+
     # If the request is successful, the response should contain the access token and refresh token
     if response.status_code == 200:
         tokens = response.json()

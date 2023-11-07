@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import React, { useState} from 'react';
+import { BrowserRouter as Router, Route, Routes,useLocation } from 'react-router-dom';
 import Home from './components/Home/Home';
 import Aboutme from './components/Aboutme/Aboutme';
 import AuthCallbackPage from './components/AuthCallbackPage/AuthCallbackPage';
+import UserProfile from './components/UserProfile/UserProfile';
+import AuthProvider  from './components/AuthProvider/AuthProvider';
+import { PrivateRoute } from './components/PrivateRoute/PrivateRoute';
 import { ItemEnum } from './constants/ItemEnum';
 import { LocationEnum } from './constants/locationEnum';
 import { ColorModeContext, useMode } from './theme';
@@ -12,6 +15,7 @@ import CustomSidebar from "./scenes/global/Sidebar";
 import Dashboard from "./components/Dashboard/Dashboard";
 import axios from 'axios';
 import './App.css';
+
 
 function MainContent() {
     const [tableData, setTableData] = useState(null);
@@ -77,7 +81,7 @@ function MainContent() {
             <Topbar />
             <div className="mainWrapper">
                 {
-                    location.pathname !== "/" && location.pathname !== "/aboutme" && (
+                    location.pathname !== "/" && location.pathname !== "/aboutme" && location.pathname !== "/userprofile" && (
                         <div className="sidebar">
                             <CustomSidebar handleSidebarClick={handleSidebarClick} setTableData={setTableData} setGraphData={setGraphData} />
                         </div>
@@ -98,6 +102,14 @@ function MainContent() {
                         } />
                         <Route path="/aboutme" element={<Aboutme />} exact />
                         <Route path="/callback" element={<AuthCallbackPage />} />
+                        <Route
+    path="/userprofile"
+    element={
+      <PrivateRoute>
+        <UserProfile />
+      </PrivateRoute>
+    }
+  />
                     </Routes>
                 </main>
             </div>
@@ -109,14 +121,16 @@ function App() {
     const [theme, colorMode] = useMode();
 
     return (
-        <ColorModeContext.Provider value={colorMode}>
-            <ThemeProvider theme={theme}>
-                <CssBaseline />
-                <Router>
-                    <MainContent />
-                </Router>
-            </ThemeProvider>
-        </ColorModeContext.Provider>
+        <AuthProvider>
+            <ColorModeContext.Provider value={colorMode}>
+                <ThemeProvider theme={theme}>
+                    <CssBaseline />
+                    <Router>
+                        <MainContent />
+                    </Router>
+                </ThemeProvider>
+            </ColorModeContext.Provider>
+        </AuthProvider>
     );
 }
 
