@@ -12,6 +12,11 @@ from utils import ItemIdEnum as item
 import numpy as np
 from pathlib import Path
 import re
+import requests
+from dotenv import load_dotenv
+from flask import current_app
+
+load_dotenv()
 
 app = Flask(__name__)
 
@@ -24,6 +29,9 @@ db = mdb.mongoData('eve-orders-the-forge')
 dbh = mdb.mongoData('eve-historical-daily-the-forge')
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+
 
 def is_roman_numeral(word):
     # Regex to match a Roman numeral
@@ -44,6 +52,38 @@ def format_item_name(item_name):
 
     # Join the words back together
     return ' '.join(formatted_words)
+
+@app.route('/exchange', methods=['POST'])
+def exchange_code_for_token():
+    current_app.logger.info('Exchange endpoint hit')
+
+    code = request.json.get('code')
+    
+    # Prepare the data for the token exchange
+    data = {
+        'grant_type': 'authorization_code',
+        'code': code,
+        'redirect_uri': CALLBACK_URL,
+    }
+    current_app.logger.info(f"Code: {code}")
+    current_app.logger.info(f"Data for token exchange: {data}")
+    # Prepare the basic auth header
+    auth = requests.auth.HTTPBasicAuth(CLIENT_ID, CLIENT_SECRET)
+
+    # Make the POST request to get the access token
+    response = requests.post(TOKEN_URL, data=data, auth=auth)
+    current_app.logger.info(f"Response: {response.json()}")
+    current_app.logger.info(f"Status Code: {response.status_code}")
+    print("*******")
+    print(response)
+    
+    # If the request is successful, the response should contain the access token and refresh token
+    if response.status_code == 200:
+        tokens = response.json()
+        print(f"**Received tokens: {tokens}**")
+        return jsonify(tokens), 200
+    else:
+        return jsonify(response.json()), response.status_code
 
 
 @app.route('/get_item/<item_name>/<item_type>')
