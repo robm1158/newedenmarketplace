@@ -5,12 +5,12 @@ import './UserProfile.css';
 
 const UserProfile = () => {
   const { auth } = useContext(AuthContext);
-  const [orders, setOrders] = useState(null);
+//   const [orders, setOrders] = useState(null);
   const [wallet, setWallet] = useState(null);
   const [paid, setPaid] = useState(false);
   const [characterInfo, setCharacterInfo] = useState({ id: null, name: null, alliance_id: null, corporation_id: null });
   const [corpInfo, setCorpInfo] = useState({ id: null, name: null, alliance_id: null, ticker: null, member_count: null});
-  const [Alliancename, setAllianceName] = useState(null);
+//   const [Alliancename, setAllianceName] = useState(null);
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
   useEffect(() => {
