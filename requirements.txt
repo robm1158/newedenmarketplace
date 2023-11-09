@@ -24,3 +24,5 @@ Flask-Cors
 tqdm
 gunicorn
 aenum
+Flask-JWT-Extended
+python-jose==3.0.1

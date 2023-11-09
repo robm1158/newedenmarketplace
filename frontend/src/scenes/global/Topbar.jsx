@@ -4,6 +4,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { useNavigate } from 'react-router-dom';
 import homeIcon from '../../assets/images/Transparent_White.png';
+import loginIcon from '../../assets/images/eve-sso-login-black-large.png';
 import React, { useState } from 'react';
 
 const Topbar = ({ ...props }) => {
@@ -17,6 +18,16 @@ const Topbar = ({ ...props }) => {
     const handleCloseMenu = () => {
         setAnchorEl(null);
     };
+
+    const handleLogin = () => {
+        const clientId = process.env.REACT_APP_EVE_CLIENT_ID;
+        const callbackUrl = encodeURIComponent(process.env.REACT_APP_CALLBACK_URL);
+        const SCOPES = encodeURIComponent('publicData esi-wallet.read_character_wallet.v1 esi-markets.read_character_orders.v1');
+        const STATE = 'uniquestate9876';
+        const loginUrl = `https://login.eveonline.com/v2/oauth/authorize/?response_type=code&redirect_uri=${callbackUrl}&client_id=${clientId}&scope=${SCOPES}&state=${STATE}`;
+
+        window.location.href = loginUrl; // Redirects the user to the EVE SSO login page
+      };
 
     return (
         <Box display="flex" justifyContent="space-between" p={2} alignItems="center"> 
@@ -49,11 +60,14 @@ const Topbar = ({ ...props }) => {
                 <IconButton onClick={() => navigate("/aboutme")}>
                     <Typography variant="body1">About Me</Typography>
                 </IconButton>
+                <IconButton onClick={() => navigate("/userprofile")}>
+                    <Typography variant="body1">My Profile</Typography>
+                </IconButton>
             </Box>
     
             <Box flexShrink={0}>
-                <IconButton>
-                    <Typography variant="body1" style={{ marginLeft: '8px' }}>Login Place Holder</Typography>
+                <IconButton onClick={handleLogin}>
+                    <img src={loginIcon} alt="Login" style={{ width: '196px', height: '38px' }} />
                 </IconButton>
             </Box>
         </Box>

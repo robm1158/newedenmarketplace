@@ -1,0 +1,97 @@
+.dashboard-container {
+    margin: 20px;
+    display: flex;
+    flex-direction: column; /* Stack children vertically */
+}
+
+.profile-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: top;
+    background-color: #3e4450;
+    border-radius: 10px;
+    box-shadow: 2px 10px 8px rgba(0, 0, 0, 0.1);
+    width: 100%; /* Ensure the container spans the full width */
+}
+
+.character-profile {
+    display: flex;
+    align-items: center;
+    /* background-color: #282c34; */
+    padding: 20px;
+    /* border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-right: 20px; */
+}
+
+.character-profile img {
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.character-name {
+    margin: 0;
+    color: #00daff;
+}
+
+.payment-status.paid {
+    margin: 0;
+    color: green;
+}
+
+.payment-status.unpaid {
+    margin: 0;
+    color: red;
+}
+
+.wallet-balance {
+    margin: 0;
+    color: #00daff;
+}
+
+.corporation-logo-container {
+    display: flex;
+    flex-direction: row; /* Align children horizontally */
+    align-items: center; /* Center align items vertically */
+    padding: 20px;
+    margin-top: 0;
+}
+
+.corporation-logo-container img {
+    border-radius: 10px; /* Rounded corners for the image */
+    margin-left: 20px; /* Space between the ticker text and the image */
+}
+
+.corp-name,
+.corp-member-count,
+.corp-ticker {
+    
+    margin: 0;
+    color: #00daff;
+}
+
+.corp-ticker {
+    display: block; /* Ensure the ticker is displayed on a new line */
+    margin: 0;
+}
+.orders-container {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    background-color: #3e4450;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive design adjustments if necessary */
+@media (max-width: 768px) {
+    .profile-container {
+        flex-direction: column;
+    }
+
+    .character-profile, .corporation-logo-container {
+        margin-right: 0;
+        margin-bottom: 20px;
+    }
+}
