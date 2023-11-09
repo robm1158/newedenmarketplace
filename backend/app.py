@@ -15,6 +15,7 @@ import re
 import requests
 from jose import jwt
 from jose.exceptions import ExpiredSignatureError, JWTError
+from datetime import datetime, timedelta
 
 # from dotenv import load_dotenv
 # from flask_jwt_extended import (
@@ -36,7 +37,6 @@ dbh = mdb.mongoData('eve-historical-daily-the-forge')
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-CALLBACK_URL='http://localhost:3000/callback'
 TOKEN_URL = "https://login.eveonline.com/v2/oauth/token"
 VERIFY_URL = 'https://login.eveonline.com/oauth/verify'
 SSO_META_DATA_URL = "https://login.eveonline.com/.well-known/oauth-authorization-server"
@@ -139,7 +139,6 @@ def refresh():
         # Log error and return the response
         print(f"Failed to refresh token: {response.json()}")
         return jsonify(response.json()), response.status_code
-
 
 
 @app.route('/exchange', methods=['POST'])
@@ -261,17 +260,17 @@ def get_character_id():
         
     jwt = validate_eve_jwt(access_token)
     character_id = jwt["sub"].split(":")[2]
-    character_name = jwt["name"]
     if not access_token:
         return 'No access token found. Please login first.'
 
     headers = {
         'Authorization': f'Bearer {access_token}'
     }
-    response = requests.get(VERIFY_URL, headers=headers)
+    response = requests.get(f'https://esi.evetech.net/latest/characters/{character_id}/?datasource=tranquility', headers=headers)
     
     if response.status_code == 200:
         character_data = response.json()
+        character_data['character_id'] = character_id
         return jsonify(character_data)
     else:
         return 'Error retrieving character ID'
@@ -301,10 +300,56 @@ def get_wallet_balance():
     response = requests.get(f'https://esi.evetech.net/latest/characters/{character_id}/wallet/', headers=headers)
     if response.status_code == 200:
         wallet_data = response.json()
-        print(f"**Received character data: {wallet_data}**")
         return jsonify(wallet_data)
     else:
         return 'Error retrieving character ID'
+    
+@app.route('/get_wallet_log')
+def get_wallet_log():
+    auth_header = request.headers.get('Authorization')
+    
+    if auth_header:
+        # Split the header into 'Bearer' and the token part
+        parts = auth_header.split()
+        
+        if parts[0].lower() != 'bearer':
+            return jsonify({"message": "Authorization header must start with Bearer"}), 401
+        elif len(parts) == 1:
+            return jsonify({"message": "Token not found"}), 401
+        elif len(parts) > 2:
+            return jsonify({"message": "Authorization header must be Bearer token"}), 401
+
+        access_token = parts[1]
+        
+    jwt = validate_eve_jwt(access_token)
+    character_id = jwt["sub"].split(":")[2]
+    headers = {
+        'Authorization': f'Bearer {access_token}'
+    }
+    # Get the current date and time
+    now = datetime.utcnow()
+    # Calculate the date one month ago
+    one_month_ago = now - timedelta(days=30)
+    
+    response = requests.get(f'https://esi.evetech.net/latest/characters/{character_id}/wallet/journal/', headers=headers)
+    if response.status_code == 200:
+        journal_data = response.json()
+        
+        # Check if there's a transaction of 1 billion ISK or more to your character within the last month
+        payment_received = any(
+            entry['amount'] == -1000000000.00 and
+            entry['second_party_id'] == 95383397 and
+            datetime.strptime(entry['date'], '%Y-%m-%dT%H:%M:%SZ') > one_month_ago
+            for entry in journal_data
+        )
+        
+        return jsonify({'payment_received': payment_received})
+    else:
+        # Handle the error properly, maybe logging the error and returning a 500 status code
+        return jsonify({"error": "Error retrieving wallet journal"}), 500
+
+
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)

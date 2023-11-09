@@ -1,0 +1,44 @@
+.profile-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.character-container {
+    flex: 1; /* Allows this container to grow and fill the space */
+}
+
+.corporation-logo-container img {
+    margin: 0;
+}
+.character-profile {
+    display: flex;
+    
+    justify-content: flex-start;
+}
+
+.character-profile img {
+    margin-right: 10px;
+}
+
+.character-name {
+    margin: 0; /* Removes default margin from the h1 tag */
+}
+
+.payment-status {
+    font-weight: bold;
+    margin: 0; /* Remove default margin if you want it closer to the h1 */
+}
+
+.payment-status.paid {
+    color: green;
+}
+
+.payment-status.unpaid {
+    color: red;
+}
+
+.wallet-balance {
+    font-weight: bold;
+    margin: 0; /* Remove default margin if you want it closer to the h1 */
+}

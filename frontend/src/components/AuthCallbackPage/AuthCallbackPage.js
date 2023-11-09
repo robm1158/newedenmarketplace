@@ -16,7 +16,7 @@ const AuthCallbackPage = () => {
         .then(response => {
           // Assuming the response contains your tokens and user information
           setAuth(response.data); // Update the auth context with the received data
-          navigate('/dashboard'); // Redirect to the dashboard or another page
+          navigate('/userprofile'); // Redirect to the dashboard or another page
         })
         .catch(error => {
           console.error('Error exchanging code for tokens:', error);
