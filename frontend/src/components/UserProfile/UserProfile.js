@@ -18,7 +18,6 @@ const UserProfile = () => {
               Authorization: `Bearer ${auth.access_token}`,
             },
           });
-          // Assuming the response has a CharacterID and CharacterName field
           setCharacterInfo({ 
             id: response.data.CharacterID,
             name: response.data.CharacterName
@@ -53,7 +52,7 @@ const UserProfile = () => {
     // Function to get wallet
     const getWallet = async () => {
       try {
-        const response = await axios.get(`${BACKEND_URL}/get_wallet`, {
+        const response = await axios.get(`${BACKEND_URL}/get_wallet_balance`, {
           headers: {
             Authorization: `Bearer ${auth.access_token}`,  // Use the access token from auth
           },
@@ -87,7 +86,7 @@ const UserProfile = () => {
       </div>
       <div>
         <h2>Wallet</h2>
-        {/* Render wallet here */}
+        <p>wallet: {wallet}</p>
       </div>
     </div>
   );

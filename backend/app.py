@@ -36,11 +36,13 @@ dbh = mdb.mongoData('eve-historical-daily-the-forge')
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+CALLBACK_URL='http://localhost:3000/callback'
+TOKEN_URL = "https://login.eveonline.com/v2/oauth/token"
+VERIFY_URL = 'https://login.eveonline.com/oauth/verify'
+SSO_META_DATA_URL = "https://login.eveonline.com/.well-known/oauth-authorization-server"
 JWK_ALGORITHM = "RS256"
 JWK_ISSUERS = ("login.eveonline.com", "https://login.eveonline.com")
 JWK_AUDIENCE = "EVE Online"
-
-app.secret_key = CLIENT_SECRET
 
 
 def is_roman_numeral(word):
@@ -260,8 +262,6 @@ def get_character_id():
     jwt = validate_eve_jwt(access_token)
     character_id = jwt["sub"].split(":")[2]
     character_name = jwt["name"]
-    print(f"**Received character ID: {character_id}**")
-    print(f"**Received character name: {character_name}**")
     if not access_token:
         return 'No access token found. Please login first.'
 
@@ -269,14 +269,42 @@ def get_character_id():
         'Authorization': f'Bearer {access_token}'
     }
     response = requests.get(VERIFY_URL, headers=headers)
-    print(f"**Received response: {response}**")
+    
     if response.status_code == 200:
         character_data = response.json()
-        print(f"**Received character data: {character_data}**")
         return jsonify(character_data)
     else:
         return 'Error retrieving character ID'
+    
+@app.route('/get_wallet_balance')
+def get_wallet_balance():
+    auth_header = request.headers.get('Authorization')
+    
+    if auth_header:
+        # Split the header into 'Bearer' and the token part
+        parts = auth_header.split()
+        
+        if parts[0].lower() != 'bearer':
+            return jsonify({"message": "Authorization header must start with Bearer"}), 401
+        elif len(parts) == 1:
+            return jsonify({"message": "Token not found"}), 401
+        elif len(parts) > 2:
+            return jsonify({"message": "Authorization header must be Bearer token"}), 401
 
+        access_token = parts[1]
+        
+    jwt = validate_eve_jwt(access_token)
+    character_id = jwt["sub"].split(":")[2]
+    headers = {
+        'Authorization': f'Bearer {access_token}'
+    }
+    response = requests.get(f'https://esi.evetech.net/latest/characters/{character_id}/wallet/', headers=headers)
+    if response.status_code == 200:
+        wallet_data = response.json()
+        print(f"**Received character data: {wallet_data}**")
+        return jsonify(wallet_data)
+    else:
+        return 'Error retrieving character ID'
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)

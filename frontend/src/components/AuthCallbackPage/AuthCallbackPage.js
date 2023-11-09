@@ -14,7 +14,6 @@ const AuthCallbackPage = () => {
     if (code) {
       axios.post(`${BACKEND_URL}/exchange`, { code })
         .then(response => {
-          console.log('Response from exchange:', response.data);
           // Assuming the response contains your tokens and user information
           setAuth(response.data); // Update the auth context with the received data
           navigate('/dashboard'); // Redirect to the dashboard or another page
