@@ -36,7 +36,9 @@ dbh = mdb.mongoData('eve-historical-daily-the-forge')
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
+CLIENT_SECRET = 'yAO0zvK0KIgc2zrDzTLbWkmYxmzkd43aLJRhdGuB'
+CLIENT_ID='1acf89b688384a7aa9d88e0aa95c7dff'
+CALLBACK_URL='http://localhost:3000/callback'
 TOKEN_URL = "https://login.eveonline.com/v2/oauth/token"
 VERIFY_URL = 'https://login.eveonline.com/oauth/verify'
 SSO_META_DATA_URL = "https://login.eveonline.com/.well-known/oauth-authorization-server"
@@ -172,7 +174,6 @@ def exchange_code_for_token():
 
 @app.route('/get_item/<item_name>/<item_type>')
 def get_item(item_name: str, item_type: str):
-    print(f"**Received name: {item_name}, Item Type: {item_type}**")
     if item_type == 'type':
         df = db.syncPullLastDocument(item_name)
         df = df.sort_values(by=['issued'], ascending=False)
@@ -225,12 +226,10 @@ async def get_graph_data():
     # Extract selected value from request
     data = request.json
     id_type = data.get('itemType')
-    print(f'**{id_type}**')
     df = pd.DataFrame()
     
     if id_type == "type":
         selected_value = data.get('selectedValue')
-        print(f'{selected_value}***')
         if not selected_value:
             return jsonify({"error": "selectedValue not provided in the request."}), 400
         df = dbh.syncPullAllCollectionDocuments(selected_value)
@@ -348,7 +347,34 @@ def get_wallet_log():
         # Handle the error properly, maybe logging the error and returning a 500 status code
         return jsonify({"error": "Error retrieving wallet journal"}), 500
 
+@app.route('/get_corp_info/<corp_id>')
+def get_corp_info(corp_id: int):
+    auth_header = request.headers.get('Authorization')
+    if auth_header:
+        # Split the header into 'Bearer' and the token part
+        parts = auth_header.split()
+        
+        if parts[0].lower() != 'bearer':
+            return jsonify({"message": "Authorization header must start with Bearer"}), 401
+        elif len(parts) == 1:
+            return jsonify({"message": "Token not found"}), 401
+        elif len(parts) > 2:
+            return jsonify({"message": "Authorization header must be Bearer token"}), 401
 
+        access_token = parts[1]
+        
+    jwt = validate_eve_jwt(access_token)
+    headers = {
+        'Authorization': f'Bearer {access_token}'
+    }
+    
+    response = requests.get(f'https://esi.evetech.net/latest/corporations/{corp_id}/?datasource=tranquility', headers=headers)
+    if response.status_code == 200:
+        corp_data = response.json()
+        return jsonify(corp_data)
+    else:
+        # Handle the error properly, maybe logging the error and returning a 500 status code
+        return jsonify({"error": "Error retrieving wallet journal"}), 500
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
