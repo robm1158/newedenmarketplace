@@ -13,6 +13,9 @@ import numpy as np
 from pathlib import Path
 import re
 import requests
+from jose import jwt
+from jose.exceptions import ExpiredSignatureError, JWTError
+
 # from dotenv import load_dotenv
 # from flask_jwt_extended import (
 #     JWTManager, create_access_token, jwt_refresh_token_required, get_jwt_identity
@@ -33,6 +36,11 @@ dbh = mdb.mongoData('eve-historical-daily-the-forge')
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+JWK_ALGORITHM = "RS256"
+JWK_ISSUERS = ("login.eveonline.com", "https://login.eveonline.com")
+JWK_AUDIENCE = "EVE Online"
+
+app.secret_key = CLIENT_SECRET
 
 
 def is_roman_numeral(word):
@@ -54,6 +62,50 @@ def format_item_name(item_name):
 
     # Join the words back together
     return ' '.join(formatted_words)
+
+def validate_eve_jwt(token: str) -> dict:
+    """Validate a JWT access token retrieved from the EVE SSO.
+
+    Args:
+        token: A JWT access token originating from the EVE SSO
+    Returns:
+        The contents of the validated JWT access token if there are no errors
+    """
+    # fetch JWKs URL from meta data endpoint
+    res = requests.get(SSO_META_DATA_URL)
+    res.raise_for_status()
+    data = res.json()
+    try:
+        jwks_uri = data["jwks_uri"]
+    except KeyError:
+        raise RuntimeError(
+            f"Invalid data received from the SSO meta data endpoint: {data}"
+        ) from None
+
+    # fetch JWKs from endpoint
+    res = requests.get(jwks_uri)
+    res.raise_for_status()
+    data = res.json()
+    try:
+        jwk_sets = data["keys"]
+    except KeyError:
+        raise RuntimeError(
+            f"Invalid data received from the the jwks endpoint: {data}"
+        ) from None
+
+    # pick the JWK with the requested alogorithm
+    jwk_set = [item for item in jwk_sets if item["alg"] == JWK_ALGORITHM].pop()
+
+    # try to decode the token and validate it against expected values
+    # will raise JWT exceptions if decoding fails or expected values do not match
+    contents = jwt.decode(
+        token=token,
+        key=jwk_set,
+        algorithms=jwk_set["alg"],
+        issuer=JWK_ISSUERS,
+        audience=JWK_AUDIENCE,
+    )
+    return contents
 
 
 @app.route('/refresh_token', methods=['POST'])
@@ -80,7 +132,6 @@ def refresh():
     # If the request is successful, the response should contain the new access token
     if response.status_code == 200:
         new_tokens = response.json()
-        print(f"**Received new access token: {new_tokens}**")
         return jsonify(new_tokens), 200
     else:
         # Log error and return the response
@@ -191,8 +242,26 @@ async def get_graph_data():
 
 @app.route('/get_character_id')
 def get_character_id():
-    # Need to pass in access token
+    auth_header = request.headers.get('Authorization')
     
+    if auth_header:
+        # Split the header into 'Bearer' and the token part
+        parts = auth_header.split()
+        
+        if parts[0].lower() != 'bearer':
+            return jsonify({"message": "Authorization header must start with Bearer"}), 401
+        elif len(parts) == 1:
+            return jsonify({"message": "Token not found"}), 401
+        elif len(parts) > 2:
+            return jsonify({"message": "Authorization header must be Bearer token"}), 401
+
+        access_token = parts[1]
+        
+    jwt = validate_eve_jwt(access_token)
+    character_id = jwt["sub"].split(":")[2]
+    character_name = jwt["name"]
+    print(f"**Received character ID: {character_id}**")
+    print(f"**Received character name: {character_name}**")
     if not access_token:
         return 'No access token found. Please login first.'
 

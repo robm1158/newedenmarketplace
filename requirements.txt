@@ -25,3 +25,4 @@ tqdm
 gunicorn
 aenum
 Flask-JWT-Extended
+jose

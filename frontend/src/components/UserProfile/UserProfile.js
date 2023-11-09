@@ -1,30 +1,96 @@
-import React from 'react';
-// import Graph from '../Graph/Graph';
-// import BubbleGraph from '../BubbleGraph/BubbleGraph';
-// import PagedTable from '../PagedTable/PagedTable';
+import React, { useContext, useEffect, useState } from 'react';
+import axios from 'axios';
+import AuthContext from '../AuthContext/AuthContext';
 
-function UserProfile() {
+const UserProfile = () => {
+  const { auth } = useContext(AuthContext);
+  const [orders, setOrders] = useState(null);
+  const [wallet, setWallet] = useState(null);
+  const [characterInfo, setCharacterInfo] = useState({ id: null, name: null });
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
-    return (
-        <div className="centered-container">
-            <div className="overview-section">
-                <h2>Overview</h2>
-                <p className="stylish-text">
-                    This project is an ambitious undertaking aimed at significantly enhancing the decision-making process of market traders in identifying lucrative investments. 
-                    By integrating advanced Machine Learning (ML) models and comprehensive data analytics presented through various graphical representations, 
-                    this tool seeks to empower users with deeper insights and predictive analytics. 
-                    It is a testament to ongoing innovation and dedication to continuous improvement in EvE's financial technology space.<br /><br />
-                    
-                    While the tool is in active development and shows great promise, it's important to recognize that it is not a silver bullet. 
-                    No system can guarantee absolute success, and this platform is no exception. It is not 100% foolproof and should be used as an augmentative tool to support, 
-                    not replace, the nuanced judgement of savvy traders. The project's evolution is continuous, with enhancements and refinements being made regularly. 
-                    Users are invited to be part of this journey, as the tool evolves and adapts to the ever-changing landscape of the market, 
-                    always with the aim of providing valuable, actionable intelligence for the discerning trader.
-                </p>
-            </div>
-        </div>
-    );    
-    
-}
+  useEffect(() => {
+    const fetchCharacterId = async () => {
+      if (auth && auth.access_token) {
+        try {
+          const response = await axios.get(`${BACKEND_URL}/get_character_id`, {
+            headers: {
+              Authorization: `Bearer ${auth.access_token}`,
+            },
+          });
+          // Assuming the response has a CharacterID and CharacterName field
+          setCharacterInfo({ 
+            id: response.data.CharacterID,
+            name: response.data.CharacterName
+          });
+        } catch (error) {
+          console.error('Error fetching character ID:', error);
+          // Handle error, e.g. redirect to login if the token is invalid
+        }
+      }
+    };
+
+    // Call the function to fetch character information
+    fetchCharacterId();
+  }, [auth, BACKEND_URL]); 
+
+  useEffect(() => {
+    // Function to get current orders
+    const getCurrentOrders = async () => {
+      try {
+        const response = await axios.get(`${BACKEND_URL}/get_current_orders`, {
+          headers: {
+            Authorization: `Bearer ${auth.access_token}`,  // Use the access token from auth
+          },
+        });
+        setOrders(response.data);
+      } catch (error) {
+        console.error('Error fetching current orders:', error);
+        // Handle error, e.g. redirect to login if the token is invalid
+      }
+    };
+
+    // Function to get wallet
+    const getWallet = async () => {
+      try {
+        const response = await axios.get(`${BACKEND_URL}/get_wallet`, {
+          headers: {
+            Authorization: `Bearer ${auth.access_token}`,  // Use the access token from auth
+          },
+        });
+        setWallet(response.data);
+      } catch (error) {
+        console.error('Error fetching wallet:', error);
+        // Handle error, e.g. redirect to login if the token is invalid
+      }
+    };
+
+    // Call both functions if the user is authenticated
+    if (auth && auth.access_token) {
+      getCurrentOrders();
+      getWallet();
+    }
+  }, [auth, BACKEND_URL]);  // Depend on auth to re-run when it changes
+
+  // Render your dashboard structure with the data received
+  return (
+    <div>
+      {/* Render orders and wallet data */}
+      <h1>{characterInfo.name}</h1>
+      <div>
+        <h2>Character ID</h2>
+        <p>ID: {characterInfo.id}</p>
+      </div>
+      <div>
+        <h2>Current Orders</h2>
+        {/* Render orders here */}
+      </div>
+      <div>
+        <h2>Wallet</h2>
+        {/* Render wallet here */}
+      </div>
+    </div>
+  );
+};
 
 export default UserProfile;

@@ -122,16 +122,16 @@ function App() {
     const [theme, colorMode] = useMode();
 
     return (
-        <AuthProvider>
-            <ColorModeContext.Provider value={colorMode}>
-                <ThemeProvider theme={theme}>
-                    <CssBaseline />
-                    <Router>
-                        <MainContent />
-                    </Router>
-                </ThemeProvider>
-            </ColorModeContext.Provider>
-        </AuthProvider>
+        <Router>
+            <AuthProvider>
+                <ColorModeContext.Provider value={colorMode}>
+                    <ThemeProvider theme={theme}>
+                        <CssBaseline />
+                            <MainContent />
+                    </ThemeProvider>
+                </ColorModeContext.Provider>
+            </AuthProvider>
+        </Router>
     );
 }
 
