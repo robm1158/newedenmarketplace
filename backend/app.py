@@ -17,16 +17,9 @@ from jose import jwt
 from jose.exceptions import ExpiredSignatureError, JWTError
 from datetime import datetime, timedelta
 
-# from dotenv import load_dotenv
-# from flask_jwt_extended import (
-#     JWTManager, create_access_token, jwt_refresh_token_required, get_jwt_identity
-# )
-
-# load_dotenv()
 
 app = Flask(__name__)
-# app.config['JWT_SECRET_KEY'] = 'K2XqZyRlaAsP1lFtd4OLsqnfSExNcIe6P026xIz1nZI'  # Change this!
-# jwt = JWTManager(app)
+
 # Use CORS with your app
 CORS(app)
 
@@ -36,11 +29,11 @@ dbh = mdb.mongoData('eve-historical-daily-the-forge')
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-CLIENT_SECRET = 'yAO0zvK0KIgc2zrDzTLbWkmYxmzkd43aLJRhdGuB'
-CLIENT_ID='1acf89b688384a7aa9d88e0aa95c7dff'
+
+# CALLBACK_URL='http://localhost:3000/callback'
 CALLBACK_URL='http://localhost:3000/callback'
-TOKEN_URL = "https://login.eveonline.com/v2/oauth/token"
-VERIFY_URL = 'https://login.eveonline.com/oauth/verify'
+TOKEN_URL = 'https://login.eveonline.com/v2/oauth/token'
+VERIFY_URL = os.environ.get("VERIFY_URL")
 SSO_META_DATA_URL = "https://login.eveonline.com/.well-known/oauth-authorization-server"
 JWK_ALGORITHM = "RS256"
 JWK_ISSUERS = ("login.eveonline.com", "https://login.eveonline.com")
@@ -160,7 +153,11 @@ def exchange_code_for_token():
     auth = requests.auth.HTTPBasicAuth(CLIENT_ID, CLIENT_SECRET)
 
     # Make the POST request to get the access token
+    print(f"Making request to {TOKEN_URL}")
+    print(f"Data: {data}")
+    print(f"Auth: {auth}")
     response = requests.post(TOKEN_URL, data=data, auth=auth)
+    print(f"Response: {response}")
 
     # If the request is successful, the response should contain the access token and refresh token
     if response.status_code == 200:
@@ -303,8 +300,8 @@ def get_wallet_balance():
     else:
         return 'Error retrieving character ID'
     
-@app.route('/get_wallet_log')
-def get_wallet_log():
+@app.route('/get_paid_status')
+def get_paid_status():
     auth_header = request.headers.get('Authorization')
     
     if auth_header:
@@ -322,6 +319,8 @@ def get_wallet_log():
         
     jwt = validate_eve_jwt(access_token)
     character_id = jwt["sub"].split(":")[2]
+    print(f"Character ID: {character_id}")
+    print(f"Access Token: {access_token}")
     headers = {
         'Authorization': f'Bearer {access_token}'
     }
@@ -372,6 +371,34 @@ def get_corp_info(corp_id: int):
     if response.status_code == 200:
         corp_data = response.json()
         return jsonify(corp_data)
+    else:
+        # Handle the error properly, maybe logging the error and returning a 500 status code
+        return jsonify({"error": "Error retrieving wallet journal"}), 500
+    
+@app.route('/get_character_orders/<character_id>')
+def get_character_orders(character_id: int):
+    auth_header = request.headers.get('Authorization')
+    if auth_header:
+        # Split the header into 'Bearer' and the token part
+        parts = auth_header.split()
+        
+        if parts[0].lower() != 'bearer':
+            return jsonify({"message": "Authorization header must start with Bearer"}), 401
+        elif len(parts) == 1:
+            return jsonify({"message": "Token not found"}), 401
+        elif len(parts) > 2:
+            return jsonify({"message": "Authorization header must be Bearer token"}), 401
+
+        access_token = parts[1]
+        
+    jwt = validate_eve_jwt(access_token)
+    headers = {
+        'Authorization': f'Bearer {access_token}'
+    }
+    response = requests.get(f'https://esi.evetech.net/latest/characters/{character_id}/orders/?datasource=tranquility', headers=headers)
+    if response.status_code == 200:
+        char_orders = response.json()
+        return jsonify(char_orders)
     else:
         # Handle the error properly, maybe logging the error and returning a 500 status code
         return jsonify({"error": "Error retrieving wallet journal"}), 500

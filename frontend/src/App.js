@@ -5,6 +5,7 @@ import Aboutme from './components/Aboutme/Aboutme';
 import AuthCallbackPage from './components/AuthCallbackPage/AuthCallbackPage';
 import UserProfile from './components/UserProfile/UserProfile';
 import AuthProvider  from './components/AuthProvider/AuthProvider';
+import PaidContext from './components/PaidContext/PaidContext';
 import { PrivateRoute } from './components/PrivateRoute/PrivateRoute';
 import { ItemEnum } from './constants/ItemEnum';
 import { LocationEnum } from './constants/locationEnum';
@@ -18,6 +19,7 @@ import './App.css';
 
 
 function MainContent() {
+    const [isPaid, setIsPaid] = useState(false);
     const [tableData, setTableData] = useState(null);
     const [graphData, setGraphData] = useState(null);
     const [bubbleGraphData, setBubbleGraphData] = useState(null);
@@ -78,43 +80,41 @@ function MainContent() {
     };
 
     return (
-        <div className="App">
-            <Topbar />
-            <div className="mainWrapper">
-                {
-                    location.pathname !== "/" && location.pathname !== "/aboutme" && location.pathname !== "/userprofile" && (
-                        <div className="sidebar">
-                            <CustomSidebar handleSidebarClick={handleSidebarClick} setTableData={setTableData} setGraphData={setGraphData} />
-                        </div>
-                    )
-                }
-                <main className='content'>
-                    <Routes>
-                        <Route path="/" element={<Home />} exact />
-                        <Route path="/dashboard" element={
-                            <Dashboard 
-                                graphData={graphData}
-                                selectedItemName={selectedItemName}
-                                nonBuyOrders={nonBuyOrders}
-                                bubbleGraphData={bubbleGraphData}
-                                buyOrders={buyOrders}
-                                transformDataWithLocation={transformDataWithLocation}
-                            />
-                        } />
-                        <Route path="/aboutme" element={<Aboutme />} exact />
-                        <Route path="/callback" element={<AuthCallbackPage />} />
-                        <Route
-    path="/userprofile"
-    element={
-      <PrivateRoute>
-        <UserProfile />
-      </PrivateRoute>
-    }
-  />
-                    </Routes>
-                </main>
+        <PaidContext.Provider value={{ isPaid, setPaid: setIsPaid }}>
+            <div className="App">
+                <Topbar />
+                <div className="mainWrapper">
+                    {
+                        location.pathname !== "/" && location.pathname !== "/aboutme" && location.pathname !== "/userprofile" && (
+                            <div className="sidebar">
+                                <CustomSidebar handleSidebarClick={handleSidebarClick} setTableData={setTableData} setGraphData={setGraphData} />
+                            </div>
+                        )
+                    }
+                    <main className='content'>
+                        <Routes>
+                            <Route path="/" element={<Home />} exact />
+                            <Route path="/dashboard" element={
+                                <Dashboard 
+                                    graphData={graphData}
+                                    selectedItemName={selectedItemName}
+                                    nonBuyOrders={nonBuyOrders}
+                                    bubbleGraphData={bubbleGraphData}
+                                    buyOrders={buyOrders}
+                                    transformDataWithLocation={transformDataWithLocation}
+                                />
+                            } />
+                            <Route path="/aboutme" element={<Aboutme />} exact />
+                            <Route path="/callback" element={<AuthCallbackPage />} />
+                            <Route path="/userprofile" element={
+                                <PrivateRoute>
+                                    <UserProfile />
+                                </PrivateRoute>}/>
+                        </Routes>
+                    </main>
+                </div>
             </div>
-        </div>
+        </PaidContext.Provider>
     );
 }
 
