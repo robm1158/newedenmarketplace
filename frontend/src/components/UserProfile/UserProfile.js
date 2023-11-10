@@ -14,6 +14,7 @@ const UserProfile = () => {
   const [characterInfo, setCharacterInfo] = useState({ id: null, name: null, alliance_id: null, corporation_id: null });
   const [corpInfo, setCorpInfo] = useState({ id: null, name: null, alliance_id: null, ticker: null, member_count: null});
   const [orders, setOrders] = useState([]); // State to hold orders
+  const [orderHistory, setOrderHistory] = useState([]); // State to hold order history
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -57,6 +58,24 @@ const UserProfile = () => {
       return {
         ...row,
         type_id: formattedItemName // Replace type_id with the formatted item name
+      };
+    });
+  };
+
+  const transformOrderHistory = (data) => {
+    return data.map(row => {
+      const rawItemName = REVERSED_ITEM_ENUM[row.type_id] || `Unknown Item (${row.type_id})`;
+      const formattedItemName = formatItemName(rawItemName);
+  
+      // Check if state is 'Expired' and volume_remain is 0, then change state to 'Complete'
+      const updatedState = row.state === 'expired' && row.volume_remain === 0 ? 'Completed' : 'Expired';
+      const updatedIsBuyOrder = row.is_buy_order === true ? 'Buy' : 'Sell';
+  
+      return {
+        ...row,
+        type_id: formattedItemName, // Replace type_id with the formatted item name
+        state: updatedState, // Update the state conditionally
+        is_buy_order: updatedIsBuyOrder,
       };
     });
   };
@@ -174,14 +193,46 @@ const UserProfile = () => {
     fetchOrders();
   }, [characterInfo, auth, BACKEND_URL]);
 
-  const headers = [
+
+  useEffect(() => {
+    const fetchOrderHistory = async () => {
+      if (characterInfo && characterInfo.id && auth && auth.access_token) {
+        try {
+          const response = await axios.get(`${BACKEND_URL}/get_character_order_history/${characterInfo.id}`, {
+            headers: {
+              Authorization: `Bearer ${auth.access_token}`
+            },
+          });
+        const transformedWithLocation = transformDataWithLocation(response.data);
+        const transformedOrderHistory = transformOrderHistory(transformedWithLocation);
+        setOrderHistory(transformedOrderHistory);
+        } catch (error) {
+          console.error('Error fetching orders:', error);
+        }
+      }
+    };
+
+    fetchOrderHistory();
+  }, [characterInfo, auth, BACKEND_URL]);
+
+  const orderheaders = [
     { displayName: 'Location', dataKey: 'location_id' },
-    { displayName: 'Order ID', dataKey: 'order_id' },
     { displayName: 'Item', dataKey: 'type_id' },
     { displayName: 'Price Per Unit', dataKey: 'price' },
     { displayName: 'Volume Remain', dataKey: 'volume_remain' },
     { displayName: 'Volume Total', dataKey: 'volume_total' },
     { displayName: 'Issued', dataKey: 'issued' },
+    // Add more headers as needed
+  ];
+
+  const orderhistoryheaders = [
+    { displayName: 'Status', dataKey: 'state' },
+    { displayName: 'Buy/Sell', dataKey: 'is_buy_order' },
+    { displayName: 'Location', dataKey: 'location_id' },
+    { displayName: 'Item', dataKey: 'type_id' },
+    { displayName: 'Price Per Unit', dataKey: 'price' },
+    { displayName: 'Volume Remain', dataKey: 'volume_remain' },
+    { displayName: 'Volume Total', dataKey: 'volume_total' },
     // Add more headers as needed
   ];
 
@@ -211,15 +262,41 @@ const UserProfile = () => {
                 <img src={`https://images.evetech.net/corporations/${characterInfo.corporation_id}/logo?tenant=tranquility&size=128`} alt="Corporation Logo" />
             </div>
         </div>
+        {isPaid ? (
+      <>
         <div className="orders-container">
           <h2 className="orders-header">Current Orders</h2>
-          <h2 className="buy-orders-header">Buy Orders</h2>
-          <PagedTable data={buyOrders} headers={headers} />
+          <div className="tables-container">
+            <div className="table-container">
+              <h2 className="buy-orders-header">Buy Orders</h2>
+              <PagedTable data={buyOrders} headers={orderheaders} />
+            </div>
 
-          <h2 className="sell-orders-header">Sell Orders</h2>
-          <PagedTable data={sellOrders} headers={headers} />
+            <div className="table-container">
+              <h2 className="sell-orders-header">Sell Orders</h2>
+              <PagedTable data={sellOrders} headers={orderheaders} />
+            </div>
+          </div>
+        </div>
+        <div className="orders-history-container">
+          <h2 className="orders-header">Order History</h2>
+          <PagedTable data={orderHistory} headers={orderhistoryheaders} />
+        </div>
+      </>
+    ) : (
+      <div className="inactive-overlay">
+        <div className="inactive-subscription">
+          <h2 className="inactive-message">Subscription: Inactive</h2>
+        </div>
+        <div className="orders-container blurred">
+          {/* ... Repeat the orders and order history containers but with a blurred class ... */}
+        </div>
+        <div className="orders-history-container blurred">
+          {/* ... Repeat the orders and order history containers but with a blurred class ... */}
+        </div>
       </div>
-    </div>
+    )}
+  </div>
   );
 };
 

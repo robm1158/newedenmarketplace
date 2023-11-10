@@ -153,11 +153,7 @@ def exchange_code_for_token():
     auth = requests.auth.HTTPBasicAuth(CLIENT_ID, CLIENT_SECRET)
 
     # Make the POST request to get the access token
-    print(f"Making request to {TOKEN_URL}")
-    print(f"Data: {data}")
-    print(f"Auth: {auth}")
     response = requests.post(TOKEN_URL, data=data, auth=auth)
-    print(f"Response: {response}")
 
     # If the request is successful, the response should contain the access token and refresh token
     if response.status_code == 200:
@@ -198,7 +194,6 @@ def get_bubble_data():
         all_entries = utils.extract_types_by_type_id(market_data, selected_id)
 
     
-    print(all_entries)
     # Fetch data for these types
     combined_df = pd.DataFrame()
     for entry in all_entries:
@@ -399,6 +394,34 @@ def get_character_orders(character_id: int):
     if response.status_code == 200:
         char_orders = response.json()
         return jsonify(char_orders)
+    else:
+        # Handle the error properly, maybe logging the error and returning a 500 status code
+        return jsonify({"error": "Error retrieving wallet journal"}), 500
+
+@app.route('/get_character_order_history/<character_id>')
+def get_character_orders_history(character_id: int):
+    auth_header = request.headers.get('Authorization')
+    if auth_header:
+        # Split the header into 'Bearer' and the token part
+        parts = auth_header.split()
+        
+        if parts[0].lower() != 'bearer':
+            return jsonify({"message": "Authorization header must start with Bearer"}), 401
+        elif len(parts) == 1:
+            return jsonify({"message": "Token not found"}), 401
+        elif len(parts) > 2:
+            return jsonify({"message": "Authorization header must be Bearer token"}), 401
+
+        access_token = parts[1]
+        
+    jwt = validate_eve_jwt(access_token)
+    headers = {
+        'Authorization': f'Bearer {access_token}'
+    }
+    response = requests.get(f'https://esi.evetech.net/latest/characters/{character_id}/orders/history/?datasource=tranquility', headers=headers)
+    if response.status_code == 200:
+        char_order_history = response.json()
+        return jsonify(char_order_history)
     else:
         # Handle the error properly, maybe logging the error and returning a 500 status code
         return jsonify({"error": "Error retrieving wallet journal"}), 500
