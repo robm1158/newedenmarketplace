@@ -10,6 +10,7 @@ from json import loads, dumps
 from motor.motor_asyncio import AsyncIOMotorClient
 from datetime import datetime
 from pymongo import DESCENDING
+import asyncio
 
 
 class mongoData():
@@ -23,7 +24,7 @@ class mongoData():
         """
         MONGO_USER = os.environ.get("MONGO_USER")
         MONGO_PASSWORD = os.environ.get("MONGO_PASSWORD")
-        self.uri = f"mongodb+srv://{MONGO_USER}:{MONGO_PASSWORD}@evestoragecluster.4jc1x.mongodb.net/?retryWrites=true&w=majority&maxPoolSize=200"
+        self.uri = f"mongodb+srv://{'statik'}:{'Robm097956!'}@evestoragecluster.4jc1x.mongodb.net/?retryWrites=true&w=majority&maxPoolSize=200"
         self.syncClient = MongoClient(self.uri)
         # If CLIENT is not instantiated, create it
         if mongoData.CLIENT is None:
@@ -45,7 +46,7 @@ class mongoData():
         collection = db[collectionName]
         result = data.to_dict(orient="list")  # Convert DataFrame to list of dicts
         
-        result['_id'] = datetime.now().isoformat()  # Unique string based on the current time
+        result['_id'] = datetime.utcnow().isoformat()  # Unique string based on the current time
 
         await collection.insert_one(result)
         # print(f"Finished Pushing {collectionName} Data")
@@ -60,7 +61,7 @@ class mongoData():
             print("Pinged your deployment. You successfully connected to MongoDB!")
         except Exception as e:
             print(e)
-
+            
     async def createCollection(self, collectionName: str) -> None:
         """
         Asynchronously create a collection with the specified name in the database.
@@ -74,8 +75,10 @@ class mongoData():
         else:   
             db = self.CLIENT[self.dbName]
             collection = db[collectionName]
+            await collection.create_index([('date', DESCENDING)])
             print(f"Created Collection {collectionName}")
 
+   
     async def getCollectionList(self) -> list:
         """
         Asynchronously retrieve a list of all collection names in the database.
@@ -254,14 +257,7 @@ class mongoData():
 # - Fetch data from an S3 bucket using the s3PullData module.
 # - Push this data to the MongoDB instance.
 # async def main():
-#     puller = s3PullData.PullData()
-#     db = mongoData('eve-market-order-history-the-forge')
-#     await db.checkConnection()
-#     for object in puller.getS3ObjectList():
-#         for items in item:
-#             print(f'================== {items.name} ==================')
-#             object = object.replace('\\', '/')
-#             print(object)
-#             result = await puller.getItemData(items.value, regionId=10000002, path=object)
-#             await db.pushData(result, items.name)
+#     db = mongoData('eve-orders-the-forge')
+#     await db.deleteDB('eve-orders-the-forge')
+
 # asyncio.run(main())

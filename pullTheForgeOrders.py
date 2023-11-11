@@ -19,7 +19,7 @@ header = {
 }
 
 df = pd.read_csv('current_forge_etags.csv', header=0, usecols=['url', 'etag'])
-updateEtags()
+
 async def fetch(session, url, header):
     async with session.get(url, headers=header) as response:
         if response.status == 200:
@@ -45,6 +45,7 @@ async def get_names_from_ids(ids):
 
 async def main():
     start = time.time()
+    await updateEtags()
     db = mdb.mongoData('eve-orders-the-forge') 
     dfs = []
     tasks = []

@@ -170,7 +170,7 @@ def get_item(item_name: str, item_type: str):
     if item_type == 'type':
         df = db.syncPullLastDocument(item_name)
         df = df.sort_values(by=['issued'], ascending=False)
-
+        print(df)
         if df is not None:
             return df.to_json(orient="records"), 200
     return jsonify({"error": "Data not found for the given ID"}), 404
