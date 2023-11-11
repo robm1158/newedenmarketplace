@@ -90,9 +90,8 @@
     margin: 0 10px; /* Add some spacing between tables */
 }
   
-.table-container .MuiTableCell-root {
-    /* Specific adjustment for Material-UI table cells */
-    font-size: 10px; /* Example size, adjust as needed */
+.buy-table-container, .sell-table-container, .MuiTableCell-root {
+    font-size: 10px !important;
 }
 
 .orders-header {
@@ -101,7 +100,7 @@
 }
 
 .orders-history-container {
-    margin-top: 20px;
+    margin-top: -35px;
     display: flex;
     flex-direction: column;
     background-color: #3e4450;
@@ -127,6 +126,23 @@
     filter: blur(5px);
 } 
 
+.history-chart-container {
+  display: flex;
+  justify-content: center; /* Centers the child containers on the main axis */
+  align-items: center; /* Aligns children to the top */
+  gap: 10px; /* Adds space between the containers */
+  
+}
+
+.donut-chart-container {
+    color: #00daff;
+    display: flex;
+    flex-direction: column; /* Stack the h2 and chart vertically */
+    /* justify-content: center; Center the content vertically */
+    align-items: center; /* Center the content horizontally */
+    
+  }
+  
 
 /* Responsive design adjustments if necessary */
 @media (max-width: 768px) {

@@ -357,7 +357,6 @@ def get_corp_info(corp_id: int):
 
         access_token = parts[1]
         
-    jwt = validate_eve_jwt(access_token)
     headers = {
         'Authorization': f'Bearer {access_token}'
     }
@@ -386,7 +385,6 @@ def get_character_orders(character_id: int):
 
         access_token = parts[1]
         
-    jwt = validate_eve_jwt(access_token)
     headers = {
         'Authorization': f'Bearer {access_token}'
     }
@@ -401,30 +399,75 @@ def get_character_orders(character_id: int):
 @app.route('/get_character_order_history/<character_id>')
 def get_character_orders_history(character_id: int):
     auth_header = request.headers.get('Authorization')
-    if auth_header:
-        # Split the header into 'Bearer' and the token part
-        parts = auth_header.split()
-        
-        if parts[0].lower() != 'bearer':
-            return jsonify({"message": "Authorization header must start with Bearer"}), 401
-        elif len(parts) == 1:
-            return jsonify({"message": "Token not found"}), 401
-        elif len(parts) > 2:
-            return jsonify({"message": "Authorization header must be Bearer token"}), 401
+    if not auth_header:
+        return jsonify({"message": "No Authorization header provided"}), 401
 
-        access_token = parts[1]
-        
-    jwt = validate_eve_jwt(access_token)
+    parts = auth_header.split()
+    if parts[0].lower() != 'bearer' or len(parts) != 2:
+        return jsonify({"message": "Authorization header must be Bearer followed by token"}), 401
+
+    access_token = parts[1]
     headers = {
         'Authorization': f'Bearer {access_token}'
     }
-    response = requests.get(f'https://esi.evetech.net/latest/characters/{character_id}/orders/history/?datasource=tranquility', headers=headers)
-    if response.status_code == 200:
-        char_order_history = response.json()
-        return jsonify(char_order_history)
-    else:
+
+    base_url = f'https://esi.evetech.net/latest/characters/{character_id}/orders/history/?datasource=tranquility'
+    response = requests.get(base_url, headers=headers)
+    
+    if response.status_code != 200:
         # Handle the error properly, maybe logging the error and returning a 500 status code
+        return jsonify({"error": "Error retrieving character order history"}), response.status_code
+
+    # Start with the initial page of results
+    char_order_history = response.json()
+    
+    # Check for the presence of the 'X-Pages' header
+    if 'X-Pages' in response.headers:
+        total_pages = int(response.headers['X-Pages'])
+        # Fetch additional pages if more than one page is present
+        for page in range(2, total_pages + 1):
+            paginated_response = requests.get(f"{base_url}&page={page}", headers=headers)
+            if paginated_response.status_code == 200:
+                # Extend the results with the current page's data
+                char_order_history.extend(paginated_response.json())
+            else:
+                # Handle the error properly, maybe logging the error and returning a 500 status code
+                return jsonify({"error": "Error retrieving character order history"}), paginated_response.status_code
+
+    return jsonify(char_order_history)
+
+@app.route('/get_character_wallet_journal/<character_id>')
+def get_character_wallet_journal(character_id):
+    auth_header = request.headers.get('Authorization')
+    
+    if not auth_header or 'bearer' not in auth_header.lower():
+        return jsonify({"message": "Invalid authorization header"}), 401
+
+    access_token = auth_header.split()[1]
+
+    headers = {'Authorization': f'Bearer {access_token}'}
+    base_url = f'https://esi.evetech.net/latest/characters/{character_id}/wallet/journal/?datasource=tranquility'
+
+    # Initial request to get the number of pages
+    response = requests.get(base_url + '&page=1', headers=headers)
+    if response.status_code != 200:
         return jsonify({"error": "Error retrieving wallet journal"}), 500
+
+    total_pages = int(response.headers.get('X-Pages', 1))
+    all_data = response.json()
+
+    # Fetch remaining pages
+    for page in range(2, total_pages + 1):
+        response = requests.get(base_url + f'&page={page}', headers=headers)
+        if response.status_code == 200:
+            all_data.extend(response.json())
+        else:
+            # Handle individual page error if needed
+            pass
+
+    df = pd.DataFrame(all_data)
+    # Convert the DataFrame to JSON or process as needed
+    return jsonify(all_data)
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
