@@ -2,6 +2,7 @@ import React, { useState} from 'react';
 import { BrowserRouter as Router, Route, Routes,useLocation } from 'react-router-dom';
 import Home from './components/Home/Home';
 import Aboutme from './components/Aboutme/Aboutme';
+import HowTo from './components/HowTo/HowTo';
 import AuthCallbackPage from './components/AuthCallbackPage/AuthCallbackPage';
 import UserProfile from './components/UserProfile/UserProfile';
 import AuthProvider  from './components/AuthProvider/AuthProvider';
@@ -85,7 +86,7 @@ function MainContent() {
                 <Topbar />
                 <div className="mainWrapper">
                     {
-                        location.pathname !== "/" && location.pathname !== "/aboutme" && location.pathname !== "/userprofile" && (
+                        location.pathname !== "/" && location.pathname !== "/aboutme" && location.pathname !== "/userprofile" && location.pathname !== "/howto" && (
                             <div className="sidebar">
                                 <CustomSidebar handleSidebarClick={handleSidebarClick} setTableData={setTableData} setGraphData={setGraphData} />
                             </div>
@@ -104,6 +105,7 @@ function MainContent() {
                                     transformDataWithLocation={transformDataWithLocation}
                                 />
                             } />
+                            <Route path="/howto" element={<HowTo />} exact />
                             <Route path="/aboutme" element={<Aboutme />} exact />
                             <Route path="/callback" element={<AuthCallbackPage />} />
                             <Route path="/userprofile" element={

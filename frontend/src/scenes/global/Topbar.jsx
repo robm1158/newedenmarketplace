@@ -10,6 +10,7 @@ import React, { useState } from 'react';
 const Topbar = ({ ...props }) => {
     const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = useState(null);
+    const [contactAnchorEl, setContactAnchorEl] = useState(null);
 
     const handleOpenMenu = (event) => {
         setAnchorEl(event.currentTarget);
@@ -19,22 +20,24 @@ const Topbar = ({ ...props }) => {
         setAnchorEl(null);
     };
 
-    const handleLogin = () => {
-        const clientId = process.env.REACT_APP_EVE_CLIENT_ID;
-        const callbackUrl = encodeURIComponent(process.env.REACT_APP_CALLBACK_URL);
-        const SCOPES = encodeURIComponent('publicData esi-wallet.read_character_wallet.v1 esi-markets.read_character_orders.v1');
-        const STATE = 'uniquestate9876';
-        const loginUrl = `https://login.eveonline.com/v2/oauth/authorize/?response_type=code&redirect_uri=${callbackUrl}&client_id=${clientId}&scope=${SCOPES}&state=${STATE}`;
+    const handleOpenContactMenu = (event) => {
+        setContactAnchorEl(event.currentTarget);
+    };
 
-        window.location.href = loginUrl; // Redirects the user to the EVE SSO login page
-      };
+    const handleCloseContactMenu = () => {
+        setContactAnchorEl(null);
+    };
+
+    const handleLogin = () => {
+        // ... Your existing login handler code ...
+    };
 
     return (
         <Box display="flex" justifyContent="space-between" p={2} alignItems="center"> 
             {/* Home and Search Bar */}
             <Box display="flex" alignItems="center" flexShrink={0}> 
                 <IconButton onClick={() => navigate("/")}>
-                    <img src={homeIcon} alt="Home" style={{ width: '196px', height: '42px' }} /> {/* PNG image as home button */}
+                    <img src={homeIcon} alt="Home" style={{ width: '196px', height: '42px' }} />
                 </IconButton>
             </Box>
             
@@ -55,14 +58,23 @@ const Topbar = ({ ...props }) => {
                     <MenuItem onClick={handleCloseMenu}>Appraisal</MenuItem>
                     <MenuItem onClick={handleCloseMenu}>Option 2</MenuItem>
                     <MenuItem onClick={handleCloseMenu}>Option 3</MenuItem>
-                    {/* Add more MenuItem components for more options */}
                 </Menu>
-                <IconButton onClick={() => navigate("/aboutme")}>
-                    <Typography variant="body1">About Me</Typography>
-                </IconButton>
                 <IconButton onClick={() => navigate("/userprofile")}>
                     <Typography variant="body1">My Profile</Typography>
                 </IconButton>
+                <IconButton onClick={handleOpenContactMenu}>
+                    <Typography variant="body1">Contact Us</Typography>
+                </IconButton>
+                <Menu
+                    anchorEl={contactAnchorEl}
+                    open={Boolean(contactAnchorEl)}
+                    onClose={handleCloseContactMenu}
+                >
+                    <MenuItem onClick={() => {handleCloseContactMenu(); navigate("/howto");}}>How To</MenuItem>
+                    <MenuItem onClick={() => {handleCloseContactMenu(); navigate("/aboutme");}}>About Me</MenuItem>
+                    <MenuItem onClick={handleCloseContactMenu}>FAQ</MenuItem>
+                </Menu>
+                
             </Box>
     
             <Box flexShrink={0}>

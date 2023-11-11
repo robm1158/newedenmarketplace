@@ -1,0 +1,19 @@
+.payment-container {
+    text-align: center;
+    margin-top: 30px; /* Adjust as needed */
+}
+
+.paypal-qr {
+    width: 100px; /* Adjust as needed */
+    margin-bottom: 15px; /* Adjust as needed */
+}
+
+.venmo-link {
+    color: #00daff; /* Adjust color as needed */
+    text-decoration: none; /* No underline */
+    font-size: 18px; /* Adjust as needed */
+}
+
+.venmo-link:hover {
+    text-decoration: underline; /* Underline on hover for better indication of a link */
+}
