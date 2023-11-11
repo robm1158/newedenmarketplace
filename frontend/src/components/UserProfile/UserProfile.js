@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import AuthContext from "../AuthContext/AuthContext";
 import PaidContext from "../PaidContext/PaidContext";
@@ -7,6 +7,33 @@ import "./UserProfile.css";
 import PagedTable from "../PagedTable/PagedTable";
 import { LocationEnum } from "../../constants/locationEnum";
 import { ItemEnum } from "../../constants/ItemEnum";
+
+
+const REVERSED_ITEM_ENUM = Object.keys(ItemEnum).reduce((obj, key) => {
+  obj[ItemEnum[key]] = key;
+  return obj;
+}, {});
+
+
+const isRomanNumeral = (word) => {
+  // Regex to match a Roman numeral
+  const romanRegex =
+    /^(?=[MDCLXVI])(M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3}))$/i;
+  return romanRegex.test(word);
+};
+
+const formatItemName = (itemName) => {
+  if (!itemName) return "";
+  return itemName
+    .toLowerCase()
+    .split("_")
+    .map((word) => {
+      return isRomanNumeral(word)
+        ? word.toUpperCase()
+        : word.charAt(0).toUpperCase() + word.slice(1);
+    })
+    .join(" ");
+};
 
 const UserProfile = () => {
   const { auth } = useContext(AuthContext);
@@ -30,10 +57,7 @@ const UserProfile = () => {
   const [chartData, setChartData] = useState([]);
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
-  const REVERSED_ITEM_ENUM = Object.keys(ItemEnum).reduce((obj, key) => {
-    obj[ItemEnum[key]] = key;
-    return obj;
-  }, {});
+
 
   function transformDataWithLocation(data) {
     return data.map((row) => {
@@ -45,31 +69,7 @@ const UserProfile = () => {
     });
   }
 
-  const isRomanNumeral = (word) => {
-    // Regex to match a Roman numeral
-    const romanRegex =
-      /^(?=[MDCLXVI])(M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3}))$/i;
-    return romanRegex.test(word);
-  };
-
-  // Function to capitalize each segment of the itemName properly, including Roman numerals
-  const formatItemName = (itemName) => {
-    if (!itemName) return "";
-
-    // Split the itemName into words, then map through each word
-    return itemName
-      .toLowerCase()
-      .split("_")
-      .map((word) => {
-        // If the word is a Roman numeral, capitalize all letters, otherwise just capitalize the first letter
-        return isRomanNumeral(word)
-          ? word.toUpperCase()
-          : word.charAt(0).toUpperCase() + word.slice(1);
-      })
-      .join(" ");
-  };
-
-  const transformDataWithType = (data) => {
+  const transformDataWithType = useCallback((data) => {
     return data.map((row) => {
       const rawItemName =
         REVERSED_ITEM_ENUM[row.type_id] || `Unknown Item (${row.type_id})`;
@@ -80,9 +80,9 @@ const UserProfile = () => {
         type_id: formattedItemName, // Replace type_id with the formatted item name
       };
     });
-  };
+  }, [  ]);
 
-  const transformOrderHistory = (data) => {
+  const transformOrderHistory = useCallback((data) => {
     return data.map((row) => {
       const rawItemName =
         REVERSED_ITEM_ENUM[row.type_id] || `Unknown Item (${row.type_id})`;
@@ -102,7 +102,7 @@ const UserProfile = () => {
         is_buy_order: updatedIsBuyOrder,
       };
     });
-  };
+  }, [ ]);
 
   // Fetch character ID
   useEffect(() => {
@@ -230,7 +230,7 @@ const UserProfile = () => {
     };
 
     fetchOrders();
-  }, [characterInfo, auth, BACKEND_URL]);
+  }, [characterInfo, auth, BACKEND_URL, transformDataWithType]);
 
   useEffect(() => {
     const fetchOrderHistory = async () => {
@@ -258,7 +258,7 @@ const UserProfile = () => {
     };
 
     fetchOrderHistory();
-  }, [characterInfo, auth, BACKEND_URL]);
+  }, [characterInfo, auth, BACKEND_URL, transformOrderHistory]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -270,8 +270,7 @@ const UserProfile = () => {
               headers: { Authorization: `Bearer ${auth.access_token}` },
             }
           );
-          // Process the data to fit the format required for the donut chart
-          // This depends on how your data looks and what you want to display
+
           setChartData(response.data);
         } catch (error) {
           console.error("Error fetching wallet journal data:", error);
