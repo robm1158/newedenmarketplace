@@ -46,7 +46,7 @@ async def updateEtags():
 
     end = time.time()
     df.index = np.arange(1, len(df) + 1)
-    await db.pushData(df, 'the-forge-etags', True)
+    await db.pushData(df, 'the-forge-etags')
     print(end-start)
     df.to_csv('current_forge_etags.csv')
 
