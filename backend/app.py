@@ -17,16 +17,9 @@ from jose import jwt
 from jose.exceptions import ExpiredSignatureError, JWTError
 from datetime import datetime, timedelta
 
-# from dotenv import load_dotenv
-# from flask_jwt_extended import (
-#     JWTManager, create_access_token, jwt_refresh_token_required, get_jwt_identity
-# )
-
-# load_dotenv()
 
 app = Flask(__name__)
-# app.config['JWT_SECRET_KEY'] = 'K2XqZyRlaAsP1lFtd4OLsqnfSExNcIe6P026xIz1nZI'  # Change this!
-# jwt = JWTManager(app)
+
 # Use CORS with your app
 CORS(app)
 
@@ -36,11 +29,6 @@ dbh = mdb.mongoData('eve-historical-daily-the-forge')
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-CLIENT_SECRET = 'yAO0zvK0KIgc2zrDzTLbWkmYxmzkd43aLJRhdGuB'
-CLIENT_ID='1acf89b688384a7aa9d88e0aa95c7dff'
-CALLBACK_URL='http://localhost:3000/callback'
-TOKEN_URL = "https://login.eveonline.com/v2/oauth/token"
-VERIFY_URL = 'https://login.eveonline.com/oauth/verify'
 SSO_META_DATA_URL = "https://login.eveonline.com/.well-known/oauth-authorization-server"
 JWK_ALGORITHM = "RS256"
 JWK_ISSUERS = ("login.eveonline.com", "https://login.eveonline.com")
@@ -201,7 +189,6 @@ def get_bubble_data():
         all_entries = utils.extract_types_by_type_id(market_data, selected_id)
 
     
-    print(all_entries)
     # Fetch data for these types
     combined_df = pd.DataFrame()
     for entry in all_entries:
@@ -303,8 +290,8 @@ def get_wallet_balance():
     else:
         return 'Error retrieving character ID'
     
-@app.route('/get_wallet_log')
-def get_wallet_log():
+@app.route('/get_paid_status')
+def get_paid_status():
     auth_header = request.headers.get('Authorization')
     
     if auth_header:
@@ -322,6 +309,8 @@ def get_wallet_log():
         
     jwt = validate_eve_jwt(access_token)
     character_id = jwt["sub"].split(":")[2]
+    print(f"Character ID: {character_id}")
+    print(f"Access Token: {access_token}")
     headers = {
         'Authorization': f'Bearer {access_token}'
     }
@@ -363,7 +352,6 @@ def get_corp_info(corp_id: int):
 
         access_token = parts[1]
         
-    jwt = validate_eve_jwt(access_token)
     headers = {
         'Authorization': f'Bearer {access_token}'
     }
@@ -375,6 +363,106 @@ def get_corp_info(corp_id: int):
     else:
         # Handle the error properly, maybe logging the error and returning a 500 status code
         return jsonify({"error": "Error retrieving wallet journal"}), 500
+    
+@app.route('/get_character_orders/<character_id>')
+def get_character_orders(character_id: int):
+    auth_header = request.headers.get('Authorization')
+    if auth_header:
+        # Split the header into 'Bearer' and the token part
+        parts = auth_header.split()
+        
+        if parts[0].lower() != 'bearer':
+            return jsonify({"message": "Authorization header must start with Bearer"}), 401
+        elif len(parts) == 1:
+            return jsonify({"message": "Token not found"}), 401
+        elif len(parts) > 2:
+            return jsonify({"message": "Authorization header must be Bearer token"}), 401
+
+        access_token = parts[1]
+        
+    headers = {
+        'Authorization': f'Bearer {access_token}'
+    }
+    response = requests.get(f'https://esi.evetech.net/latest/characters/{character_id}/orders/?datasource=tranquility', headers=headers)
+    if response.status_code == 200:
+        char_orders = response.json()
+        return jsonify(char_orders)
+    else:
+        # Handle the error properly, maybe logging the error and returning a 500 status code
+        return jsonify({"error": "Error retrieving wallet journal"}), 500
+
+@app.route('/get_character_order_history/<character_id>')
+def get_character_orders_history(character_id: int):
+    auth_header = request.headers.get('Authorization')
+    if not auth_header:
+        return jsonify({"message": "No Authorization header provided"}), 401
+
+    parts = auth_header.split()
+    if parts[0].lower() != 'bearer' or len(parts) != 2:
+        return jsonify({"message": "Authorization header must be Bearer followed by token"}), 401
+
+    access_token = parts[1]
+    headers = {
+        'Authorization': f'Bearer {access_token}'
+    }
+
+    base_url = f'https://esi.evetech.net/latest/characters/{character_id}/orders/history/?datasource=tranquility'
+    response = requests.get(base_url, headers=headers)
+    
+    if response.status_code != 200:
+        # Handle the error properly, maybe logging the error and returning a 500 status code
+        return jsonify({"error": "Error retrieving character order history"}), response.status_code
+
+    # Start with the initial page of results
+    char_order_history = response.json()
+    
+    # Check for the presence of the 'X-Pages' header
+    if 'X-Pages' in response.headers:
+        total_pages = int(response.headers['X-Pages'])
+        # Fetch additional pages if more than one page is present
+        for page in range(2, total_pages + 1):
+            paginated_response = requests.get(f"{base_url}&page={page}", headers=headers)
+            if paginated_response.status_code == 200:
+                # Extend the results with the current page's data
+                char_order_history.extend(paginated_response.json())
+            else:
+                # Handle the error properly, maybe logging the error and returning a 500 status code
+                return jsonify({"error": "Error retrieving character order history"}), paginated_response.status_code
+
+    return jsonify(char_order_history)
+
+@app.route('/get_character_wallet_journal/<character_id>')
+def get_character_wallet_journal(character_id):
+    auth_header = request.headers.get('Authorization')
+    
+    if not auth_header or 'bearer' not in auth_header.lower():
+        return jsonify({"message": "Invalid authorization header"}), 401
+
+    access_token = auth_header.split()[1]
+
+    headers = {'Authorization': f'Bearer {access_token}'}
+    base_url = f'https://esi.evetech.net/latest/characters/{character_id}/wallet/journal/?datasource=tranquility'
+
+    # Initial request to get the number of pages
+    response = requests.get(base_url + '&page=1', headers=headers)
+    if response.status_code != 200:
+        return jsonify({"error": "Error retrieving wallet journal"}), 500
+
+    total_pages = int(response.headers.get('X-Pages', 1))
+    all_data = response.json()
+
+    # Fetch remaining pages
+    for page in range(2, total_pages + 1):
+        response = requests.get(base_url + f'&page={page}', headers=headers)
+        if response.status_code == 200:
+            all_data.extend(response.json())
+        else:
+            # Handle individual page error if needed
+            pass
+
+    df = pd.DataFrame(all_data)
+    # Convert the DataFrame to JSON or process as needed
+    return jsonify(all_data)
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))

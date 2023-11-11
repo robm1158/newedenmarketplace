@@ -17,11 +17,7 @@
 .character-profile {
     display: flex;
     align-items: center;
-    /* background-color: #282c34; */
     padding: 20px;
-    /* border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-right: 20px; */
 }
 
 .character-profile img {
@@ -65,7 +61,6 @@
 .corp-name,
 .corp-member-count,
 .corp-ticker {
-    
     margin: 0;
     color: #00daff;
 }
@@ -83,6 +78,71 @@
     border-radius: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
+.tables-container {
+    display: flex;
+    justify-content: space-around; /* Adjust as needed */
+    text-align: center;
+}
+  
+.table-container {
+    flex: 1; /* Makes each table container take equal width */
+    margin: 0 10px; /* Add some spacing between tables */
+}
+  
+.buy-table-container, .sell-table-container, .MuiTableCell-root {
+    font-size: 10px !important;
+}
+
+.orders-header {
+    text-align: center;
+    color: #00daff;
+}
+
+.orders-history-container {
+    margin-top: -35px;
+    display: flex;
+    flex-direction: column;
+    background-color: #3e4450;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.inactive-overlay {
+    position: relative;
+}
+  
+.inactive-subscription {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10; /* Ensure it's above the blurred tables */
+    color: red
+}
+  
+.blurred {
+    filter: blur(5px);
+} 
+
+.history-chart-container {
+  display: flex;
+  justify-content: center; /* Centers the child containers on the main axis */
+  align-items: center; /* Aligns children to the top */
+  gap: 10px; /* Adds space between the containers */
+  
+}
+
+.donut-chart-container {
+    color: #00daff;
+    display: flex;
+    flex-direction: column; /* Stack the h2 and chart vertically */
+    /* justify-content: center; Center the content vertically */
+    align-items: center; /* Center the content horizontally */
+    
+  }
+  
 
 /* Responsive design adjustments if necessary */
 @media (max-width: 768px) {
