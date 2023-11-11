@@ -29,6 +29,11 @@ dbh = mdb.mongoData('eve-historical-daily-the-forge')
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+CLIENT_SECRET = os.environ.get("CLIENT_SECRET")
+CLIENT_ID = os.environ.get("CLIENT_ID")
+CALLBACK_URL = os.environ.get("CALLBACK_URL")
+TOKEN_URL = os.environ.get("TOKEN_URL")
+VERIFY_URL = os.environ.get("VERIFY_URL")
 SSO_META_DATA_URL = "https://login.eveonline.com/.well-known/oauth-authorization-server"
 JWK_ALGORITHM = "RS256"
 JWK_ISSUERS = ("login.eveonline.com", "https://login.eveonline.com")
