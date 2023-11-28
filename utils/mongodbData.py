@@ -24,7 +24,7 @@ class mongoData():
         """
         MONGO_USER = os.environ.get("MONGO_USER")
         MONGO_PASSWORD = os.environ.get("MONGO_PASSWORD")
-        self.uri = f"mongodb+srv://{'statik'}:{'Robm097956!'}@evestoragecluster.4jc1x.mongodb.net/?retryWrites=true&w=majority&maxPoolSize=200"
+        self.uri = f"mongodb+srv://{MONGO_USER}:{MONGO_PASSWORD}@evestoragecluster.4jc1x.mongodb.net/?retryWrites=true&w=majority&maxPoolSize=200"
         self.syncClient = MongoClient(self.uri)
         # If CLIENT is not instantiated, create it
         if mongoData.CLIENT is None:
