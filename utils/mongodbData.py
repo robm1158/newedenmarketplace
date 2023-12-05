@@ -4,7 +4,6 @@ import os
 sys.path.append('/home/statik/Documents/newedenmarketplace/utils')
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
-from ItemIdEnum import item
 import pandas as pd
 from json import loads, dumps
 from motor.motor_asyncio import AsyncIOMotorClient
